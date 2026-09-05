@@ -1,0 +1,17 @@
+{
+  "appId": "in.adgips.secf",
+  "appName": "Sec F IT-I",
+  "webDir": "deploy",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#07090C"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon",
+      "iconColor": "#E4322B"
+    }
+  }
+}

@@ -1,0 +1,3673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#070C1C" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#EEF1F7" media="(prefers-color-scheme: light)">
+<title>Sec F IT-I — Red Line</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+/* ============================================================
+   RED LINE — Sec F IT-I
+   A day is a line. Periods are stations.
+   ============================================================ */
+
+:root {
+  --bg:#070C1C; --plate:#0F1830; --plate-2:#17223F; --plate-3:#1D2A4C;
+  --rule:#26314F; --rule-soft:#1A2340; --rail:#2C3859;
+  --ink:#F3F6FC; --ink-2:#A6B3CE; --ink-3:#6E7C99;
+  --focus:#7FB2FF;
+  --l-pps:#FF4D40; --l-bee:#FFB92E; --l-phy:#4E96FF; --l-smt:#35D07F;
+  --l-em:#B18CFF;  --l-csl:#FF6BB0; --l-evs:#29D6CD; --l-eg:#FF9147; --l-pd:#93A3C0;
+  --ok:#35D07F; --warn:#FFB92E; --bad:#FF4D40;
+  --lift:0 1px 1px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.9);
+  --lift-lg:0 2px 4px rgba(0,0,0,.4), 0 20px 44px -22px rgba(0,0,0,1);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --line:var(--rail); --badge-ink:#08101F;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:#EEF1F7; --plate:#FFFFFF; --plate-2:#F5F7FC; --plate-3:#EAEFF8;
+    --rule:#D3DAE8; --rule-soft:#E4E9F2; --rail:#C3CCDE;
+    --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580;
+    --focus:#1B5BD7;
+    --l-pps:#D62B1F; --l-bee:#9C6500; --l-phy:#1560D8; --l-smt:#0E8C4E;
+    --l-em:#6B3FD4;  --l-csl:#C42B77; --l-evs:#0A857E; --l-eg:#BF5210; --l-pd:#5A6883;
+    --ok:#0E8C4E; --warn:#9C6500; --bad:#D62B1F; --badge-ink:#FFFFFF;
+    --lift:0 1px 1px rgba(10,16,36,.05), 0 10px 26px -18px rgba(10,16,36,.4);
+    --lift-lg:0 2px 4px rgba(10,16,36,.06), 0 20px 44px -22px rgba(10,16,36,.45);
+  }
+}
+:root[data-theme="light"] {
+  --bg:#EEF1F7; --plate:#FFFFFF; --plate-2:#F5F7FC; --plate-3:#EAEFF8;
+  --rule:#D3DAE8; --rule-soft:#E4E9F2; --rail:#C3CCDE;
+  --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580;
+  --focus:#1B5BD7;
+  --l-pps:#D62B1F; --l-bee:#9C6500; --l-phy:#1560D8; --l-smt:#0E8C4E;
+  --l-em:#6B3FD4;  --l-csl:#C42B77; --l-evs:#0A857E; --l-eg:#BF5210; --l-pd:#5A6883;
+  --ok:#0E8C4E; --warn:#9C6500; --bad:#D62B1F; --badge-ink:#FFFFFF;
+  --lift:0 1px 1px rgba(10,16,36,.05), 0 10px 26px -18px rgba(10,16,36,.4);
+  --lift-lg:0 2px 4px rgba(10,16,36,.06), 0 20px 44px -22px rgba(10,16,36,.45);
+  --badge-ink:#FFFFFF;
+}
+
+*,*::before,*::after { box-sizing:border-box; }
+/* author rules outrank the UA sheet, so [hidden] needs saying out loud */
+[hidden] { display:none !important; }
+html { -webkit-text-size-adjust:100%; }
+body {
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:Barlow, ui-sans-serif, system-ui, sans-serif;
+  font-size:15px; line-height:1.45; font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  overflow-wrap:break-word;
+}
+h1,h2,h3 { font-family:"Barlow Condensed", Barlow, sans-serif; margin:0; font-weight:700; letter-spacing:.005em; }
+button, input { font:inherit; color:inherit; }
+
+/* --- browser surfaces --- */
+::selection { background:var(--l-pps); color:#fff; }
+::-webkit-scrollbar { width:10px; height:10px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--rail); border-radius:6px; border:3px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background:var(--ink-3); }
+* { scrollbar-color:var(--rail) transparent; scrollbar-width:thin; }
+:focus-visible { outline:2px solid var(--focus); outline-offset:3px; border-radius:3px; }
+input { caret-color:var(--l-pps); }
+
+/* ============ shell ============ */
+.shell { max-width:1320px; margin:0 auto; }
+.page { padding:0 18px 128px; max-width:960px; margin:0 auto; }
+
+/* --- top strip --- */
+.top {
+  position:sticky; top:0; z-index:30;
+  display:flex; align-items:center; gap:12px;
+  padding:11px 18px; background:color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter:blur(14px) saturate(1.4); border-bottom:1px solid var(--rule-soft);
+}
+.mark { display:flex; align-items:center; gap:9px; min-width:0; }
+.mark .bullet { width:11px; height:11px; border-radius:50%; background:var(--l-pps); flex:none; }
+.mark .txt { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:16px;
+             letter-spacing:.055em; text-transform:uppercase; white-space:nowrap; }
+.mark .sub { font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3);
+             font-weight:600; white-space:nowrap; }
+.top .spacer { flex:1; }
+
+.seg {
+  display:flex; gap:1px; padding:2px; background:var(--plate); border:1px solid var(--rule);
+  border-radius:999px; flex:none;
+}
+.seg button {
+  border:0; background:transparent; color:var(--ink-2); cursor:pointer;
+  padding:5px 11px; border-radius:999px; font-size:12.5px; font-weight:600;
+  letter-spacing:.04em; transition:color .18s var(--ease), background .18s var(--ease);
+}
+.seg button:hover { color:var(--ink); }
+.seg button[aria-pressed="true"] { background:var(--ink); color:var(--bg); }
+.iconbtn {
+  width:34px; height:34px; flex:none; display:grid; place-items:center; cursor:pointer;
+  border:1px solid var(--rule); border-radius:999px; background:var(--plate); color:var(--ink-2);
+  transition:color .18s var(--ease), border-color .18s var(--ease);
+}
+.iconbtn:hover { color:var(--ink); border-color:var(--ink-3); }
+
+/* --- nav --- */
+.nav {
+  position:fixed; left:0; right:0; bottom:0; z-index:40;
+  display:grid; grid-template-columns:repeat(6,1fr);
+  background:color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter:blur(18px) saturate(1.4);
+  border-top:1px solid var(--rule);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.nav a {
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:9px 1px 8px; text-decoration:none; color:var(--ink-3);
+  font-size:9px; font-weight:700; letter-spacing:.01em; text-transform:uppercase;
+  position:relative; transition:color .2s var(--ease);
+  -webkit-tap-highlight-color:transparent;
+}
+.nav a svg { width:21px; height:21px; }
+.nav a::after {
+  content:""; position:absolute; top:0; left:50%; transform:translateX(-50%) scaleX(0);
+  width:22px; height:3px; border-radius:0 0 3px 3px; background:var(--l-pps);
+  transition:transform .32s var(--ease);
+}
+.nav a[aria-current="page"] { color:var(--ink); }
+.nav a[aria-current="page"]::after { transform:translateX(-50%) scaleX(1); }
+
+/* ============ shared: line ink ============ */
+[data-line="pps"] { --line:var(--l-pps); } [data-line="bee"] { --line:var(--l-bee); }
+[data-line="phy"] { --line:var(--l-phy); } [data-line="smt"] { --line:var(--l-smt); }
+[data-line="em"]  { --line:var(--l-em); }  [data-line="csl"] { --line:var(--l-csl); }
+[data-line="evs"] { --line:var(--l-evs); } [data-line="eg"]  { --line:var(--l-eg); }
+[data-line="pd"]  { --line:var(--l-pd); }
+[data-line=""] { --line:var(--ink-2); }
+
+.badge {
+  display:inline-flex; align-items:center; gap:6px; flex:none;
+  padding:3px 9px 3px; border-radius:3px; background:var(--line, var(--rail));
+  color:var(--badge-ink); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  font-family:"Barlow Condensed",sans-serif; line-height:1.5;
+}
+.badge.ghost {
+  background:transparent; color:var(--line); box-shadow:inset 0 0 0 1px var(--line);
+}
+
+/* ============ status plate ============ */
+.plate {
+  position:relative; overflow:hidden;
+  margin:16px 0 4px; padding:18px 18px 16px;
+  background:var(--plate); border:1px solid var(--rule); border-radius:14px;
+  box-shadow:var(--lift);
+}
+.plate-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:9px; }
+.plate-when { font-size:13px; color:var(--ink-2); font-weight:500; }
+.plate-when b { color:var(--ink); font-weight:600; }
+.plate-hi {
+  font-size:13.5px; font-weight:600; color:var(--ink-2); margin-bottom:6px;
+  letter-spacing:.03em;
+}
+.plate h1 {
+  font-size:clamp(30px, 8.4vw, 44px); line-height:1.02; letter-spacing:-.012em;
+  text-wrap:balance; margin-bottom:6px;
+}
+.plate .who { font-size:14.5px; color:var(--ink-2); }
+.plate .who b { color:var(--ink); font-weight:600; }
+
+.gauge { margin-top:15px; }
+.gauge .track {
+  height:4px; border-radius:2px; background:var(--rule); overflow:hidden;
+}
+.gauge .track i {
+  display:block; height:100%; background:var(--line, var(--rail));
+  transform-origin:left; transition:width 1s linear;
+}
+.gauge .cap {
+  display:flex; justify-content:space-between; gap:12px;
+  margin-top:7px; font-size:12px; color:var(--ink-3); font-weight:500;
+  letter-spacing:.05em; text-transform:uppercase;
+}
+.gauge .cap b { color:var(--ink); font-weight:700; font-size:13.5px; }
+
+.upnext {
+  display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+  margin-top:14px; padding:12px 14px; cursor:pointer;
+  background:var(--plate-2); border:1px solid var(--rule-soft); border-radius:10px;
+  transition:border-color .2s var(--ease), transform .2s var(--ease);
+}
+.upnext:hover { border-color:var(--rail); transform:translateY(-1px); }
+.upnext .tick { width:11px; height:11px; border-radius:50%; flex:none;
+                box-shadow:inset 0 0 0 3px var(--line, var(--rail)); background:var(--plate); }
+.upnext .m { min-width:0; flex:1; }
+.upnext .lbl { font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:700; }
+.upnext .val { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:19px; line-height:1.15; color:var(--line); }
+.upnext .fac { font-size:12.5px; color:var(--ink-2); }
+.upnext .t { font-size:15px; color:var(--ink); font-weight:700; flex:none; }
+
+/* ============ vertical rail (Today / mobile week) ============ */
+.railwrap { position:relative; margin-top:22px; padding-left:44px; }
+.railwrap::before {
+  content:""; position:absolute; left:20px; top:8px; bottom:8px; width:2px;
+  background:var(--rail); border-radius:1px;
+}
+.stop { position:relative; display:flex; flex-direction:column; }
+.stop .node {
+  position:absolute; left:-31px; top:var(--nodetop, 14px); width:16px; height:16px;
+  border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 3.5px var(--line, var(--rail));
+  z-index:2;
+}
+.stop .span {
+  position:absolute; left:-25px; top:var(--nodetop, 14px); width:4px; bottom:10px;
+  border-radius:2px; background:var(--line, var(--rail)); opacity:.9; z-index:1;
+}
+.stop.past .node, .stop.past .span { opacity:.3; }
+.stop.free .node { box-shadow:inset 0 0 0 2px var(--rail); background:var(--bg); width:10px; height:10px; left:-28px; }
+.stop.lunch .node { width:20px; height:20px; left:-33px; box-shadow:inset 0 0 0 3px var(--ink-3); }
+
+.card {
+  width:100%; text-align:left; flex:1; cursor:pointer;
+  display:flex; flex-direction:column; justify-content:center;
+  background:var(--plate); border:1px solid var(--rule); border-radius:12px;
+  padding:13px 15px; transition:border-color .22s var(--ease), transform .22s var(--ease), box-shadow .22s var(--ease);
+}
+.card:hover { border-color:var(--rail); transform:translateY(-2px); box-shadow:var(--lift); }
+.card .hd { display:flex; align-items:baseline; gap:9px; margin-bottom:3px; flex-wrap:wrap; }
+.card .t { font-size:12.5px; font-weight:600; color:var(--ink-3); letter-spacing:.03em; flex:none; }
+.card .name {
+  font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:22px; line-height:1.1;
+  color:var(--line, var(--ink)); letter-spacing:.004em;
+}
+.card .meta { font-size:13.5px; color:var(--ink-2); }
+.card .meta b { color:var(--ink); font-weight:600; }
+.stop.live .card { border-color:var(--line); box-shadow:0 0 0 1px var(--line), var(--lift); }
+.stop.past .card { opacity:.78; }
+
+.gap {
+  padding:0 2px; min-height:inherit; display:flex; align-items:center;
+  font-size:12.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:600;
+}
+.gap::before {
+  content:""; position:absolute; left:-24px; top:12px; bottom:12px;
+  border-left:2px dashed var(--rail);
+}
+.stop.lunch .gap { color:var(--ink-2); }
+
+/* the branch: two batches, two rails */
+.branch { display:grid; gap:7px; }
+.branch .arm { display:flex; align-items:center; gap:10px; }
+.branch .arm .k {
+  font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--ink-3);
+  width:20px; flex:none;
+}
+.branch .arm .bar { width:4px; align-self:stretch; min-height:22px; border-radius:2px; background:var(--line); flex:none; }
+.branch .arm .n { font-family:"Barlow Condensed",sans-serif; font-weight:600; font-size:17px; color:var(--line); }
+.branch .arm .f { font-size:12.5px; color:var(--ink-2); }
+
+/* --- the live marker --- */
+.marker { position:absolute; left:14px; width:14px; height:14px; z-index:5; pointer-events:none;
+          transition:top 1.2s var(--ease); }
+.marker i {
+  position:absolute; inset:0; border-radius:50%; background:var(--ink);
+  box-shadow:0 0 0 3px var(--bg), 0 0 0 5px var(--line, var(--l-pps));
+}
+.marker::after {
+  content:""; position:absolute; inset:-6px; border-radius:50%;
+  background:var(--line, var(--l-pps)); opacity:.28; animation:ping 2.6s var(--ease) infinite;
+}
+@keyframes ping { 0%{transform:scale(.6);opacity:.4} 70%{transform:scale(2.1);opacity:0} 100%{opacity:0} }
+
+/* --- travelled rail --- */
+.travelled {
+  position:absolute; left:20px; top:8px; width:2px; border-radius:1px;
+  background:var(--ink-2); transition:height 1.2s var(--ease); z-index:1;
+}
+
+/* ============ section headings ============ */
+h2 {
+  font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+  font-weight:700; font-family:Barlow, sans-serif;
+  margin:38px 0 13px; display:flex; align-items:center; gap:12px;
+}
+h2::after { content:""; flex:1; height:1px; background:var(--rule-soft); }
+.h2row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:38px 0 13px; }
+.h2row h2 { margin:0; flex:1; }
+.link {
+  background:none; border:0; padding:0; cursor:pointer; color:var(--ink-2);
+  font-size:12.5px; font-weight:600; letter-spacing:.03em;
+  text-decoration:underline; text-decoration-color:var(--rail); text-underline-offset:4px;
+  transition:color .18s var(--ease), text-decoration-color .18s var(--ease);
+}
+.link:hover { color:var(--ink); text-decoration-color:currentColor; }
+
+/* ============ week: network diagram (wide) ============ */
+.net { display:none; }
+.weekday { display:block; }
+@media (min-width:900px) { .net { display:block; } .weekday { display:none; } }
+.netscroll { overflow-x:auto; padding-bottom:6px; }
+.nethead {
+  display:flex; gap:0; padding-left:126px; margin-bottom:8px; min-width:820px;
+}
+.nethead span {
+  font-size:11.5px; font-weight:600; color:var(--ink-3); letter-spacing:.02em;
+  padding-left:8px; border-left:1px solid var(--rule-soft);
+}
+.netrow { display:flex; align-items:stretch; min-width:820px; margin-bottom:2px; }
+.netrow .day {
+  width:126px; flex:none; padding:16px 14px 16px 0;
+}
+.netrow .day .d { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:19px; }
+.netrow .day .c { font-size:11.5px; color:var(--ink-3); font-weight:600; letter-spacing:.04em; }
+.netrow.today .day .d { color:var(--l-pps); }
+.netrow .trk { position:relative; flex:1; display:flex; padding-top:22px; padding-bottom:14px; }
+.netrow .trk::before {
+  content:""; position:absolute; left:0; right:0; top:8px; height:2px; background:var(--rail);
+}
+.netrow.today .trk { background:color-mix(in srgb, var(--l-pps) 5%, transparent); border-radius:10px; }
+.slot { position:relative; min-width:0; padding:0 3px; }
+.slot .seg-rail {
+  position:absolute; left:3px; right:3px; top:6px; height:6px; border-radius:3px;
+  background:var(--line, var(--rail));
+}
+.slot.empty .seg-rail { background:none; border-top:2px dashed var(--rail); height:0; top:8px; }
+.slot.lunchslot .seg-rail { background:none; }
+.slot .stationdot {
+  position:absolute; left:0; top:3px; width:12px; height:12px; border-radius:50%;
+  background:var(--bg); box-shadow:inset 0 0 0 3px var(--line, var(--rail)); z-index:2;
+}
+.slot.lunchslot .stationdot { left:50%; margin-left:-8px; width:16px; height:16px; box-shadow:inset 0 0 0 3px var(--ink-3); }
+.nc {
+  width:100%; height:100%; min-height:66px; text-align:left; cursor:pointer; display:block;
+  background:var(--plate); border:1px solid var(--rule); border-radius:9px; padding:9px 10px;
+  transition:border-color .2s var(--ease), transform .2s var(--ease), box-shadow .2s var(--ease);
+}
+.nc:hover { border-color:var(--rail); transform:translateY(-2px); box-shadow:var(--lift); }
+.nc.live { border-color:var(--line); box-shadow:0 0 0 1px var(--line), var(--lift); }
+.nc .n { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:17px; line-height:1.12; color:var(--line, var(--ink)); }
+.nc .f { font-size:12px; color:var(--ink-2); line-height:1.25; margin-top:1px; }
+.nc .b { font-size:10.5px; color:var(--ink-3); font-weight:600; letter-spacing:.07em; text-transform:uppercase; margin-top:3px; }
+.slot.empty .void {
+  min-height:66px; display:flex; align-items:center; justify-content:center;
+  font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); opacity:.65; font-weight:600;
+}
+.slot.lunchslot .void { writing-mode:vertical-rl; text-orientation:mixed; margin:0 auto;
+  font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); font-weight:600; }
+
+/* mobile week */
+.chips { display:flex; gap:7px; overflow-x:auto; padding:2px 0 14px; margin:0 -18px; padding-left:18px; padding-right:18px; }
+.chips button {
+  flex:none; cursor:pointer; padding:8px 15px; border-radius:999px;
+  background:var(--plate); border:1px solid var(--rule); color:var(--ink-2);
+  font-size:13.5px; font-weight:600; letter-spacing:.03em;
+  transition:color .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
+}
+.chips button[aria-pressed="true"] { background:var(--ink); border-color:var(--ink); color:var(--bg); }
+
+/* ============ line key ============ */
+.key { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; }
+@media (min-width:700px) { .key { grid-template-columns:1fr 1fr; } }
+.keyrow { display:flex; gap:13px; align-items:flex-start; padding:13px 15px; background:var(--plate); }
+.keyrow .bar { width:5px; align-self:stretch; min-height:34px; border-radius:3px; background:var(--line); flex:none; }
+.keyrow .m { min-width:0; flex:1; }
+.keyrow .n { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:18px; color:var(--line); line-height:1.15; }
+.keyrow .full { font-size:13.5px; color:var(--ink); }
+.keyrow .f { font-size:12.5px; color:var(--ink-2); }
+.keyrow .c { font-size:11.5px; color:var(--ink-3); font-weight:500; letter-spacing:.03em; margin-top:2px; }
+
+/* ============ attendance ============ */
+.bar-tools { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:16px 0 6px; }
+input[type="date"] {
+  padding:9px 12px; border-radius:9px; background:var(--plate);
+  border:1px solid var(--rule); font-size:14px; font-weight:600;
+  transition:border-color .2s var(--ease);
+}
+input[type="date"]:hover { border-color:var(--rail); }
+::-webkit-calendar-picker-indicator { filter:invert(.6) sepia(1) saturate(0) hue-rotate(180deg); cursor:pointer; }
+:root[data-theme="light"] ::-webkit-calendar-picker-indicator,
+:root:not([data-theme="dark"]) ::-webkit-calendar-picker-indicator { filter:none; opacity:.5; }
+.daynote { font-size:13.5px; color:var(--ink-2); font-weight:500; }
+.daynote b { color:var(--ink); font-weight:600; }
+
+.arow {
+  display:flex; gap:13px; align-items:center; flex-wrap:wrap; flex:1;
+  padding:13px 15px; background:var(--plate); border:1px solid var(--rule); border-radius:12px;
+}
+.arow .m { flex:1; min-width:150px; }
+.arow .t { font-size:12px; color:var(--ink-3); font-weight:600; letter-spacing:.03em; }
+.arow .n { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:19px; color:var(--line); line-height:1.15; }
+.arow .f { font-size:12.5px; color:var(--ink-2); }
+
+.marks { display:flex; gap:1px; padding:2px; background:var(--plate-2); border:1px solid var(--rule); border-radius:999px; flex:none; }
+.marks button {
+  display:flex; align-items:center; gap:6px; cursor:pointer; border:0; background:transparent;
+  color:var(--ink-2); padding:6px 12px; border-radius:999px; font-size:12.5px; font-weight:600;
+  transition:background .2s var(--ease), color .2s var(--ease);
+}
+.marks button:hover { color:var(--ink); }
+#todayRail .marks { margin-top:8px; }
+#todayRail .marks button { flex:1; justify-content:center; padding:6px 8px; font-size:12px; }
+.marks .glyph { width:15px; height:15px; flex:none; display:block; }
+.marks button[aria-pressed="true"][data-m="P"] { background:var(--ok); color:var(--badge-ink); }
+.marks button[aria-pressed="true"][data-m="A"] { background:var(--bad); color:#fff; }
+.marks button[aria-pressed="true"][data-m="C"] { background:var(--ink-3); color:var(--bg); }
+
+.preview {
+  font-size:12px; font-weight:600; color:var(--ink-3); letter-spacing:.04em;
+  min-height:16px; flex-basis:100%; opacity:0; transition:opacity .2s var(--ease);
+}
+.preview.on { opacity:1; }
+.preview b { color:var(--ink); }
+.preview .up { color:var(--ok); } .preview .down { color:var(--bad); }
+
+/* --- service board --- */
+.summary {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:18px 22px; padding:16px 18px; margin-bottom:14px;
+  background:var(--plate); border:1px solid var(--rule); border-radius:12px;
+}
+.summary div { font-size:12px; color:var(--ink-3); font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
+.summary b { display:block; font-family:"Barlow Condensed",sans-serif; font-weight:700;
+             font-size:30px; color:var(--ink); letter-spacing:-.01em; line-height:1.05; margin-bottom:1px; }
+.summary .big b { font-size:40px; }
+@media (min-width:560px) { .summary { display:flex; gap:30px; flex-wrap:wrap; } }
+.summary .ok b { color:var(--ok); } .summary .bad b { color:var(--bad); }
+
+.board { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; }
+.srow { display:grid; grid-template-columns:5px 1fr auto; gap:13px; align-items:center; padding:14px 15px; background:var(--plate); }
+.srow .bar { width:5px; align-self:stretch; min-height:38px; border-radius:3px; background:var(--line); }
+.srow .m { min-width:0; }
+.srow .n { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:18px; color:var(--line); line-height:1.15; }
+.srow .st { font-size:12.5px; font-weight:600; letter-spacing:.03em; }
+.srow .st.ok { color:var(--ok); } .srow .st.warn { color:var(--warn); } .srow .st.bad { color:var(--bad); }
+.srow .adv { font-size:12.5px; color:var(--ink-2); }
+.srow .r { text-align:right; }
+.srow .pct { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:27px; line-height:1; letter-spacing:-.01em; }
+.srow.ok .pct { color:var(--ok); } .srow.warn .pct { color:var(--warn); } .srow.bad .pct { color:var(--bad); }
+.srow .held { font-size:11.5px; color:var(--ink-3); font-weight:600; margin-top:2px; }
+.srow .track { position:relative; height:4px; border-radius:2px; background:var(--rule); margin-top:7px; overflow:visible; }
+.srow .track i { display:block; height:100%; border-radius:2px; background:var(--line); }
+.srow .track u { position:absolute; top:-3px; left:75%; width:1px; height:10px; background:var(--ink-3); }
+
+.syncnote { font-size:12.5px; font-weight:600; color:var(--ink-3); display:flex; align-items:center; gap:7px; }
+.syncnote i { width:7px; height:7px; border-radius:50%; background:var(--ink-3); flex:none; }
+.syncnote.ok i { background:var(--ok); }
+.syncnote.bad { color:var(--bad); }
+.syncnote.bad i { background:var(--bad); }
+
+.empty {
+  padding:26px 20px; text-align:center; border:1px dashed var(--rule); border-radius:12px;
+  color:var(--ink-2); font-size:14px;
+}
+.empty b { display:block; font-family:"Barlow Condensed",sans-serif; font-size:20px; color:var(--ink); margin-bottom:4px; font-weight:700; }
+
+/* --- the 75% engine: budget, leave, catch-up --- */
+.cu { display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:13px 15px; margin:16px 0 0;
+      background:var(--plate); border:1px solid var(--warn); border-radius:12px; font-size:13.5px; color:var(--ink-2); }
+.cu b { color:var(--ink); font-weight:600; }
+.cu .link { margin-left:auto; flex:none; }
+.lv { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:0 0 12px; }
+.lv > span { font-size:13px; color:var(--ink-3); font-weight:600; }
+.srow .pct.ok { color:var(--ok); } .srow .pct.bad { color:var(--bad); }
+.summary .warn b { color:var(--warn); }
+.cud { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft);
+       border-radius:12px; overflow:hidden; max-height:46vh; overflow-y:auto; margin-top:14px; }
+.cud .d { display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:10px 13px; background:var(--plate); }
+.cud .d.done { opacity:.5; }
+.cud .w { flex:1; min-width:118px; font-size:12px; color:var(--ink-3); font-weight:600; }
+.cud .w b { display:block; font-family:"Barlow Condensed",sans-serif; font-size:17px;
+            color:var(--ink); font-weight:700; letter-spacing:.005em; }
+.cud .marks button { padding:5px 9px; font-size:12px; }
+.cud .w i { display:block; font-style:normal; color:var(--warn); font-weight:600; }
+
+/* ============ holidays ============ */
+.hkey { display:flex; gap:20px; flex-wrap:wrap; align-items:center; margin:2px 0 18px; font-size:13px; color:var(--ink-2); }
+.hkey span { display:flex; align-items:center; gap:8px; }
+.hkey i { width:12px; height:12px; border-radius:50%; background:var(--l-pps); flex:none; }
+.hkey i.res { width:12px; height:12px; background:transparent; box-shadow:inset 0 0 0 2px var(--ink-3); }
+.hkey .next { color:var(--ink); font-weight:600; }
+
+.months { display:grid; grid-template-columns:repeat(auto-fill, minmax(152px,1fr)); gap:10px; }
+.mo { padding:12px 11px 12px; background:var(--plate); border:1px solid var(--rule); border-radius:12px; }
+.mo h3 { font-size:14px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2); margin-bottom:9px; }
+.mgrid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+.mgrid span, .mgrid button {
+  font-size:12px; line-height:1; border:0; background:none; padding:0;
+  color:var(--ink-2); font-weight:500;
+  aspect-ratio:1; display:grid; place-items:center; border-radius:50%;
+}
+.mgrid .wd { color:var(--ink-3); font-size:10px; letter-spacing:.06em; font-weight:700; aspect-ratio:auto; padding-bottom:4px; }
+.mgrid .sun { color:var(--ink-3); }
+.mgrid button { cursor:pointer; position:relative; transition:background .18s var(--ease); }
+.mgrid button:hover { background:var(--plate-3); }
+.mgrid button.gaz { background:var(--l-pps); color:#fff; font-weight:700; }
+.mgrid button.gaz:hover { background:var(--l-pps); filter:brightness(1.12); }
+.mgrid button.res::after {
+  content:""; position:absolute; left:50%; bottom:1px; width:4px; height:4px; margin-left:-2px;
+  border-radius:50%; background:var(--ink-3);
+}
+.mgrid button.gaz.res::after { background:#fff; }
+.mgrid .today, .mgrid button.today { box-shadow:inset 0 0 0 1.5px var(--focus); }
+
+.hlist { display:grid; grid-template-columns:repeat(auto-fill, minmax(272px,1fr)); gap:1px;
+         background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; margin-top:8px; }
+.hrow { display:flex; gap:13px; align-items:baseline; padding:11px 14px; background:var(--plate); }
+.hrow .d { font-size:12.5px; color:var(--ink-3); width:96px; flex:none; font-weight:600; }
+.hrow .n { font-size:13.5px; }
+.hrow.res .n { color:var(--ink-2); }
+.hrow.res .d::before { content:"○ "; }
+.hrow.past { opacity:.45; }
+
+/* --- contact links --- */
+.clinks { display:grid; gap:8px; margin-top:16px; }
+.clink {
+  display:flex; align-items:center; gap:12px; padding:11px 13px; text-decoration:none;
+  border:1px solid var(--rule); border-radius:11px; background:var(--plate-2); color:var(--ink);
+  transition:border-color .2s var(--ease), background .2s var(--ease), transform .2s var(--ease);
+}
+.clink:hover { border-color:var(--rail); background:var(--plate-3); transform:translateX(2px); }
+.clink > svg:first-child { width:19px; height:19px; flex:none; color:var(--ink-2); }
+.clink .m { min-width:0; flex:1; }
+.clink .l { font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3); }
+.clink .v { font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.clink .go { width:15px; height:15px; flex:none; color:var(--ink-3); }
+.clink[data-k="linkedin"]:hover > svg:first-child { color:#0A66C2; }
+.clink[data-k="instagram"]:hover > svg:first-child { color:#E1306C; }
+.clink[data-k="github"]:hover > svg:first-child { color:var(--ink); }
+.clink[data-k="email"]:hover > svg:first-child,
+.clink[data-k="mobile"]:hover > svg:first-child { color:var(--l-phy); }
+
+/* ============ dialog ============ */
+dialog {
+  border:0; border-radius:16px; background:var(--plate); color:var(--ink);
+  padding:0; max-width:440px; width:calc(100% - 28px); box-shadow:var(--lift-lg);
+  margin:auto; overflow:hidden;
+}
+dialog::backdrop { background:color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter:blur(4px); }
+dialog[open] { animation:dlg .34s var(--ease); }
+@keyframes dlg { from { opacity:0; transform:translateY(14px) scale(.98); } }
+.d-in { padding:20px 22px 20px; position:relative; }
+.d-top { display:flex; align-items:center; gap:9px; margin-bottom:10px; flex-wrap:wrap; }
+.d-name { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:29px; line-height:1.05;
+          color:var(--line, var(--ink)); letter-spacing:-.005em; margin-bottom:2px; text-wrap:balance; }
+.d-full { font-size:14.5px; color:var(--ink-2); }
+.d-rows { margin-top:16px; }
+.d-row { display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-top:1px solid var(--rule-soft); font-size:14px; }
+.d-row span:first-child { color:var(--ink-3); font-size:11.5px; letter-spacing:.09em; text-transform:uppercase;
+                          font-weight:700; padding-top:3px; flex:none; }
+.d-row span:last-child { text-align:right; font-weight:500; }
+.d-act { display:flex; gap:8px; margin-top:18px; }
+.btn {
+  flex:1; padding:11px; border:1px solid var(--rule); border-radius:9px; cursor:pointer;
+  background:var(--plate-2); color:var(--ink); font-weight:600; font-size:14px;
+  transition:border-color .2s var(--ease), background .2s var(--ease);
+}
+.btn:hover { border-color:var(--rail); background:var(--plate-3); }
+.btn.pri { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+.btn.pri:hover { filter:brightness(.92); background:var(--ink); }
+textarea {
+  width:100%; height:170px; margin-top:14px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size:11px; line-height:1.5; padding:11px; border:1px solid var(--rule); border-radius:9px;
+  background:var(--plate-2); color:var(--ink-2); resize:vertical;
+}
+
+/* ============ desktop rail nav ============ */
+@media (min-width:980px) {
+  .nav {
+    top:0; right:auto; bottom:0; width:212px; grid-template-columns:1fr;
+    grid-auto-rows:max-content; align-content:start; gap:2px;
+    border-top:0; border-right:1px solid var(--rule); padding:78px 14px 0;
+  }
+  .nav a {
+    flex-direction:row; justify-content:flex-start; gap:12px; padding:11px 14px;
+    border-radius:9px; font-size:12.5px;
+  }
+  .nav a::after { top:50%; left:0; transform:translateY(-50%) scaleY(0); width:3px; height:22px; border-radius:0 3px 3px 0; }
+  .nav a[aria-current="page"] { background:var(--plate); }
+  .nav a[aria-current="page"]::after { transform:translateY(-50%) scaleY(1); }
+  .top { padding-left:226px; }
+  .page { padding:0 30px 70px; margin-left:212px; max-width:1000px; }
+  .chips { margin:0; padding-left:0; padding-right:0; }
+}
+
+section { scroll-margin-top:96px; }
+
+/* ============ travelcard (first run) ============ */
+.gate { position:fixed; inset:0; z-index:100; background:var(--bg); overflow:auto;
+        display:grid; place-items:center; padding:28px 20px 40px; }
+.gate-in { width:100%; max-width:392px; }
+.gate h1 { font-size:31px; line-height:1.06; margin-bottom:7px; }
+.gate .sub { font-size:14.5px; color:var(--ink-2); margin-bottom:20px; }
+.tcard {
+  position:relative; aspect-ratio:1.586; border-radius:15px; background:var(--plate-2);
+  border:1px solid var(--rule); padding:17px 18px 20px; overflow:hidden;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+.tcard .brand { display:flex; align-items:center; gap:8px; }
+.tcard .brand i { width:10px; height:10px; border-radius:50%; background:var(--l-pps); flex:none; }
+.tcard .brand span { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:14px;
+                     letter-spacing:.1em; text-transform:uppercase; }
+.tcard .brand em { font-style:normal; font-size:11.5px; color:var(--ink-3); font-weight:600; letter-spacing:.07em; }
+.tcard .nm { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:28px;
+             line-height:1.04; letter-spacing:-.005em; text-wrap:balance; }
+.tcard .nm.ph { color:var(--ink-3); }
+.tcard .un { font-size:13px; color:var(--ink-2); letter-spacing:.07em; margin-top:2px; }
+.tcard .stripes { position:absolute; left:0; right:0; bottom:0; display:flex; height:5px; }
+.tcard .stripes i { flex:1; }
+
+.field { margin-top:15px; }
+.field label { display:block; font-size:11px; font-weight:700; letter-spacing:.11em;
+               text-transform:uppercase; color:var(--ink-3); margin-bottom:6px; }
+.field input { width:100%; padding:11px 13px; border-radius:10px; background:var(--plate);
+               border:1px solid var(--rule); font-size:15px; font-weight:500;
+               transition:border-color .2s var(--ease); }
+.field input:hover { border-color:var(--rail); }
+.field .hint { font-size:12.5px; color:var(--ink-3); margin-top:6px; }
+.field .hint.err { color:var(--bad); font-weight:600; }
+.go { width:100%; margin-top:20px; padding:13px; border-radius:10px; border:0; cursor:pointer;
+      background:var(--ink); color:var(--bg); font-family:"Barlow Condensed",sans-serif;
+      font-weight:700; font-size:16px; letter-spacing:.07em; text-transform:uppercase;
+      transition:opacity .2s var(--ease); }
+.go[disabled] { opacity:.35; cursor:not-allowed; }
+.gate .fine { font-size:12px; color:var(--ink-3); margin-top:16px; line-height:1.5; }
+.authlinks { display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:16px; }
+.pcount { font-size:11.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+          color:var(--ink-3); margin:14px 0 8px; }
+.picker { max-height:46vh; overflow:auto; display:grid; gap:1px; background:var(--rule-soft);
+          border:1px solid var(--rule-soft); border-radius:12px; }
+.pname { display:flex; align-items:center; gap:12px; width:100%; text-align:left; cursor:pointer;
+         border:0; background:var(--plate); padding:12px 14px; transition:background .15s var(--ease); }
+.pname:hover { background:var(--plate-2); }
+.pname .sn { font-size:12px; font-weight:600; color:var(--ink-3); width:22px; flex:none; }
+.pname .n { flex:1; font-size:15px; font-weight:600; }
+.pname .bt { font-size:10.5px; font-weight:700; letter-spacing:.1em; color:var(--ink-3); }
+.picker .none { padding:20px; text-align:center; color:var(--ink-3); font-size:13.5px; background:var(--plate); }
+.picker.full { max-height:none; }
+.dirfilter { display:inline-flex; margin:2px 0 14px; }
+
+/* every student is a station: filled once they are on the network */
+.dgroup { position:sticky; top:53px; z-index:5; display:flex; align-items:baseline; gap:10px;
+          padding:9px 2px 7px; background:var(--bg); }
+.dgroup b { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:16px;
+            letter-spacing:.06em; text-transform:uppercase; }
+.dgroup span { font-size:11.5px; font-weight:600; letter-spacing:.08em;
+               text-transform:uppercase; color:var(--ink-3); }
+.dgroup::after { content:""; flex:1; height:1px; background:var(--rule-soft); }
+
+.dlist { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft);
+         border-radius:12px; overflow:hidden; margin-bottom:20px; }
+.drow { display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+        border:0; background:var(--plate); padding:10px 13px; }
+button.drow { cursor:pointer; transition:background .15s var(--ease); }
+button.drow:hover { background:var(--plate-2); }
+.dot2 { width:34px; height:34px; flex:none; border-radius:50%; display:grid; place-items:center;
+        font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:13.5px;
+        letter-spacing:.02em; background:var(--line); color:var(--badge-ink); }
+.drow.ghost .dot2 { background:transparent; box-shadow:inset 0 0 0 2px var(--rule); color:var(--ink-3); }
+.dwho { flex:1; min-width:0; }
+.dwho .n2 { font-size:15px; font-weight:600; line-height:1.25; }
+.drow.ghost .dwho .n2 { color:var(--ink-2); font-weight:500; }
+.dwho .u2 { font-size:12.5px; color:var(--ink-3); }
+.dicons { display:flex; gap:7px; flex:none; color:var(--ink-3); }
+.dicons svg { width:15px; height:15px; }
+.dnone { font-size:11.5px; color:var(--ink-3); letter-spacing:.06em; text-transform:uppercase; font-weight:600; }
+.crtag { font-size:9.5px; font-weight:700; letter-spacing:.11em; color:var(--l-pps); flex:none; }
+.d-idrow { display:flex; align-items:center; gap:13px; }
+.d-idrow .dot2 { width:44px; height:44px; font-size:17px; }
+.d-idrow .d-name { font-size:23px; }
+.dempty { padding:26px 20px; text-align:center; color:var(--ink-3); font-size:13.5px;
+          border:1px dashed var(--rule); border-radius:12px; }
+
+.planbar { padding:14px 16px; margin-bottom:14px; background:var(--plate);
+           border:1px solid var(--rule); border-radius:12px; }
+.psum { font-size:14px; color:var(--ink-2); }
+.psum b { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:30px;
+          color:var(--ink); letter-spacing:-.01em; margin-right:6px; }
+.pdelta { font-size:13px; color:var(--ink-2); margin-top:5px; }
+.pdelta.bad { color:var(--bad); font-weight:600; }
+.planbar .link { margin-top:9px; }
+.skipmark { align-self:flex-start; margin-top:5px; font-size:10.5px; font-weight:700;
+            letter-spacing:.09em; text-transform:uppercase; color:var(--bad); }
+.stop.suspended .card { opacity:.55; }
+.stop.suspended .card .name { text-decoration:line-through; }
+.stop.suspended .node { box-shadow:inset 0 0 0 2px var(--ink-3) !important; }
+
+.d-note { font-size:13px; color:var(--ink-2); margin-top:12px; line-height:1.45; }
+.d-row a { color:var(--l-phy); text-decoration:underline; text-underline-offset:3px; }
+.lbrow { cursor:pointer; transition:background .15s var(--ease); }
+.lbrow:hover { background:var(--plate-2); }
+dialog .field { margin-top:11px; }
+dialog .field input { font-size:14px; padding:9px 11px; }
+dialog .btn { margin-top:8px; }
+
+/* ============ ranks ============ */
+.lb { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft);
+      border-radius:12px; overflow:hidden; }
+.lbrow { display:grid; grid-template-columns:34px 1fr auto; gap:14px; align-items:center;
+         padding:12px 15px; background:var(--plate); }
+.lbrow .rk { display:grid; place-items:center; width:30px; height:30px; border-radius:50%;
+             font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:15px;
+             color:var(--ink-2); box-shadow:inset 0 0 0 2px var(--rule); }
+.lbrow.podium .rk { background:var(--ink); color:var(--bg); box-shadow:none; }
+.lbrow.me { background:var(--plate-2); }
+.lbrow.me .rk { background:var(--l-pps); color:#fff; box-shadow:none; }
+.lbrow .nm { font-size:15px; font-weight:600; }
+.lbrow .un { font-size:12.5px; color:var(--ink-3); }
+.lbrow .tag { font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase;
+              color:var(--ink-3); }
+.lbrow.me .tag { color:var(--l-pps); }
+.lbstate { display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink-2); margin-bottom:14px; }
+.lbstate i { width:9px; height:9px; border-radius:50%; background:var(--ink-3); flex:none; }
+.lbstate.live i { background:var(--ok); }
+.lbstate.err i { background:var(--bad); }
+.setup { font-size:13px; color:var(--ink-2); line-height:1.6; }
+.setup code { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px;
+              background:var(--plate-2); padding:1px 5px; border-radius:4px; color:var(--ink); }
+.setup ol { margin:8px 0 0; padding-left:20px; }
+.setup li { margin-bottom:5px; }
+
+/* ============ user pill ============ */
+.user-pill {
+  position:relative; flex:none; z-index:41;
+  display:flex; align-items:center; gap:8px; cursor:pointer;
+  padding:3px 12px 3px 3px; border-radius:999px; border:1px solid var(--rule);
+  background:var(--plate);
+  transition:border-color .2s var(--ease), box-shadow .2s var(--ease);
+  -webkit-tap-highlight-color:transparent;
+}
+.user-pill:hover { border-color:var(--rail); box-shadow:var(--lift-lg); }
+.user-pill .avatar {
+  width:28px; height:28px; border-radius:50%; display:grid; place-items:center;
+  background:var(--l-pps); color:var(--badge-ink);
+  font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:.02em; flex:none;
+}
+.user-pill .uname {
+  font-size:12.5px; font-weight:600; color:var(--ink); white-space:nowrap;
+  max-width:100px; overflow:hidden; text-overflow:ellipsis;
+}
+@media (max-width:560px) { .user-pill .uname { display:none; } .user-pill { padding:3px; } }
+
+.user-drop {
+  position:absolute; top:calc(100% + 8px); right:0; z-index:50; min-width:190px;
+  background:var(--plate); border:1px solid var(--rule); border-radius:12px;
+  box-shadow:var(--lift-lg); overflow:hidden;
+  opacity:0; transform:translateY(6px) scale(.97); pointer-events:none;
+  transition:opacity .22s var(--ease), transform .22s var(--ease);
+}
+.user-drop.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+.user-drop { transform-origin:top right; }
+.user-drop button {
+  display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  border:0; background:transparent; padding:12px 15px; cursor:pointer;
+  font-size:13.5px; font-weight:600; color:var(--ink);
+  transition:background .15s var(--ease);
+}
+.user-drop button:hover { background:var(--plate-2); }
+.user-drop button svg { width:17px; height:17px; flex:none; color:var(--ink-3); }
+.user-drop .sep { height:1px; background:var(--rule-soft); }
+.user-drop .drop-bad { color:var(--bad); }
+.user-drop .drop-bad svg { color:var(--bad); }
+
+/* the bar is the first thing a phone shows: keep it to a line and no more */
+@media (max-width:560px) {
+  .top { padding:8px 12px; gap:8px; }
+  .mark .sub { display:none; }
+  .mark .txt { font-size:15px; }
+  .mark .bullet { width:9px; height:9px; }
+  .seg button { padding:5px 9px; font-size:12px; letter-spacing:.02em; }
+  .iconbtn { width:30px; height:30px; }
+  .user-pill .avatar { width:26px; height:26px; font-size:11px; }
+}
+
+/* ============ motion ============ */
+@media (prefers-reduced-motion: no-preference) {
+  .enter > * { animation:rise .5s var(--ease) backwards; }
+  .enter > *:nth-child(1){animation-delay:.02s} .enter > *:nth-child(2){animation-delay:.06s}
+  .enter > *:nth-child(3){animation-delay:.1s}  .enter > *:nth-child(4){animation-delay:.14s}
+  .enter > *:nth-child(5){animation-delay:.18s} .enter > *:nth-child(6){animation-delay:.22s}
+  .enter > *:nth-child(n+7){animation-delay:.26s}
+  @keyframes rise { from { opacity:0; transform:translateY(9px); } }
+  .marks button[aria-pressed="true"] .glyph { animation:stamp .42s var(--ease); }
+  @keyframes stamp { 0%{transform:scale(.4)} 60%{transform:scale(1.18)} 100%{transform:scale(1)} }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important;
+                           transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav" aria-label="Sections">
+  <a href="#today" data-p="today">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M12 3v6M12 15v6"/><circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/></svg>
+    Today</a>
+  <a href="#week" data-p="week">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.2 8.2h6.3l3.4 3.4h8"/><path d="M3.2 17.4h9.7"/><circle cx="9.5" cy="8.2" r="1.9" fill="currentColor" stroke="none"/><circle cx="20.3" cy="11.6" r="1.9" fill="currentColor" stroke="none"/><circle cx="12.9" cy="17.4" r="1.9" fill="currentColor" stroke="none"/></svg>
+    Week</a>
+  <a href="#ranks" data-p="ranks">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 20.5v-6M12 20.5V3.5M18.5 20.5v-9"/><circle cx="5.5" cy="11.6" r="1.9" fill="currentColor" stroke="none"/><circle cx="12" cy="3.5" r="1.9" fill="currentColor" stroke="none"/><circle cx="18.5" cy="8.6" r="1.9" fill="currentColor" stroke="none"/></svg>
+    Ranks</a>
+  <a href="#directory" data-p="directory">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.4" r="3.1"/><path d="M3.6 19.2c.6-3 2.8-4.6 5.4-4.6s4.8 1.6 5.4 4.6"/><path d="M16.4 6.2a2.6 2.6 0 0 1 0 5.2M18.2 14.8c1.6.6 2.6 2.2 2.9 4.4"/></svg>
+    Directory</a>
+  <a href="#attendance" data-p="attendance">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.4"/><path d="M8.4 12.2l2.6 2.6 4.8-5"/></svg>
+    Attendance</a>
+  <a href="#holidays" data-p="holidays">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="3.4" y="5.4" width="17.2" height="15.2" rx="2.4"/><path d="M8 3.2v4M16 3.2v4M3.4 10.4h17.2"/><circle cx="12" cy="15" r="1.9" fill="currentColor" stroke="none"/></svg>
+    Holidays</a>
+</nav>
+
+
+<div class="top">
+  <div class="mark">
+    <span class="bullet"></span>
+    <span class="txt">Sec F</span>
+    <span class="sub">IT-I · Room 2311</span>
+  </div>
+  <span class="spacer"></span>
+  <div class="seg" role="group" aria-label="Practical batch">
+    <button type="button" data-batch="F1" aria-pressed="false">F1</button>
+    <button type="button" data-batch="F2" aria-pressed="false">F2</button>
+    <button type="button" data-batch="both" aria-pressed="true">Both</button>
+  </div>
+  <button class="iconbtn" id="themeBtn" type="button" aria-label="Switch theme">
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></svg>
+  </button>
+  <div class="user-pill" id="userPill" hidden>
+  <span class="avatar" id="userAvatar"></span>
+  <span class="uname" id="userName"></span>
+  <div class="user-drop" id="userDrop">
+    <button type="button" id="dropProfile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.4" r="3.6"/><path d="M4.2 20.4c.8-3.8 3.6-5.8 7.8-5.8s7 2 7.8 5.8"/></svg>
+      Your profile
+    </button>
+    <div class="sep"></div>
+    <button type="button" id="dropLogout" class="drop-bad">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 12H3.6M7.4 8.2 3.6 12l3.8 3.8"/><path d="M11.2 7V5.2a1.8 1.8 0 0 1 1.8-1.8h5.8a1.8 1.8 0 0 1 1.8 1.8v13.6a1.8 1.8 0 0 1-1.8 1.8H13a1.8 1.8 0 0 1-1.8-1.8V17"/></svg>
+      Sign out
+    </button>
+  </div>
+</div>
+</div>
+
+<main class="page">
+
+  <section id="today">
+    <div id="plateBox"></div>
+    <div class="h2row" style="margin-top:30px">
+      <h2 id="todayHead">Today's line</h2>
+      <button class="link" id="alertBtn" type="button" aria-pressed="true" hidden>Class alerts</button>
+    </div>
+    <div class="railwrap" id="todayRail"></div>
+  </section>
+
+  <section id="week" hidden>
+    <div class="net">
+      <div class="netscroll">
+        <div class="nethead" id="netHead"></div>
+        <div id="netBody"></div>
+      </div>
+    </div>
+
+    <div class="h2row" style="margin-top:0">
+      <h2>The week</h2>
+      <button class="link" id="planBtn" type="button" aria-pressed="false">Plan a bunk</button>
+    </div>
+    <div class="planbar" id="planBar" hidden></div>
+
+    <div class="weekday">
+      <div class="chips" id="dayChips"></div>
+      <div class="railwrap" id="weekRail"></div>
+    </div>
+
+    <div class="h2row">
+      <h2>Line key</h2>
+      <button class="link" id="icsBtn" type="button">Export to calendar</button>
+    </div>
+    <div class="key" id="lineKey"></div>
+  </section>
+
+  <section id="attendance" hidden>
+    <div id="catchup"></div>
+    <div class="bar-tools">
+      <input type="date" id="attDate" aria-label="Date to mark">
+      <span class="daynote" id="attNote"></span>
+    </div>
+    <div class="railwrap" id="attRail"></div>
+
+    <div class="h2row">
+      <h2>Service board</h2>
+      <span class="syncnote" id="syncNote"></span>
+      <button class="link" id="attClear" type="button">Clear records</button>
+    </div>
+    <div id="summary"></div>
+    <div id="board"></div>
+
+    <div class="h2row">
+      <h2>Bunk budget</h2>
+      <span class="daynote">Term ends</span>
+      <input type="date" id="semEndInput" aria-label="Last teaching day of the term">
+      <span class="daynote" id="termNote"></span>
+    </div>
+    <div id="budget"></div>
+
+    <div class="h2row">
+      <h2>Leave planner</h2>
+      <span class="daynote">What a stretch of days off actually costs.</span>
+    </div>
+    <div class="lv">
+      <input type="date" id="lvFrom" aria-label="Away from">
+      <span>to</span>
+      <input type="date" id="lvTo" aria-label="Away until">
+      <button class="link" id="lvClear" type="button">Clear</button>
+    </div>
+    <div id="lvOut"></div>
+  </section>
+
+  <section id="ranks" hidden>
+    <div class="h2row">
+      <h2>Section ranks</h2>
+      <button class="link" id="cardEdit" type="button">Your card</button>
+    </div>
+    <div class="lbstate" id="lbState"><i></i><span>Connecting…</span></div>
+    <div id="lbBox"></div>
+  </section>
+
+  <section id="directory" hidden>
+    <div class="h2row">
+      <h2>Sec F IT-I</h2>
+      <span class="pcount" id="dirCount" style="margin:0">Loading…</span>
+    </div>
+    <div class="field" style="margin-top:0">
+      <input id="dirSearch" type="search" autocapitalize="off" spellcheck="false"
+             placeholder="Search the section" enterkeyhint="search">
+    </div>
+    <div class="seg dirfilter" id="dirFilter" role="group" aria-label="Filter">
+      <button type="button" data-f="all"    aria-pressed="true">All</button>
+      <button type="button" data-f="joined" aria-pressed="false">Joined</button>
+      <button type="button" data-f="F1"     aria-pressed="false">F1</button>
+      <button type="button" data-f="F2"     aria-pressed="false">F2</button>
+    </div>
+    <div id="dirList"></div>
+  </section>
+
+  <section id="holidays" hidden>
+    <div class="h2row">
+      <h2>Closures 2026</h2>
+      <button class="link" id="resToggle" type="button" aria-pressed="false">Show restricted</button>
+    </div>
+    <div class="hkey">
+      <span><i></i>Gazetted — institute closed</span>
+      <span><i class="res"></i>Restricted — institute decides</span>
+      <span class="next" id="nextHol"></span>
+    </div>
+    <div class="months" id="months"></div>
+    <div class="hlist" id="hlist"></div>
+  </section>
+
+</main>
+
+<div class="gate" id="gate" hidden>
+  <div class="gate-in">
+
+    <!-- ---------- log in ---------- -->
+    <div id="vLogin">
+      <h1>Sec F IT-I</h1>
+      <div class="sub">Sign in to see your timetable and where you stand.</div>
+      <div class="field">
+        <label for="liEmail">Email</label>
+        <input id="liEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com">
+      </div>
+      <div class="field">
+        <label for="liPass">Password</label>
+        <input id="liPass" type="password" autocomplete="current-password" placeholder="••••••••" enterkeyhint="go">
+        <div class="hint" id="liHint"></div>
+      </div>
+      <button class="go" id="liGo" type="button">Sign in</button>
+      <div class="authlinks">
+        <button class="link" type="button" data-goto="pick">First time? Claim your name</button>
+        <button class="link" type="button" data-goto="forgot">Forgot password</button>
+      </div>
+    </div>
+
+    <!-- ---------- claim: pick your name ---------- -->
+    <div id="vPick" hidden>
+      <h1>Find your name</h1>
+      <div class="sub">The official IT (F) list. Take yours once — after that it is gone from the list for everyone else.</div>
+      <div class="field">
+        <input id="pkSearch" type="search" autocapitalize="off" spellcheck="false" placeholder="Search the list" enterkeyhint="search">
+      </div>
+      <div class="pcount" id="pkCount">Loading the roster…</div>
+      <div class="picker" id="pkList"></div>
+      <div class="authlinks">
+        <button class="link" type="button" data-goto="login">Already have an account? Sign in</button>
+      </div>
+    </div>
+
+    <!-- ---------- claim: set up the account ---------- -->
+    <div id="vClaim" hidden>
+      <h1>Your travelcard</h1>
+      <div class="sub">This card is yours for the year. Nobody else can take this name.</div>
+      <div class="tcard">
+        <div class="brand"><i></i><span>Sec F</span><em>IT-I · 2026–27</em></div>
+        <div>
+          <div class="nm" id="cardName">Your name</div>
+          <div class="un" id="cardUser">@username</div>
+        </div>
+        <div class="stripes" id="cardStripes"></div>
+      </div>
+      <div class="field">
+        <label for="clUser">Username</label>
+        <input id="clUser" type="text" maxlength="16" autocapitalize="off" spellcheck="false" placeholder="daksh">
+        <div class="hint" id="clUserHint">3–16 characters: lowercase letters, numbers, underscore.</div>
+      </div>
+      <div class="field">
+        <label for="clEmail">Email</label>
+        <input id="clEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com">
+        <div class="hint">Only used to reset your password. Never shown to your section.</div>
+      </div>
+      <div class="field">
+        <label for="clPass">Password</label>
+        <input id="clPass" type="password" autocomplete="new-password" placeholder="at least 8 characters">
+        <div class="hint" id="clHint"></div>
+      </div>
+      <button class="go" id="clGo" type="button" disabled>Claim this name</button>
+      <div class="authlinks">
+        <button class="link" type="button" data-goto="pick">Pick a different name</button>
+      </div>
+    </div>
+
+    <!-- ---------- forgot ---------- -->
+    <div id="vForgot" hidden>
+      <h1>Reset your password</h1>
+      <div class="sub">We'll email you a link. Use the address you signed up with.</div>
+      <div class="field">
+        <label for="fgEmail">Email</label>
+        <input id="fgEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com" enterkeyhint="go">
+        <div class="hint" id="fgHint"></div>
+      </div>
+      <button class="go" id="fgGo" type="button">Send reset link</button>
+      <div class="authlinks">
+        <button class="link" type="button" data-goto="login">Back to sign in</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<dialog id="dlg"><div class="d-in" id="dlgIn"></div></dialog>
+
+<script>
+/* ============================================================
+   Lines. Nine subject families, one colour each; labs ride the
+   parent line the way a depot branch rides its own.
+   ============================================================ */
+const LINES = {
+  pps:{ name:"Red Line",     of:"Programming" },
+  bee:{ name:"Yellow Line",  of:"Electrical" },
+  phy:{ name:"Blue Line",    of:"Physics" },
+  smt:{ name:"Green Line",   of:"System Modeling" },
+  em: { name:"Violet Line",  of:"Mechanics" },
+  csl:{ name:"Magenta Line", of:"Communication" },
+  evs:{ name:"Aqua Line",    of:"Environment" },
+  eg: { name:"Orange Line",  of:"Graphics" },
+  pd: { name:"Grey Line",    of:"Personality Development" },
+};
+
+const SUB = {
+  PPS:   { line:"pps", short:"PPS",            code:"ICT 101 T", name:"Programming for Problem Solving", fac:"Ms. Alka" },
+  PPSLAB:{ line:"pps", short:"PPS Lab",        code:"ICT 151",   name:"Programming for Problem Solving — practical", fac:"Mr. Sharat Srivastava", lab:true },
+  BEE:   { line:"bee", short:"BEE",            code:"ICT 103 T", name:"Basics of Electrical Engineering", fac:"Mr. Kumar Gaurav" },
+  BEELAB:{ line:"bee", short:"BEE Lab",        code:"ICT 103 P", name:"Basics of Electrical Engineering — practical", fac:"Mr. Kumar Gaurav", lab:true },
+  PHL:   { line:"phy", short:"Physics",        code:"ICT 111 T", name:"Engineering Physics I", fac:"Dr. Mamta Gupta" },
+  PHP:   { line:"phy", short:"Physics Lab",    code:"ICT 111 P", name:"Engineering Physics Lab I", fac:"Dr. Mamta Gupta", lab:true },
+  SMT:   { line:"smt", short:"SMT",            code:"ICT 107",   name:"System Modeling Techniques", fac:"Dr. Suryya Farhad" },
+  EM:    { line:"em",  short:"Mechanics",      code:"ICT 119",   name:"Engineering Mechanics", fac:"Mr. Naman Bajpai" },
+  EGL:   { line:"eg",  short:"Graphics Lab",   code:"ICT 123",   name:"Engineering Graphics I Lab", fac:"Mr. Naman Bajpai", lab:true },
+  CSL:   { line:"csl", short:"Comm Skills",    code:"ICT 113",   name:"Communication Skills", fac:"Ms. Isha" },
+  PD:    { line:"pd",  short:"Personality Dev", code:"PD",       name:"Personality Development", fac:"Ms. Isha" },
+  EVSL:  { line:"evs", short:"EVS",            code:"EM 117 T",  name:"Environment Studies (lecture)", fac:"Dr. Kavita Gupta" },
+  EVSP:  { line:"evs", short:"EVS Lab",        code:"ICT 117 P", name:"Environment Studies Lab", fac:"Dr. Kavita Gupta", lab:true },
+  EVSLP: { line:"evs", short:"EVS L/P",        code:"EM 117 T / ICT 117 P", name:"Environment Studies (lecture / practical)", fac:"Dr. Kavita Gupta" },
+};
+
+/* period index 0-6; lunch sits between period 2 and period 3 */
+const TIMES = ["8:15","9:10","10:05","11:00","11:30","12:25","1:20","2:15","3:10"];
+const MINS  = [495, 550, 605, 660, 690, 745, 800, 855, 910];
+const DAY_OPEN = MINS[0], DAY_CLOSE = MINS[8], LUNCH_FROM = MINS[3], LUNCH_TO = MINS[4];
+const startMin = i => MINS[i < 3 ? i : i + 1];
+const endMin   = (i, span) => MINS[(i + span - 1 < 3 ? i + span - 1 : i + span) + 1];
+const label    = (i, span) => TIMES[i < 3 ? i : i + 1] + "–" + TIMES[(i + span - 1 < 3 ? i + span - 1 : i + span) + 1];
+
+const DAYS = [
+  { d:"Monday",    short:"Mon", items:[ {i:1,k:"EM"}, {i:2,k:"BEE"}, {i:3,k:"PPS"}, {i:4,k:"CSL"}, {i:5,k:"EVSL"} ] },
+  { d:"Tuesday",   short:"Tue", items:[ {i:0,k:"CSL"}, {i:1,span:2,split:{F1:"PHP",F2:"EVSP"}}, {i:3,k:"PHL"}, {i:4,k:"SMT"}, {i:5,span:2,k:"PPSLAB"} ] },
+  { d:"Wednesday", short:"Wed", items:[ {i:0,k:"PHL"}, {i:1,k:"EM"}, {i:2,k:"SMT"}, {i:3,k:"PPS"}, {i:4,k:"BEE"}, {i:5,k:"CSL"} ] },
+  { d:"Thursday",  short:"Thu", items:[ {i:0,k:"PPS"}, {i:1,span:2,split:{F1:"BEELAB",F2:"PHP"}}, {i:3,k:"EVSLP"}, {i:4,k:"BEE"}, {i:5,k:"PHL"}, {i:6,k:"PD"} ] },
+  { d:"Friday",    short:"Fri", items:[ {i:0,k:"SMT"}, {i:1,span:2,split:{F1:"EVSP",F2:"BEELAB"}}, {i:3,k:"EM"}, {i:4,k:"EVSL"}, {i:5,span:2,k:"EGL"} ] },
+  { d:"Saturday",  short:"Sat", items:[] },
+];
+
+let batch = "both";
+try { batch = localStorage.getItem("adgips-batch") || "both"; } catch (e) {}
+
+const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+const nowMin = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+const pad = n => String(n).padStart(2, "0");
+const isoOf = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const fromISO = iso => { const [y,m,d] = iso.split("-").map(Number); return new Date(y, m-1, d); };
+const lineOf = k => (k && SUB[k]) ? SUB[k].line : "";
+
+/* which subject an item resolves to for the selected batch (null = both halves) */
+function resolve(item) {
+  if (!item.split) return item.k;
+  return batch === "both" ? null : item.split[batch];
+}
+function describe(item) {
+  const key = resolve(item);
+  if (key) return SUB[key].short + " · " + SUB[key].fac;
+  return "F1 " + SUB[item.split.F1].short + " / F2 " + SUB[item.split.F2].short;
+}
+
+/* ============================================================
+   A day as a continuous timeline: classes, lunch, and the real
+   voids between them. Nothing is skipped, so the rail is honest.
+   ============================================================ */
+function segmentsFor(dayIdx) {
+  const day = DAYS[dayIdx], segs = [];
+  const byStart = new Map(), covered = new Set();
+  day.items.forEach(it => {
+    const sp = it.span || 1;
+    byStart.set(it.i, it);
+    for (let n = 0; n < sp; n++) covered.add(it.i + n);
+  });
+  if (!day.items.length) return segs;
+
+  for (let p = 0; p < 7; p++) {
+    if (p === 3) segs.push({ kind:"lunch", from:LUNCH_FROM, to:LUNCH_TO });
+    if (byStart.has(p)) {
+      const it = byStart.get(p), sp = it.span || 1;
+      segs.push({ kind:"class", from:startMin(p), to:endMin(p, sp), item:it, span:sp, i:p });
+      p += sp - 1; continue;
+    }
+    if (covered.has(p)) continue;
+    let q = p;
+    while (q + 1 < 7 && !covered.has(q + 1) && q !== 2) q++;   // a free run never swallows lunch
+    segs.push({ kind:"free", from:startMin(p), to:endMin(q, 1), i:p });
+    p = q;
+  }
+  // a free first period is the best news on a Monday, so it stays on the rail;
+  // trailing emptiness is not news, and the rail ending already says it
+  while (segs.length && segs[segs.length - 1].kind !== "class") segs.pop();
+  segs.forEach(s => s.dur = s.to - s.from);
+  return segs;
+}
+
+const PX_PER_MIN = 1.42;
+const MIN_H = { class:78, lunch:46, free:64 };
+/* ponytail: the marked rail reserves a flat 128px per class rather than measuring the
+   card; if the card ever grows past that the live marker drifts, and the fix is to lay
+   the rail out after a first paint instead of before it. */
+const MIN_H_MARKED = 128;
+function layout(segs, marked) {
+  let top = 0;
+  segs.forEach(s => {
+    const min = marked && s.kind === "class" ? MIN_H_MARKED : MIN_H[s.kind];
+    s.h = Math.max(min, Math.round(s.dur * PX_PER_MIN));
+    s.top = top; top += s.h + 10;
+  });
+  return top;
+}
+
+/* ============================================================
+   The rail. Shared by Today, the mobile week, and attendance.
+   ============================================================ */
+function renderRail(box, dayIdx, opts) {
+  opts = opts || {};
+  box.textContent = "";
+  const segs = segmentsFor(dayIdx);
+  if (!segs.length) {
+    box.style.paddingLeft = "0";
+    const e = el("div", "empty");
+    e.appendChild(el("b", null, "No classes"));
+    e.appendChild(document.createTextNode(DAYS[dayIdx].d + " is clear. The line does not run today."));
+    box.appendChild(e);
+    return;
+  }
+  box.style.paddingLeft = "";
+  const total = layout(segs, opts.mark);
+  const live = opts.live, now = nowMin();
+
+  segs.forEach(s => {
+    const stop = el("div", "stop");
+    stop.style.minHeight = s.h + "px";
+    stop.style.marginBottom = "10px";
+    stop.style.position = "relative";
+
+    if (s.kind === "class") {
+      const key = resolve(s.item);
+      const ln = key ? lineOf(key) : lineOf(s.item.split.F1);
+      stop.dataset.line = ln;
+      const isLive = live && now >= s.from && now < s.to;
+      const isPast = live && now >= s.to;
+      if (isLive) stop.classList.add("live");
+      if (isPast) stop.classList.add("past");
+      if (live && isCancelled(isoOf(new Date()), s.i)) stop.classList.add("suspended");
+      stop.appendChild(el("span", "node"));
+      if (s.h > 92) stop.appendChild(el("span", "span"));
+      stop.appendChild(opts.build ? opts.build(s, key) : classCard(s, key, dayIdx));
+    } else if (s.kind === "lunch") {
+      stop.classList.add("lunch");
+      if (live && now >= s.to) stop.classList.add("past");
+      stop.appendChild(el("span", "node"));
+      stop.appendChild(el("div", "gap", "Lunch · " + TIMES[3] + "–" + TIMES[4]));
+    } else {
+      stop.classList.add("free");
+      if (live && now >= s.to) stop.classList.add("past");
+      stop.appendChild(el("span", "node"));
+      const mins = s.dur;
+      stop.appendChild(el("div", "gap", "Free · " + (mins >= 60 ? Math.floor(mins/60) + "h " : "") + (mins % 60 ? (mins % 60) + "m" : "") ));
+    }
+    box.appendChild(stop);
+  });
+
+  if (!live) return;
+
+  // travelled rail + the live marker, placed by real clock time
+  const at = positionAt(segs, now);
+  if (at === null) return;
+  const travelled = el("span", "travelled");
+  travelled.style.height = at + "px";
+  box.appendChild(travelled);
+  const cur = segs.find(s => now >= s.from && now < s.to);
+  const marker = el("span", "marker");
+  marker.dataset.line = cur && cur.kind === "class"
+    ? (resolve(cur.item) ? lineOf(resolve(cur.item)) : lineOf(cur.item.split.F1)) : "";
+  marker.appendChild(el("i"));
+  marker.style.top = (at + 1) + "px";
+  box.appendChild(marker);
+}
+
+/* pixel offset down the rail for a clock time, or null when off the line */
+function positionAt(segs, now) {
+  const first = segs[0], last = segs[segs.length - 1];
+  if (now < first.from || now >= last.to) return null;
+  for (const s of segs) {
+    if (now < s.from) return s.top;                       // in a trimmed gap: sit at the next stop
+    if (now < s.to) return s.top + ((now - s.from) / s.dur) * s.h;
+  }
+  return null;
+}
+
+function classCard(s, key, dayIdx) {
+  const btn = el("button", "card");
+  btn.type = "button";
+  const hd = el("div", "hd");
+  hd.appendChild(el("span", "t", label(s.i, s.span)));
+  if (key && SUB[key].lab) hd.appendChild(el("span", "badge ghost", "Lab"));
+  if (!key) hd.appendChild(el("span", "badge ghost", "Batches split"));
+  btn.appendChild(hd);
+
+  if (key) {
+    btn.appendChild(el("div", "name", SUB[key].short));
+    const meta = el("div", "meta");
+    meta.appendChild(el("b", null, SUB[key].fac));
+    meta.appendChild(document.createTextNode(" · " + (SUB[key].lab ? "Lab" : "Room 2311")));
+    btn.appendChild(meta);
+  } else {
+    const br = el("div", "branch");
+    ["F1","F2"].forEach(b => {
+      const k = s.item.split[b], arm = el("div", "arm");
+      arm.dataset.line = lineOf(k);
+      arm.appendChild(el("span", "k", b));
+      arm.appendChild(el("span", "bar"));
+      const m = el("div");
+      m.appendChild(el("div", "n", SUB[k].short));
+      m.appendChild(el("div", "f", SUB[k].fac));
+      arm.appendChild(m);
+      br.appendChild(arm);
+    });
+    btn.appendChild(br);
+  }
+  btn.addEventListener("click", () => {
+    if (!planning) return openDetail(s.item, dayIdx);
+    if (!key) return;                       // a split lab has no single subject to skip
+    plan[key] = (plan[key] || 0) + 1;
+    if (plan[key] > 4) delete plan[key];    // tap past four to clear that subject
+    savePlan(); renderWeekRail(); renderPlan();
+  });
+  if (planning && key && plan[key]) btn.appendChild(el("span", "skipmark", "skip ×" + plan[key]));
+  return btn;
+}
+
+/* ============================================================
+   Today
+   ============================================================ */
+/* Sunday is not in DAYS at all — the week runs Mon(0) to Sat(5). Anything that needs
+   "the next day the line runs" asks here, so nobody has to guess with an index again. */
+function nextRunningDay(fromIso) {
+  const to = fromISO(fromIso);
+  to.setDate(to.getDate() + 9);                    /* a week, plus room for closures */
+  return classDays(fromIso, isoOf(to))[0] || null;
+}
+
+/* the card, plus the marks for the class you just walked out of */
+function todayCard(s, key, iso, ii, dayIdx) {
+  const f = document.createDocumentFragment();
+  f.appendChild(classCard(s, key, dayIdx));
+  if (key) f.appendChild(markStrip(key, iso, ii, label(s.i, s.span)));
+  return f;
+}
+
+function renderToday() {
+  const di = new Date().getDay() - 1;
+  const live = di >= 0 && di < 6;                  /* Sunday: di is -1, and it owns no rail */
+  renderPlate();
+  const up = live ? null : nextRunningDay(isoOf(new Date()));
+  const dayIdx = live ? di : (up ? up.di : 0);
+  document.getElementById("todayHead").textContent =
+    live ? "Today's line" : DAYS[dayIdx].d + "'s line";
+
+  /* only the real today is markable — the Sunday view is next week's, not yet attended */
+  const iso = isoOf(new Date());
+  const order = new Map();
+  DAYS[dayIdx].items.forEach((it, ii) => order.set(it.i, ii));
+  renderRail(document.getElementById("todayRail"), dayIdx, {
+    live, mark: live,
+    build: live ? (s, key) => todayCard(s, key, iso, order.get(s.i), dayIdx) : null,
+  });
+}
+
+function renderPlate() {
+  const box = document.getElementById("plateBox");
+  box.textContent = "";
+  const now = nowMin(), di = new Date().getDay() - 1;
+  const day = di >= 0 && di < 6 ? DAYS[di] : null;
+  const hol = gazettedOn(isoOf(new Date()));
+
+  let current = null, next = null, nextDay = day;
+  if (day && !hol) {
+    day.items.forEach(item => {
+      const span = item.span || 1;
+      if (now >= startMin(item.i) && now < endMin(item.i, span)) current = item;
+      else if (startMin(item.i) > now && !next) next = item;
+    });
+  }
+  if (!next) {                                     /* nothing left today: roll on to the next day that runs */
+    const t = new Date(); t.setDate(t.getDate() + 1);
+    const up = nextRunningDay(isoOf(t));
+    if (up) { nextDay = DAYS[up.di]; next = nextDay.items[0]; }
+  }
+
+  const plate = el("div", "plate");
+  if (profile) {
+    const hi = el("div", "plate-hi", "Hi, " + profile.name.split(/\s+/)[0]);
+    plate.appendChild(hi);
+  }
+  const row = el("div", "plate-row");
+  const when = el("div", "plate-when");
+
+  if (hol) {
+    plate.dataset.line = "";
+    row.appendChild(el("span", "badge", "Closed"));
+    when.textContent = new Date().toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long" });
+    row.appendChild(when);
+    plate.appendChild(row);
+    plate.appendChild(el("h1", null, hol.n));
+    plate.appendChild(el("div", "who", "Institute closed — gazetted holiday."));
+  } else if (current) {
+    const key = resolve(current);
+    const span = current.span || 1;
+    const ln = key ? lineOf(key) : lineOf(current.split.F1);
+    plate.dataset.line = ln;
+    const ends = endMin(current.i, span), left = ends - now;
+    row.appendChild(el("span", "badge", "In class"));
+    when.innerHTML = "";
+    when.appendChild(document.createTextNode("ends "));
+    when.appendChild(el("b", null, TIMES[(current.i + span - 1 < 3 ? current.i + span - 1 : current.i + span) + 1]));
+    row.appendChild(when);
+    plate.appendChild(row);
+    plate.appendChild(el("h1", null, key ? SUB[key].name : "Practical — batches split"));
+    const who = el("div", "who");
+    if (key) {
+      who.appendChild(el("b", null, SUB[key].fac));
+      who.appendChild(document.createTextNode(" · " + (SUB[key].lab ? "Lab" : "Room 2311")));
+    } else {
+      who.textContent = "F1 " + SUB[current.split.F1].short + " · F2 " + SUB[current.split.F2].short;
+    }
+    plate.appendChild(who);
+
+    const g = el("div", "gauge");
+    const track = el("div", "track");
+    const fill = el("i");
+    fill.style.width = Math.round(((now - startMin(current.i)) / (ends - startMin(current.i))) * 100) + "%";
+    track.appendChild(fill); g.appendChild(track);
+    const cap = el("div", "cap");
+    cap.appendChild(el("span", null, label(current.i, span)));
+    const r = el("span"); r.appendChild(el("b", null, left + " min")); r.appendChild(document.createTextNode(" left"));
+    cap.appendChild(r);
+    g.appendChild(cap);
+    plate.appendChild(g);
+  } else {
+    plate.dataset.line = "";
+    const lunching = day && now >= LUNCH_FROM && now < LUNCH_TO;
+    const closed = !day || !day.items.length;
+    const before = day && day.items.length && now < startMin(day.items[0].i);
+    const after = day && day.items.length && now >= DAY_CLOSE;
+    row.appendChild(el("span", "badge ghost", lunching ? "Lunch" : closed ? "No service" : "Between classes"));
+    when.textContent = new Date().toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long" });
+    row.appendChild(when);
+    plate.appendChild(row);
+    plate.appendChild(el("h1", null,
+      lunching ? "Lunch until 11:30"
+      : closed ? "No classes today"
+      : before ? "Classes haven't started"
+      : after ? "Day's over"
+      : "Free right now"));
+    plate.appendChild(el("div", "who", closed
+      ? "The line does not run on " + (day ? day.d : "Sunday") + "."
+      : "Nothing scheduled at this moment."));
+  }
+
+  if (next) {
+    const key = resolve(next), span = next.span || 1;
+    const b = el("button", "upnext");
+    b.type = "button";
+    b.dataset.line = key ? lineOf(key) : lineOf(next.split.F1);
+    b.appendChild(el("span", "tick"));
+    const m = el("div", "m");
+    m.appendChild(el("div", "lbl", nextDay === day ? "Next station" : "Next · " + nextDay.d));
+    m.appendChild(el("div", "val", key ? SUB[key].short : "Practical (F1 / F2)"));
+    m.appendChild(el("div", "fac", key ? SUB[key].fac
+      : SUB[next.split.F1].fac + " / " + SUB[next.split.F2].fac));
+    b.appendChild(m);
+    b.appendChild(el("span", "t", TIMES[next.i < 3 ? next.i : next.i + 1]));
+    b.addEventListener("click", () => openDetail(next, DAYS.indexOf(nextDay)));
+    plate.appendChild(b);
+  }
+  box.appendChild(plate);
+}
+
+/* ============================================================
+   Week — network diagram (wide) and rail (narrow)
+   ============================================================ */
+function renderNetwork() {
+  const head = document.getElementById("netHead");
+  head.textContent = "";
+  const cols = [];
+  for (let p = 0; p < 7; p++) {
+    if (p === 3) cols.push({ grow:30, txt:"11:00" });
+    cols.push({ grow:55, txt:TIMES[p < 3 ? p : p + 1] });
+  }
+  cols.forEach(c => {
+    const s = el("span", null, c.txt);
+    s.style.flex = c.grow + " 1 0";
+    head.appendChild(s);
+  });
+
+  const body = document.getElementById("netBody");
+  body.textContent = "";
+  const todayIdx = new Date().getDay() - 1;
+  const now = nowMin();
+
+  DAYS.forEach((day, di) => {
+    const row = el("div", "netrow" + (di === todayIdx ? " today" : ""));
+    const dcell = el("div", "day");
+    dcell.appendChild(el("div", "d", day.d));
+    dcell.appendChild(el("div", "c", day.items.length ? day.items.length + " classes" : "no classes"));
+    row.appendChild(dcell);
+
+    const trk = el("div", "trk");
+    if (!day.items.length) {
+      const off = el("div", "slot empty");
+      off.style.flex = "1 1 0";
+      off.appendChild(el("span", "seg-rail"));
+      off.appendChild(el("div", "void", "No classes"));
+      trk.appendChild(off);
+      row.appendChild(trk);
+      body.appendChild(row);
+      return;
+    }
+    const byStart = new Map(), covered = new Set();
+    day.items.forEach(it => {
+      const sp = it.span || 1; byStart.set(it.i, it);
+      for (let n = 0; n < sp; n++) covered.add(it.i + n);
+    });
+
+    for (let p = 0; p < 7; p++) {
+      if (p === 3) {
+        const ls = el("div", "slot lunchslot");
+        ls.style.flex = "30 1 0";
+        ls.title = "Lunch · 11:00–11:30";
+        ls.appendChild(el("span", "seg-rail"));
+        const d = el("span", "stationdot");
+        d.setAttribute("aria-label", "Lunch, 11:00 to 11:30");
+        ls.appendChild(d);
+        trk.appendChild(ls);
+      }
+      const slot = el("div", "slot");
+      if (byStart.has(p)) {
+        const it = byStart.get(p), sp = it.span || 1;
+        const key = resolve(it);
+        slot.dataset.line = key ? lineOf(key) : lineOf(it.split.F1);
+        slot.style.flex = (55 * sp) + " 1 0";
+        slot.appendChild(el("span", "seg-rail"));
+        slot.appendChild(el("span", "stationdot"));
+        const isLive = di === todayIdx && now >= startMin(p) && now < endMin(p, sp);
+        const c = el("button", "nc" + (isLive ? " live" : ""));
+        c.type = "button";
+        if (key) {
+          c.appendChild(el("div", "n", SUB[key].short));
+          c.appendChild(el("div", "f", SUB[key].fac));
+          if (SUB[key].lab) c.appendChild(el("div", "b", "Lab"));
+        } else {
+          c.appendChild(el("div", "n", "F1 " + SUB[it.split.F1].short));
+          c.appendChild(el("div", "n", "F2 " + SUB[it.split.F2].short));
+          c.appendChild(el("div", "b", "Batches split"));
+        }
+        c.addEventListener("click", () => openDetail(it, di));
+        slot.appendChild(c);
+        trk.appendChild(slot);
+        p += sp - 1; continue;
+      }
+      slot.classList.add("empty");
+      slot.style.flex = "55 1 0";
+      if (!covered.has(p)) {
+        slot.appendChild(el("span", "seg-rail"));
+        slot.appendChild(el("div", "void", day.items.length ? "free" : ""));
+      }
+      trk.appendChild(slot);
+    }
+    row.appendChild(trk);
+    body.appendChild(row);
+  });
+}
+
+let openDay = Math.min(Math.max(new Date().getDay() - 1, 0), 5);
+function renderWeekRail() {
+  const chips = document.getElementById("dayChips");
+  chips.textContent = "";
+  DAYS.forEach((day, di) => {
+    const b = el("button", null, day.short);
+    b.type = "button";
+    b.setAttribute("aria-pressed", di === openDay);
+    b.addEventListener("click", () => { openDay = di; renderWeekRail(); });
+    chips.appendChild(b);
+  });
+  const rail = document.getElementById("weekRail");
+  renderRail(rail, openDay, { live: new Date().getDay() - 1 === openDay });
+  rail.classList.add("enter");
+  renderPlan();
+}
+
+function renderLineKey() {
+  const box = document.getElementById("lineKey");
+  box.textContent = "";
+  const seen = new Set();
+  Object.keys(SUB).forEach(k => {
+    const s = SUB[k];
+    if (seen.has(k)) return;
+    seen.add(k);
+    const row = el("div", "keyrow");
+    row.dataset.line = s.line;
+    row.appendChild(el("span", "bar"));
+    const m = el("div", "m");
+    m.appendChild(el("div", "n", s.short));
+    m.appendChild(el("div", "full", s.name));
+    m.appendChild(el("div", "f", s.fac));
+    m.appendChild(el("div", "c", s.code + " · " + LINES[s.line].name));
+    row.appendChild(m);
+    box.appendChild(row);
+  });
+}
+
+/* ============================================================
+   Detail
+   ============================================================ */
+function openDetail(item, dayIdx) {
+  const span = item.span || 1, key = resolve(item);
+  const box = document.getElementById("dlgIn");
+  box.textContent = "";
+  box.dataset.line = key ? lineOf(key) : (item.split ? lineOf(item.split.F1) : "");
+
+  const top = el("div", "d-top");
+  const rows = [];
+  if (key) {
+    const s = SUB[key];
+    top.appendChild(el("span", "badge", s.lab ? "Practical" : "Lecture"));
+    top.appendChild(el("span", "plate-when", LINES[s.line].name));
+    box.appendChild(top);
+    box.appendChild(el("div", "d-name", s.short));
+    box.appendChild(el("div", "d-full", s.name));
+    rows.push(["Faculty", s.fac], ["Code", s.code], ["Room", s.lab ? "Lab" : "2311"]);
+  } else {
+    top.appendChild(el("span", "badge ghost", "Batches split"));
+    box.appendChild(top);
+    box.appendChild(el("div", "d-name", "Practical"));
+    box.appendChild(el("div", "d-full", "F1 and F2 run different labs in this slot."));
+    rows.push(
+      ["Batch F1", SUB[item.split.F1].name + " — " + SUB[item.split.F1].fac],
+      ["Batch F2", SUB[item.split.F2].name + " — " + SUB[item.split.F2].fac]
+    );
+  }
+  rows.push(["Day", DAYS[dayIdx] ? DAYS[dayIdx].d : "—"], ["Time", label(item.i, span)]);
+
+  const list = el("div", "d-rows");
+  rows.forEach(([a, b]) => {
+    const r = el("div", "d-row");
+    r.appendChild(el("span", null, a));
+    r.appendChild(el("span", null, b));
+    list.appendChild(r);
+  });
+  box.appendChild(list);
+
+  // reporting only makes sense for a class that is actually on today
+  const iso = isoOf(new Date());
+  const onToday = profile && new Date().getDay() - 1 === dayIdx;
+  if (onToday) {
+    const v = votesFor(iso, item.i), mine = myReports[iso + "|" + item.i];
+    const note = el("div", "d-note");
+    note.textContent = isCancelled(iso, item.i)
+      ? "Cancelled — " + v + " students reported it."
+      : v ? v + " of " + CANCEL_MIN + " reported this cancelled."
+          : "Not running today? Tell the section.";
+    box.appendChild(note);
+    const b = el("button", "btn", mine ? "Undo my report" : "Report cancelled");
+    b.type = "button";
+    b.addEventListener("click", async () => {
+      b.disabled = true; b.textContent = "…";
+      try { await reportCancelled(iso, item.i, !mine); document.getElementById("dlg").close(); renderToday(); }
+      catch (err) { note.textContent = explain(err).join(" — "); b.disabled = false; }
+    });
+    box.appendChild(actions(b));
+  } else {
+    box.appendChild(actions());
+  }
+  document.getElementById("dlg").showModal();
+}
+
+function actions(extra) {
+  const act = el("div", "d-act");
+  if (extra) act.appendChild(extra);
+  const close = el("button", "btn" + (extra ? "" : " pri"), "Close");
+  close.type = "button";
+  close.addEventListener("click", () => document.getElementById("dlg").close());
+  act.appendChild(close);
+  return act;
+}
+
+/* ============================================================
+   Closures — GGSIPU office order F.1(6)(21)/2010/Estt.-NT/10463
+   ============================================================ */
+const GAZETTED = [
+  ["2026-01-26","Republic Day"], ["2026-03-04","Holi"], ["2026-03-21","Id-ul-Fitr"],
+  ["2026-03-26","Ram Navami"], ["2026-03-31","Mahavir Jayanti"], ["2026-04-03","Good Friday"],
+  ["2026-05-01","Buddha Purnima"], ["2026-05-27","Id-ul-Zuha (Bakrid)"], ["2026-06-26","Muharram"],
+  ["2026-08-15","Independence Day"], ["2026-08-26","Milad-un-Nabi / Id-e-Milad"],
+  ["2026-09-04","Janmashtami (Vaishnva)"], ["2026-10-02","Mahatma Gandhi's Birthday"],
+  ["2026-10-20","Dussehra"], ["2026-10-26","Maharishi Valmiki's Birthday"],
+  ["2026-11-08","Diwali (Deepavali)"], ["2026-11-24","Guru Nanak's Birthday"], ["2026-12-25","Christmas Day"],
+];
+const RESTRICTED = [
+  ["2026-01-01","New Year's Day"], ["2026-01-03","Hazarat Ali's Birthday"], ["2026-01-14","Makar Sankranti"],
+  ["2026-01-14","Magh Bihu / Pongal"], ["2026-01-23","Sri Panchami / Basant Panchami"],
+  ["2026-02-01","Guru Ravidas's Birthday"], ["2026-02-12","Birthday of Swami Dayananda Saraswati"],
+  ["2026-02-15","Maha Shivratri"], ["2026-02-19","Shiva ji Jayanti"], ["2026-03-03","Holika Dahan", 1],
+  ["2026-03-03","Dolyatra"], ["2026-03-19","Chaitra Sukladi / Gudi Padava / Ugadi / Cheti Chand"],
+  ["2026-03-20","Jamat-ul-Vida"], ["2026-04-05","Easter Sunday"], ["2026-04-14","Vaishakhi / Vishu / Meshadi"], ["2026-04-14","Dr. B. R. Ambedkar Jayanti", 1],
+  ["2026-04-15","Vaisakhadi (Bengal) / Bahag Bihu (Assam)"], ["2026-05-09","Birthday of Guru Rabindranath Tagore"],
+  ["2026-07-16","Rath Yatra"], ["2026-08-15","Parsi New Year's Day / Nauraj"], ["2026-08-26","Onam"],
+  ["2026-08-28","Raksha Bandhan", 1], ["2026-09-03","Janmashtami (Smarta)", 1],
+  ["2026-09-05","Teachers' Day"], ["2026-09-14","Ganesh Chaturthi / Vinayaka Chaturthi"],
+  ["2026-10-18","Dussehra (Saptami)"], ["2026-10-19","Dussehra (Mahashtami)", 1], ["2026-10-20","Dussehra (Mahanavmi)"],
+  ["2026-10-29","Karaka Chaturthi (Karva Chauth)"], ["2026-11-08","Naraka Chaturdasi"],
+  ["2026-11-09","Govardhan Puja", 1], ["2026-11-11","Bhai Duj", 1], ["2026-11-15","Chhath Puja"],
+  ["2026-11-24","Guru Teg Bahadur's Martyrdom Day"], ["2026-12-23","Hazrat Ali's Birthday"],
+  ["2026-12-24","Christmas Eve", 1],
+];
+const HOLIDAYS = {};
+GAZETTED.forEach(([d, n]) => (HOLIDAYS[d] = HOLIDAYS[d] || []).push({ n, gaz:true }));
+RESTRICTED.forEach(([d, n, likely]) => (HOLIDAYS[d] = HOLIDAYS[d] || []).push({ n, gaz:false, likely:!!likely }));
+const gazettedOn = iso => (HOLIDAYS[iso] || []).filter(h => h.gaz)[0];
+
+/* Restricted on paper, shut in practice. The university order only fixes the gazetted
+   closures; the institute decides the rest, and these are the ones it usually takes.
+   A guess never silently eats a class: the day stays on the timetable and in the maths
+   until you mark it Off yourself. */
+const likelyOn = iso => (HOLIDAYS[iso] || []).filter(h => h.likely)[0];
+const holidayNames = iso => (HOLIDAYS[iso] || []).map(h => h.n).join(" · ");
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+let showRestricted = false;
+
+function renderMonths() {
+  const box = document.getElementById("months");
+  box.textContent = "";
+  const todayISO = isoOf(new Date());
+  for (let m = 0; m < 12; m++) {
+    const mo = el("div", "mo");
+    mo.appendChild(el("h3", null, MONTHS[m]));
+    const g = el("div", "mgrid");
+    ["S","M","T","W","T","F","S"].forEach(w => g.appendChild(el("span", "wd", w)));
+    const first = new Date(2026, m, 1).getDay();
+    for (let i = 0; i < first; i++) g.appendChild(el("span"));
+    const last = new Date(2026, m + 1, 0).getDate();
+    for (let d = 1; d <= last; d++) {
+      const iso = "2026-" + pad(m + 1) + "-" + pad(d);
+      const hits = HOLIDAYS[iso] || [];
+      const gaz = hits.some(h => h.gaz), res = hits.some(h => !h.gaz), lik = hits.some(h => h.likely);
+      if (!hits.length || (!gaz && !lik && !showRestricted)) {
+        const c = el("span", new Date(2026, m, d).getDay() === 0 ? "sun" : null, String(d));
+        if (iso === todayISO) c.className = (c.className ? c.className + " " : "") + "today";
+        g.appendChild(c);
+        continue;
+      }
+      const b = el("button", ((gaz ? "gaz " : "") + (res && (showRestricted || lik) ? "res " : "") + (iso === todayISO ? "today" : "")).trim(), String(d));
+      b.type = "button";
+      b.title = hits.map(h => h.n).join(" · ");
+      b.addEventListener("click", () => openHoliday(iso));
+      g.appendChild(b);
+    }
+    mo.appendChild(g);
+    box.appendChild(mo);
+  }
+}
+
+function renderHolidayList() {
+  const box = document.getElementById("hlist");
+  box.textContent = "";
+  const todayISO = isoOf(new Date());
+  const rest = showRestricted ? RESTRICTED : RESTRICTED.filter(h => h[2]);
+  const rows = [...GAZETTED.map(h => [h[0], h[1], true, false]), ...rest.map(h => [h[0], h[1], false, !!h[2]])]
+    .sort((a, b) => a[0].localeCompare(b[0]));
+  rows.forEach(([iso, name, gaz, likely]) => {
+    const r = el("div", "hrow" + (gaz ? "" : " res") + (iso < todayISO ? " past" : ""));
+    const d = fromISO(iso);
+    r.appendChild(el("div", "d", d.toLocaleDateString("en-IN", { day:"2-digit", month:"short" }) + " · " + d.toLocaleDateString("en-IN", { weekday:"short" })));
+    r.appendChild(el("div", "n", name + (likely ? " · usually closed" : "")));
+    box.appendChild(r);
+  });
+
+  const next = GAZETTED.find(h => h[0] >= todayISO);
+  const nh = document.getElementById("nextHol");
+  if (next) {
+    const days = Math.round((fromISO(next[0]) - fromISO(todayISO)) / 86400000);
+    nh.textContent = "Next closure: " + next[1] + (days === 0 ? ", today" : days === 1 ? ", tomorrow" : ", in " + days + " days");
+  } else nh.textContent = "";
+}
+
+function openHoliday(iso) {
+  const box = document.getElementById("dlgIn");
+  box.textContent = "";
+  const hits = HOLIDAYS[iso], d = fromISO(iso), gaz = hits.some(h => h.gaz), lik = hits.some(h => h.likely);
+  box.dataset.line = gaz ? "pps" : "";
+  const top = el("div", "d-top");
+  top.appendChild(el("span", gaz ? "badge" : "badge ghost", gaz ? "Closed" : lik ? "Usually closed" : "Restricted"));
+  top.appendChild(el("span", "plate-when", d.toLocaleDateString("en-IN", { weekday:"long" })));
+  box.appendChild(top);
+  box.appendChild(el("div", "d-name", d.toLocaleDateString("en-IN", { day:"numeric", month:"long" })));
+  box.appendChild(el("div", "d-full", hits.map(h => h.n).join(" · ")));
+  const list = el("div", "d-rows");
+  const r = el("div", "d-row");
+  r.appendChild(el("span", null, "Classes"));
+  r.appendChild(el("span", null, gaz ? "None — institute closed"
+    : lik ? "The institute usually shuts. Still counted until you mark them Off."
+    : "Held unless the institute says otherwise"));
+  list.appendChild(r);
+  box.appendChild(list);
+  box.appendChild(actions());
+  document.getElementById("dlg").showModal();
+}
+
+/* ============================================================
+   Attendance. 75% is the line; everything reports against it.
+   ============================================================ */
+let att = {};
+try { att = JSON.parse(localStorage.getItem("adgips-att") || "{}"); } catch (e) {}
+const saveAtt = () => { try { localStorage.setItem("adgips-att", JSON.stringify(att)); } catch (e) {} };
+
+function demo() {                                   // run demo() in the console to check the 75% math
+  const ok = (x, y, m) => { if (x !== y) throw new Error(m + ": got " + x + ", want " + y); };
+  const segs = segmentsFor(0);                      // Monday: free 8:15, then five classes
+  ok(segs[0].kind, "free", "a free first period stays on the rail");
+  ok(segs.some(s => s.kind === "lunch"), true, "lunch sits on the rail");
+  ok(positionAt(segs, 300), null, "before the first class the marker is off the line");
+  ["ab", "Daksh", "has space", "toolongusername123", "ok_1"].forEach((u, i) =>
+    ok(USERNAME_RE.test(u), i === 4, "username rule rejects " + JSON.stringify(u)));
+
+  /* the term budget: the same line, read against the classes still to come */
+  ok(budgetOf(0, 0, 100).canBunk, 25, "a fresh term of 100 classes buys 25 skips");
+  ok(budgetOf(0, 0, 100).must, 75, "...and 75 of them are mandatory");
+  ok(budgetOf(30, 40, 0).canBunk, 0, "30 of 40 with nothing left sits exactly on the line");
+  ok(budgetOf(10, 20, 20).canBunk, 0, "10 of 20 with 20 left: every one left is mandatory");
+  ok(budgetOf(0, 20, 20).canBunk, -10, "20 missed with only 20 left cannot reach 75%");
+  ok(budgetOf(0, 20, 20).best, 50, "...50% is the ceiling, and it is worth saying so");
+  ok(budgetOf(90, 100, 20).canBunk, 20, "far enough ahead that the rest is optional");
+  ok(classDays("2026-08-15", "2026-08-21").length, 5, "Saturday, Sunday and Independence Day hold no class");
+  ok(classDays("2026-09-04", "2026-09-04").length, 0, "a gazetted holiday is not a class day");
+  ok(classesIn("2026-08-17", "2026-08-17").total, 5, "Monday runs five classes");
+  ok(leaveCost("2000-01-01", "1999-01-01"), null, "leave that ends before it starts costs nothing");
+  ok(!!likelyOn("2026-08-28"), true, "Raksha Bandhan is one the institute usually takes");
+  ok(!!likelyOn("2026-09-14"), false, "Ganesh Chaturthi is not");
+  ok(classDays("2026-08-28", "2026-08-28").length, 1, "a likely closure is still a class day until it is marked Off");
+  ok(classDays("2026-09-04", "2026-09-04").length, 0, "a gazetted one never is");
+  ok(holidayNames("2026-09-03"), "Janmashtami (Smarta)", "the day before Janmashtami is on the calendar");
+  ok(nextRunningDay("2026-09-06").di, 0, "Sunday rolls on to Monday, not to Tuesday");
+  ok(nextRunningDay("2026-09-06").iso, "2026-09-07", "...and to the real date, not an index");
+  ok(nextRunningDay("2026-10-25").iso, "2026-10-27", "a gazetted Monday is skipped for Tuesday");
+  ok(nextRunningDay("2026-08-29").di, 0, "Saturday rolls past Sunday to Monday");
+
+  /* the sync merge: records are irreplaceable, so this only ever resolves a collision */
+  ok(mergeMark(undefined, 5), "take", "a class only the cloud has comes down");
+  ok(mergeMark({ m:"P" }, 5), "take", "an undated local mark loses to a dated cloud one");
+  ok(mergeMark({ m:"P", t:9 }, 5), "keep", "the newer of two writes wins");
+  ok(mergeMark({ m:"P", t:5 }, 5), "take", "a tie goes to the server, so devices converge");
+  return "checks ok";
+}
+
+function tally() {
+  const t = {};
+  Object.values(att).forEach(({ m, s }) => {
+    if (!SUB[s] || m === "C") return;
+    const e = t[s] = t[s] || { p:0, h:0 };
+    e.h++; if (m === "P") e.p++;
+  });
+  return t;
+}
+
+/* ============================================================
+   The 75% engine. Every number below answers one question, asked
+   against the real term and not just against what is marked so far:
+   how many classes can you still miss and still finish on 75%.
+   ============================================================ */
+const SEM_START = "2026-08-17";                  /* the session opened for Sec F IT-I */
+const SEM_END_FALLBACK = "2026-12-11";           /* last teaching day — terms move, so it is editable */
+let semEnd = SEM_END_FALLBACK;
+try { semEnd = localStorage.getItem("adgips-semend") || SEM_END_FALLBACK; } catch (e) {}
+const saveSemEnd = () => { try { localStorage.setItem("adgips-semend", semEnd); } catch (e) {} };
+
+const nowISO = () => isoOf(new Date());
+
+/* Percentages are floored, never rounded: 74.6% must never show as 75%, and the pass
+   test is done in integers so it never disagrees with the number on screen. */
+const pctOf = (p, h) => h ? Math.floor(p * 100 / h) : null;
+const clear = (p, h) => p * 4 >= h * 3;
+const dayBefore = iso => { const d = fromISO(iso); d.setDate(d.getDate() - 1); return isoOf(d); };
+const longDate = iso => fromISO(iso).toLocaleDateString("en-IN", { weekday:"short", day:"numeric", month:"long" });
+
+/* every teaching day in a window: no Sundays, no Saturdays, no gazetted closures */
+function classDays(fromIso, toIso) {
+  const out = [], d = fromISO(fromIso), end = fromISO(toIso);
+  for (; d <= end; d.setDate(d.getDate() + 1)) {
+    const di = d.getDay() - 1;
+    if (di < 0 || di > 5 || !DAYS[di].items.length) continue;
+    const iso = isoOf(d);
+    if (gazettedOn(iso)) continue;
+    out.push({ iso, di });
+  }
+  return out;
+}
+
+/* the classes that sit in a window, for your batch.
+   skipMarked drops the ones already recorded, so nothing is counted twice */
+function classesIn(fromIso, toIso, skipMarked) {
+  const per = {};
+  let total = 0, unknown = 0;
+  classDays(fromIso, toIso).forEach(({ iso, di }) => {
+    DAYS[di].items.forEach((it, ii) => {
+      if (skipMarked && att[iso + "|" + ii]) return;
+      const k = resolve(it);
+      if (!k) { unknown++; return; }            /* a split practical, batch not chosen yet */
+      per[k] = (per[k] || 0) + 1; total++;
+    });
+  });
+  return { per, total, unknown };
+}
+
+/* p attended, h held, r still to come → what the term can still become */
+function budgetOf(p, h, r) {
+  const total = h + r;
+  const need = Math.ceil(total * 3 / 4);        /* presents the term must end with */
+  const must = Math.max(0, need - p);           /* of the r left, attend at least this many */
+  return {
+    p, h, r, total, need, must,
+    pct:     pctOf(p, h),
+    canBunk: r - must,                          /* below zero: 75% is out of reach */
+    best:    pctOf(p + r, total),
+  };
+}
+
+/* the whole term in one object: overall and per subject */
+function termBudget() {
+  const t = tally(), left = classesIn(nowISO(), semEnd, true);
+  let p = 0, h = 0;
+  Object.values(t).forEach(v => { p += v.p; h += v.h; });
+  const per = {};
+  Object.keys(t).concat(Object.keys(left.per)).forEach(k => {
+    if (per[k]) return;
+    const e = t[k] || { p:0, h:0 };
+    per[k] = budgetOf(e.p, e.h, left.per[k] || 0);
+  });
+  return { overall: budgetOf(p, h, left.total), per, left };
+}
+
+/* stop coming from today: the last day you could stay away and still land on 75% */
+function vanishUntil(spare) {
+  if (spare <= 0) return null;
+  let n = spare, last = null;
+  for (const { iso, di } of classDays(nowISO(), semEnd)) {
+    const cost = DAYS[di].items.filter((it, ii) => resolve(it) && !att[iso + "|" + ii]).length;
+    if (cost > n) break;
+    n -= cost; last = iso;
+  }
+  return last;
+}
+
+/* what a stretch of leave costs, and where it leaves you if you attend everything else */
+function leaveCost(fromIso, toIso) {
+  const today = nowISO();
+  const from = fromIso < today ? today : fromIso;   /* the past is marked, not planned */
+  const to = toIso > semEnd ? semEnd : toIso;       /* and nothing past the last teaching day exists to miss */
+  if (!fromIso || !toIso || to < from) return null;
+  const b = termBudget(), o = b.overall;
+  const gone = classesIn(from, to, true);
+  const hits = [];
+  Object.keys(gone.per).forEach(k => {
+    const s = b.per[k];
+    if (!s || !s.total) return;
+    hits.push({ k, n: gone.per[k], pct: pctOf(s.p + s.r - gone.per[k], s.total) });
+  });
+  hits.sort((a, c) => a.pct - c.pct);
+  return {
+    from, to, clipped: to !== toIso, gone: gone.total, unknown: gone.unknown,
+    days: classDays(from, to).length,
+    end: pctOf(o.p + o.r - gone.total, o.total),
+    spare: o.canBunk - gone.total,
+    worst: hits[0] || null,
+  };
+}
+
+/* the untouched days that fell on a festival the institute usually takes off */
+const likelyClosures = days => days.filter(({ iso }) => likelyOn(iso));
+
+/* class days since the session opened that you never touched — the onboarding backlog */
+function untouchedDays() {
+  return classDays(SEM_START, dayBefore(nowISO())).filter(({ iso, di }) =>
+    DAYS[di].items.some(it => resolve(it)) &&
+    !DAYS[di].items.some((it, ii) => att[iso + "|" + ii]));
+}
+
+/* fill a whole day with one mark; null clears it. Split practicals need a batch first */
+function markDay(iso, di, mk) {
+  DAYS[di].items.forEach((it, ii) => {
+    const k = resolve(it);
+    if (!k) return;
+    const id = iso + "|" + ii;
+    if (mk === null) delete att[id]; else att[id] = { m:mk, s:k, t:Date.now() };
+  });
+}
+
+function renderAttendance() {
+  const input = document.getElementById("attDate");
+  if (!input.value) input.value = isoOf(new Date());
+  const iso = input.value;
+  const date = fromISO(iso);
+  const di = date.getDay() - 1;
+  const day = di >= 0 && di < 6 ? DAYS[di] : null;
+  const gaz = gazettedOn(iso);
+
+  const note = document.getElementById("attNote");
+  note.textContent = date.toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long" });
+  if (!gaz && HOLIDAYS[iso]) {
+    note.appendChild(el("b", null, " · " + holidayNames(iso)));
+    if (likelyOn(iso)) note.appendChild(document.createTextNode(" — usually closed here; mark these Off if nothing ran"));
+  }
+  const rail = document.getElementById("attRail");
+
+  if (gaz) {
+    note.appendChild(el("b", null, " · closed"));
+    rail.textContent = ""; rail.style.paddingLeft = "0";
+    const e = el("div", "empty");
+    e.appendChild(el("b", null, gaz.n));
+    e.appendChild(document.createTextNode("Institute closed. Nothing to mark."));
+    rail.appendChild(e);
+  } else if (!day || !day.items.length) {
+    rail.textContent = ""; rail.style.paddingLeft = "0";
+    const e = el("div", "empty");
+    e.appendChild(el("b", null, "No classes"));
+    e.appendChild(document.createTextNode("Nothing was scheduled on this day."));
+    rail.appendChild(e);
+  } else {
+    const order = new Map();
+    day.items.forEach((it, ii) => order.set(it.i, ii));
+    renderRail(rail, di, { build: (s, key) => markRow(s, key, iso, order.get(s.i)) });
+  }
+  renderBoard();
+  renderCatchup();
+  renderBudget();
+  renderLeave();
+  renderSyncNote();
+}
+
+/* station states, borrowed from the network: served, suspended, not running */
+const GLYPH = {
+  P: '<circle cx="9" cy="9" r="5.4" fill="currentColor"/>',
+  A: '<circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/>' +
+     '<path d="M5.6 12.4 12.4 5.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  C: '<circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="2.4 2.6"/>',
+};
+function glyph(m) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 18 18");
+  svg.setAttribute("class", "glyph");
+  svg.setAttribute("aria-hidden", "true");
+  svg.innerHTML = GLYPH[m];
+  return svg;
+}
+
+function markRow(s, key, iso, ii) {
+  const row = el("div", "arow");
+  const m = el("div", "m");
+  m.appendChild(el("div", "t", label(s.i, s.span)));
+  if (key) {
+    m.appendChild(el("div", "n", SUB[key].short));
+    m.appendChild(el("div", "f", SUB[key].name + " · " + SUB[key].fac));
+  } else {
+    m.appendChild(el("div", "n", "Practical (F1 / F2)"));
+    m.appendChild(el("div", "f", "Choose F1 or F2 at the top to mark this one"));
+  }
+  row.appendChild(m);
+  if (!key) return row;
+
+  const preview = el("div", "preview");
+  row.appendChild(markStrip(key, iso, ii, label(s.i, s.span), preview));
+  row.appendChild(preview);
+  return row;
+}
+
+/* The P / A / C strip. Shared by the attendance rail and today's line, so a class
+   marked in either place is the same record and both views redraw together. */
+function markStrip(key, iso, ii, when, preview) {
+  const id = iso + "|" + ii, rec = att[id];
+  const marks = el("div", "marks");
+  [["P","Present"],["A","Absent"],["C","Off"]].forEach(([mk, lbl]) => {
+    const b = el("button");
+    b.type = "button"; b.dataset.m = mk;
+    b.setAttribute("aria-pressed", !!(rec && rec.m === mk));
+    b.setAttribute("aria-label", lbl + " — " + SUB[key].short + ", " + when);
+    b.appendChild(glyph(mk));
+    b.appendChild(document.createTextNode(lbl));
+    if (preview) {                                 // the hover read-out only fits the wide row
+      const show = () => showPreview(preview, key, id, mk);
+      const hide = () => { preview.classList.remove("on"); };
+      b.addEventListener("pointerenter", show);
+      b.addEventListener("focus", show);
+      b.addEventListener("pointerleave", hide);
+      b.addEventListener("blur", hide);
+    }
+    b.addEventListener("click", () => {
+      if (rec && rec.m === mk) delete att[id]; else att[id] = { m:mk, s:key, t:Date.now() };
+      saveAtt();
+      renderToday(); renderAttendance();           // one record, both pages
+      if (profile) {
+        pushMark(id, att[id]).then(() => {
+          if (syncState && !syncState.ok) { syncState = { ok:true, pulled:0, pushed:0 }; renderSyncNote(); }
+        }).catch(err => {
+          const [what, fix] = explain(err);
+          syncState = { ok:false, msg: what + " — " + fix };
+          renderSyncNote();
+          console.warn("mark not saved to the account:", err);
+        });
+        pushScore().catch(() => {});
+      }
+    });
+    marks.appendChild(b);
+  });
+  return marks;
+}
+
+/* what this mark would do to the subject, before you commit to it */
+function showPreview(node, key, id, mk) {
+  const before = tally()[key] || { p:0, h:0 };
+  const cur = att[id];
+  const after = { p:before.p, h:before.h };
+  if (cur && cur.s === key && cur.m !== "C") { after.h--; if (cur.m === "P") after.p--; }
+  const same = cur && cur.m === mk;
+  if (!same && mk !== "C") { after.h++; if (mk === "P") after.p++; }
+
+  node.textContent = "";
+  if (!after.h) { node.textContent = same ? "Undo — nothing held for this subject" : "No classes held yet for this subject"; node.classList.add("on"); return; }
+  const wasPct = pctOf(before.p, before.h);
+  const pct = pctOf(after.p, after.h);
+  node.appendChild(document.createTextNode((same ? "Undo → " : SUB[key].short + " → ")));
+  const b = el("b", null, pct + "%");
+  if (wasPct !== null && pct !== wasPct) b.className = pct > wasPct ? "up" : "down";
+  node.appendChild(b);
+  node.appendChild(document.createTextNode(" · " + after.p + " of " + after.h));
+  node.classList.add("on");
+}
+
+/* the one sentence a student actually reads on a subject */
+function advice(b) {
+  /* nothing left to attend has to be said first, or it reads "attend all 0 left" */
+  if (!b.r) return b.pct === null ? "Nothing held and nothing left"
+          : b.pct >= 75 ? "Term over for this one — finished at " + b.pct + "%"
+                        : "No classes left to fix it — finished at " + b.pct + "%";
+  if (b.canBunk < 0) return "Attend all " + b.r + " left and you still finish at " + b.best + "%";
+  if (!b.canBunk) return "Attend every one of the " + b.r + " left";
+  return "Miss up to " + b.canBunk + " of the " + b.r + " left";
+}
+
+function renderBoard() {
+  const t = tally(), tb = termBudget();
+  const keys = Object.keys(t);
+  const totalP = keys.reduce((n, k) => n + t[k].p, 0);
+  const totalH = keys.reduce((n, k) => n + t[k].h, 0);
+
+  const sum = document.getElementById("summary");
+  sum.textContent = "";
+  const board = document.getElementById("board");
+  board.textContent = "";
+
+  if (!totalH) {
+    const e = el("div", "empty");
+    e.appendChild(el("b", null, "Nothing marked yet"));
+    e.appendChild(document.createTextNode("Pick a date above and tap Present or Absent on a class. Your percentage per subject shows up here."));
+    board.appendChild(e);
+    return;
+  }
+
+  const overall = pctOf(totalP, totalH);
+  const canMiss = Math.max(0, tb.overall.canBunk);
+  const box = el("div", "summary");
+  const big = el("div", "big " + (clear(totalP, totalH) ? "ok" : "bad"));
+  big.appendChild(el("b", null, overall + "%"));
+  big.appendChild(document.createTextNode("Overall"));
+  box.appendChild(big);
+  [["Attended", totalP + " / " + totalH], ["Classes left", String(tb.overall.r)],
+   ["Can still miss", canMiss + ""]].forEach(([k, v]) => {
+    const d = el("div");
+    d.appendChild(el("b", null, v));
+    d.appendChild(document.createTextNode(k));
+    box.appendChild(d);
+  });
+  sum.appendChild(box);
+
+  const list = el("div", "board");
+  keys.sort((a, b) => (t[a].p / t[a].h) - (t[b].p / t[b].h)).forEach(k => {
+    const { p, h } = t[k], pct = pctOf(p, h);
+    const b = tb.per[k] || budgetOf(p, h, 0);
+    const state = b.canBunk < 0 ? "bad" : b.canBunk ? "ok" : "warn";
+    const row = el("div", "srow " + state);
+    row.dataset.line = SUB[k].line;
+    row.appendChild(el("span", "bar"));
+
+    const m = el("div", "m");
+    m.appendChild(el("div", "n", SUB[k].short));
+    m.appendChild(el("div", "st " + state,
+      state === "ok" ? "Good service" : state === "warn" ? "At the line" : "Below minimum"));
+    m.appendChild(el("div", "adv", advice(b)));
+    const track = el("div", "track");
+    const fill = el("i"); fill.style.width = Math.min(100, pct) + "%";
+    track.appendChild(fill); track.appendChild(el("u"));
+    m.appendChild(track);
+    row.appendChild(m);
+
+    const r = el("div", "r");
+    r.appendChild(el("div", "pct " + (clear(p, h) ? "ok" : "bad"), pct + "%"));
+    r.appendChild(el("div", "held", p + " of " + h));
+    row.appendChild(r);
+    list.appendChild(row);
+  });
+  board.appendChild(list);
+}
+
+/* ---------- the budget panel: the term, not just the marks so far ---------- */
+function renderBudget() {
+  const box = document.getElementById("budget");
+  const input = document.getElementById("semEndInput");
+  input.value = semEnd;
+  input.min = SEM_START;
+  ["lvFrom", "lvTo"].forEach(id => {
+    const f = document.getElementById(id);
+    f.min = nowISO(); f.max = semEnd;
+  });
+  box.textContent = "";
+  const daysLeft = classDays(nowISO(), semEnd).length;
+  document.getElementById("termNote").textContent =
+    daysLeft + (daysLeft === 1 ? " class day left" : " class days left") +
+    " · " + classDays(SEM_START, semEnd).length + " in the term";
+
+  const { overall: o, left } = termBudget();
+  if (!o.total) {
+    const e = el("div", "empty");
+    e.appendChild(el("b", null, "Nothing left to plan"));
+    e.appendChild(document.createTextNode(
+      "No classes are marked and none are scheduled between today and " + longDate(semEnd) +
+      ". Check the term end date above."));
+    box.appendChild(e);
+    return;
+  }
+
+  const spare = Math.max(0, o.canBunk);
+  const card = el("div", "summary");
+  const big = el("div", "big " + (o.canBunk < 0 ? "bad" : o.canBunk ? "ok" : "warn"));
+  big.appendChild(el("b", null, String(spare)));
+  big.appendChild(document.createTextNode("Bunks left this term"));
+  card.appendChild(big);
+  [["Classes left", String(o.r)],
+   ["Must attend", String(o.must)],
+   ["Ceiling", o.best + "%"]].forEach(([k, v]) => {
+    const d = el("div");
+    d.appendChild(el("b", null, v));
+    d.appendChild(document.createTextNode(k));
+    card.appendChild(d);
+  });
+  box.appendChild(card);
+
+  const note = el("div", "planbar");
+  note.hidden = false;
+  const head = el("div", "psum");
+  if (o.canBunk < 0) {
+    head.appendChild(el("b", null, o.best + "%"));
+    head.appendChild(document.createTextNode(
+      " is the highest this term can still end at, even attending all " + o.r +
+      " classes left. 75% is out of reach — every class from here still lifts the number."));
+  } else if (!o.canBunk) {
+    head.appendChild(el("b", null, "0"));
+    head.appendChild(document.createTextNode(
+      " to spare. Attend all " + o.r + " classes left and you finish at exactly " + o.best +
+      "%. One more absence and the term closes below the line."));
+  } else {
+    head.appendChild(el("b", null, String(spare)));
+    head.appendChild(document.createTextNode(
+      (spare === 1 ? " class" : " classes") + " you can still miss. Attend everything left and you finish at " +
+      o.best + "%; miss all " + spare + " and you land on 75% with nothing to spare."));
+  }
+  note.appendChild(head);
+
+  const facts = el("div", "pdelta");
+  facts.textContent = o.total + " classes across the term · " + o.p + " attended, " +
+    (o.h - o.p) + " missed, " + o.r + " to come · 75% of " + o.total + " is " + o.need + " classes.";
+  note.appendChild(facts);
+
+  const v = vanishUntil(o.canBunk);
+  if (v) {
+    const d = el("div", "pdelta");
+    d.textContent = "Disappear from today and you stay clear until " + longDate(v) +
+      " — that is the last day off the budget covers.";
+    note.appendChild(d);
+  }
+  const shut = classDays(nowISO(), semEnd).filter(({ iso }) => likelyOn(iso));
+  if (shut.length) {
+    const d = el("div", "pdelta");
+    d.textContent = shut.length + (shut.length === 1 ? " day" : " days") +
+      " ahead fall on festivals the institute usually shuts for (" +
+      shut.slice(0, 3).map(x => holidayNames(x.iso).split(" · ")[0]).join(", ") +
+      (shut.length > 3 ? ", …" : "") + "). They are still counted as classes until you mark them Off.";
+    note.appendChild(d);
+  }
+  if (left.unknown) {
+    const d = el("div", "pdelta bad");
+    d.textContent = left.unknown + " split practicals are not counted. Pick F1 or F2 at the top of the page.";
+    note.appendChild(d);
+  }
+  box.appendChild(note);
+}
+
+/* ---------- leave planner: name the days, get the bill ---------- */
+function renderLeave() {
+  const out = document.getElementById("lvOut");
+  const from = document.getElementById("lvFrom").value;
+  const to = document.getElementById("lvTo").value;
+  out.textContent = "";
+
+  const r = leaveCost(from, to);
+  if (!r) {
+    out.appendChild(el("div", "psum", from || to
+      ? "Pick both dates inside the term — it runs to " + longDate(semEnd) + ", and the second date has to be on or after the first."
+      : "Pick the days you want off. Weekends, gazetted holidays and classes you already marked are left out of the bill."));
+    return;
+  }
+  const bar = el("div", "planbar");
+  bar.hidden = false;
+  const head = el("div", "psum");
+  head.appendChild(el("b", null, String(r.gone)));
+  head.appendChild(document.createTextNode(
+    (r.gone === 1 ? " class" : " classes") + " across " + r.days +
+    (r.days === 1 ? " class day" : " class days") + ", " + longDate(r.from) + " to " + longDate(r.to) + "."));
+  bar.appendChild(head);
+
+  const verdict = el("div", "pdelta" + (r.end !== null && r.end < 75 ? " bad" : ""));
+  verdict.textContent = r.end === null ? "Nothing marked yet, so there is no percentage to project."
+    : r.end < 75
+      ? "Too expensive. You would finish at " + r.end + "% — " + Math.abs(r.spare) +
+        " more classes than the budget covers. Trim the trip by that much."
+      : "Affordable. You would finish at " + r.end + "%, with " + r.spare +
+        (r.spare === 1 ? " class" : " classes") + " still spare after it.";
+  bar.appendChild(verdict);
+
+  if (r.worst) {
+    const w = el("div", "pdelta" + (r.worst.pct < 75 ? " bad" : ""));
+    w.textContent = "Tightest line: " + SUB[r.worst.k].short + " lands at " + r.worst.pct +
+      "% after missing " + r.worst.n + " of it.";
+    bar.appendChild(w);
+  }
+  if (r.unknown) {
+    const u = el("div", "pdelta");
+    u.textContent = r.unknown + " split practicals in that window are not counted until you pick a batch.";
+    bar.appendChild(u);
+  }
+  if (r.clipped) {
+    const c = el("div", "pdelta");
+    c.textContent = "Counted up to " + longDate(semEnd) + " only — the term ends there.";
+    bar.appendChild(c);
+  }
+  out.appendChild(bar);
+}
+
+/* ---------- catch-up: onboard in the middle of the term without losing the term ---------- */
+function renderCatchup() {
+  const box = document.getElementById("catchup");
+  box.textContent = "";
+  if (batch === "both") {
+    const b = el("div", "cu");
+    b.appendChild(el("b", null, "Pick F1 or F2"));
+    b.appendChild(document.createTextNode(
+      " at the top of the page. Until you do, the split practicals cannot be marked and every number here is short."));
+    box.appendChild(b);
+    return;
+  }
+  const days = untouchedDays();
+  if (!days.length) return;
+  const b = el("div", "cu");
+  b.appendChild(el("b", null, days.length + (days.length === 1 ? " class day" : " class days")));
+  b.appendChild(document.createTextNode(
+    " since the session opened on " + longDate(SEM_START) + " have nothing marked. Your percentage is missing them."));
+  const go = el("button", "link", "Catch up");
+  go.type = "button";
+  go.addEventListener("click", openCatchup);
+  b.appendChild(go);
+  box.appendChild(b);
+}
+
+function openCatchup() {
+  const box = document.getElementById("dlgIn");
+  const draw = () => {
+    box.textContent = "";
+    box.dataset.line = "";
+    const days = untouchedDays();
+    box.appendChild(el("div", "d-name", "Catch up"));
+    const shutN = likelyClosures(days).length;
+    box.appendChild(el("div", "d-full", days.length
+      ? "Every class day since " + longDate(SEM_START) + " that you have not touched. Mark a whole day at a time; open one to fix single classes."
+        + (shutN ? " " + shutN + " of them fell on a festival the institute usually takes off — Off keeps them out of your percentage entirely." : "")
+      : "Nothing left — every class day since " + longDate(SEM_START) + " has been marked."));
+
+    if (days.length) {
+      const all = el("button", "btn", "Mark all " + days.length + " days present");
+      all.type = "button";
+      all.addEventListener("click", () => {
+        if (!confirm("Mark every class on all " + days.length + " untouched days as present? You can change any of them afterwards.")) return;
+        days.forEach(({ iso, di }) => markDay(iso, di, "P"));
+        saveAtt(); renderAttendance();
+        if (profile) { syncAttendance().catch(() => {}); pushScore().catch(() => {}); }
+        draw();
+      });
+      box.appendChild(all);
+
+      const shut = likelyClosures(days);
+      if (shut.length) {
+        const off = el("button", "btn", "Mark the " + shut.length + " festival " +
+          (shut.length === 1 ? "day" : "days") + " Off");
+        off.type = "button";
+        off.addEventListener("click", () => {
+          shut.forEach(({ iso, di }) => markDay(iso, di, "C"));
+          saveAtt(); renderAttendance();
+          if (profile) { syncAttendance().catch(() => {}); pushScore().catch(() => {}); }
+          draw();
+        });
+        box.appendChild(off);
+      }
+
+      const list = el("div", "cud");
+      days.forEach(({ iso, di }) => {
+        const row = el("div", "d");
+        const w = el("div", "w");
+        w.appendChild(el("b", null, longDate(iso)));
+        const n = DAYS[di].items.filter(it => resolve(it)).length;
+        const names = holidayNames(iso);
+        w.appendChild(document.createTextNode(n + (n === 1 ? " class" : " classes") + (names ? " · " + names : "")));
+        if (likelyOn(iso)) w.appendChild(el("i", "flag", "usually closed — Off"));
+        row.appendChild(w);
+        const marks = el("div", "marks");
+        [["P", "All present"], ["A", "All absent"], ["C", "Off"]].forEach(([mk, lbl]) => {
+          const btn = el("button", null, lbl);
+          btn.type = "button"; btn.dataset.m = mk;
+          btn.setAttribute("aria-label", lbl + " — " + longDate(iso));
+          btn.addEventListener("click", () => {
+            markDay(iso, di, mk);
+            saveAtt(); renderAttendance();
+            if (profile) { syncAttendance().catch(() => {}); pushScore().catch(() => {}); }
+            row.classList.add("done");
+            btn.setAttribute("aria-pressed", "true");
+          });
+          marks.appendChild(btn);
+        });
+        row.appendChild(marks);
+        const open = el("button", "link", "Open");
+        open.type = "button";
+        open.addEventListener("click", () => {
+          document.getElementById("attDate").value = iso;
+          document.getElementById("dlg").close();
+          renderAttendance();
+          document.getElementById("attRail").scrollIntoView({ block:"start" });
+        });
+        row.appendChild(open);
+        list.appendChild(row);
+      });
+      box.appendChild(list);
+    }
+    box.appendChild(actions());
+  };
+  draw();
+  document.getElementById("dlg").showModal();
+}
+
+/* ============================================================
+   .ics export
+   ============================================================ */
+const icsTime = min => pad(Math.floor(min / 60)) + pad(min % 60) + "00";
+const compact = d => d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
+function nextDateFor(dayIdx) {
+  const d = new Date(); d.setHours(0, 0, 0, 0);
+  while (d.getDay() !== dayIdx + 1) d.setDate(d.getDate() + 1);
+  return d;
+}
+function buildICS() {
+  const out = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Sec F IT-I//Timetable//EN", "CALSCALE:GREGORIAN"];
+  const BYDAY = ["MO","TU","WE","TH","FR","SA"];
+  const stamp = compact(new Date()) + "T000000";
+  DAYS.forEach((day, di) => {
+    const first = nextDateFor(di);
+    day.items.forEach((item, ii) => {
+      const span = item.span || 1, key = resolve(item);
+      const title = key ? SUB[key].short + " · " + SUB[key].name
+                        : "Lab · F1 " + SUB[item.split.F1].short + " / F2 " + SUB[item.split.F2].short;
+      const who = key ? SUB[key].fac : SUB[item.split.F1].fac + " / " + SUB[item.split.F2].fac;
+      const skips = GAZETTED.filter(([iso]) => {
+        const d = fromISO(iso);
+        return d.getDay() === di + 1 && d >= first;
+      }).map(([iso]) => compact(fromISO(iso)) + "T" + icsTime(startMin(item.i)));
+      out.push(
+        "BEGIN:VEVENT",
+        "UID:secf-" + di + "-" + ii + "@adgips",
+        "DTSTAMP:" + stamp,
+        "SUMMARY:" + title,
+        "LOCATION:" + (key && SUB[key].lab ? "Lab" : "Room 2311"),
+        "DESCRIPTION:" + who.replace(/,/g, "\\,"),
+        "DTSTART:" + compact(first) + "T" + icsTime(startMin(item.i)),
+        "DTEND:" + compact(first) + "T" + icsTime(endMin(item.i, span)),
+        "RRULE:FREQ=WEEKLY;BYDAY=" + BYDAY[di] + ";UNTIL=20261231T235959"
+      );
+      if (skips.length) out.push("EXDATE:" + skips.join(","));
+      out.push("END:VEVENT");
+    });
+  });
+  out.push("END:VCALENDAR");
+  return out.join("\r\n");
+}
+
+function openICS() {
+  const text = buildICS();
+  const box = document.getElementById("dlgIn");
+  box.textContent = ""; box.dataset.line = "";
+  const top = el("div", "d-top");
+  top.appendChild(el("span", "badge ghost", "Export"));
+  box.appendChild(top);
+  box.appendChild(el("div", "d-name", "timetable.ics"));
+  box.appendChild(el("div", "d-full", "Every class as a weekly repeat until 31 Dec 2026, with gazetted closures already skipped. Copy this, save it as timetable.ics, and open it with your calendar."));
+  const ta = el("textarea");
+  ta.value = text; ta.readOnly = true;
+  ta.setAttribute("aria-label", "Calendar file contents");
+  box.appendChild(ta);
+  const copy = el("button", "btn pri", "Copy");
+  copy.type = "button";
+  copy.addEventListener("click", () => {
+    ta.select();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text)
+        .then(() => copy.textContent = "Copied")
+        .catch(() => copy.textContent = "Select the text and copy");
+    } else copy.textContent = "Select the text and copy";
+  });
+  box.appendChild(actions(copy));
+  document.getElementById("dlg").showModal();
+}
+
+/* ============================================================
+   Accounts and section ranks.
+
+   The publishable key below is meant to be public — it ships in
+   the source of every Supabase app. What protects the data is the
+   row-level security in students-setup.sql: a student can read and
+   write only the roster row they have claimed, claiming goes through
+   a database function that cannot be raced, and percentages never
+   leave the database. Everyone reads two views: roster (names and
+   whether they are taken) and leaderboard_ranks (name and position).
+   ============================================================ */
+const CLOUD = {
+  url: "https://jyhfhbkidggwvfjmrsxh.supabase.co",
+  key: "sb_publishable_8v8hGsWlqZOPRWcnGIZo8A_TnmaXQe-",
+};
+const USERNAME_RE = /^[a-z0-9_]{3,16}$/;
+const MIN_PASS = 8;
+
+let sess = null, profile = null;
+try { sess = JSON.parse(localStorage.getItem("adgips-sess") || "null"); } catch (e) {}
+try { profile = JSON.parse(localStorage.getItem("adgips-profile") || "null"); } catch (e) {}
+const saveSess = () => { try { sess ? localStorage.setItem("adgips-sess", JSON.stringify(sess))
+                                   : localStorage.removeItem("adgips-sess"); } catch (e) {} };
+const saveProfile = () => { try { profile ? localStorage.setItem("adgips-profile", JSON.stringify(profile))
+                                          : localStorage.removeItem("adgips-profile"); } catch (e) {} };
+
+function apiError(j, status) {
+  const e = new Error(j.msg || j.error_description || j.message || "Something went wrong");
+  e.code = j.error_code || j.code; e.status = status;
+  return e;
+}
+async function call(path, opts, token) {
+  opts = opts || {};
+  const h = Object.assign({ apikey: CLOUD.key, "Content-Type": "application/json" }, opts.headers || {});
+  h.Authorization = "Bearer " + (token || CLOUD.key);
+  const r = await fetch(CLOUD.url + path, Object.assign({}, opts, { headers: h }));
+  if (r.status === 204) return null;
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw apiError(j, r.status);
+  return j;
+}
+
+const tokenFresh = () => sess && sess.access_token && sess.expires_at && sess.expires_at * 1000 > Date.now() + 60000;
+
+/* a live access token, refreshed when stale; null means signed out */
+async function token() {
+  if (tokenFresh()) return sess.access_token;
+  if (sess && sess.refresh_token) {
+    try {
+      sess = await call("/auth/v1/token?grant_type=refresh_token", {
+        method: "POST", body: JSON.stringify({ refresh_token: sess.refresh_token }) });
+      saveSess();
+      return sess.access_token;
+    } catch (e) { sess = null; saveSess(); }
+  }
+  return null;
+}
+const auth = (path, body) => call(path, { method: "POST", body: JSON.stringify(body) });
+
+async function signIn(email, password) {
+  sess = await auth("/auth/v1/token?grant_type=password", { email: email.trim(), password });
+  saveSess();
+  return loadProfile();
+}
+async function signUp(email, password) {
+  const out = await auth("/auth/v1/signup", { email: email.trim(), password });
+  if (!out.access_token) throw new Error("Check your email to confirm the account, then sign in.");
+  sess = out; saveSess();
+}
+function signOut() {
+  sess = null; profile = null; saveSess(); saveProfile();
+  location.hash = ""; location.reload();
+}
+
+/* your own roster row. RLS means this can only ever return yours. */
+async function loadProfile() {
+  const t = await token();
+  if (!t) { profile = null; saveProfile(); return null; }
+  const rows = await call("/rest/v1/students?select=sno,name,batch,username,role,present,held,github,linkedin,instagram,mobile,email", {}, t);
+  profile = rows && rows.length ? rows[0] : null;
+  saveProfile();
+  return profile;
+}
+
+async function claimName(sno, username, email, password) {
+  await signUp(email, password);
+  const t = await token();
+  try {
+    await call("/rest/v1/rpc/claim_student", {
+      method: "POST", body: JSON.stringify({ p_sno: sno, p_username: username }) }, t);
+  } catch (e) {
+    // the account exists but holds no name; signing in again lands on this same state
+    throw e;
+  }
+  return loadProfile();
+}
+
+function myTotals() {
+  const t = tally();
+  return Object.values(t).reduce((a, v) => ({ present:a.present + v.p, held:a.held + v.h }), { present:0, held:0 });
+}
+
+/* your totals only — never the per-subject breakdown */
+async function pushScore() {
+  if (!profile) return;
+  const t = await token();
+  if (!t) return;
+  const { present, held } = myTotals();
+  await call("/rest/v1/students?sno=eq." + profile.sno, {
+    method: "PATCH",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ present, held, updated_at: new Date().toISOString() }),
+  }, t);
+}
+
+const fetchRanks = () => call("/rest/v1/leaderboard_ranks?select=name,username,batch,rank&order=rank.asc&limit=200");
+
+/* ---------- attendance in the cloud ----------
+   One row per marked class. localStorage stays the source of truth — the app
+   draws every page from it and works with no signal — and this is a copy that
+   survives a lost phone. user_id is filled in by the database from the token,
+   so the app never sends it and cannot get it wrong.
+
+   Merge rule, for two devices marking the same class: the newer write wins.
+   A local record with no timestamp predates syncing, so a dated cloud row beats
+   it; but a local record the cloud has never seen is always pushed, never
+   dropped. Records are irreplaceable, so the merge only ever resolves a genuine
+   collision — it never deletes.
+
+   ponytail: an unmark that fails to reach the server comes back on the next
+   pull, because a deletion leaves nothing behind to replay. Tombstones would
+   fix it; one re-tap also fixes it, so it can wait for a real complaint. */
+/* which copy of one class survives: take the cloud's, or keep ours and push it up.
+   A tie goes to the server so two devices always converge on the same answer. */
+const mergeMark = (mine, theirsAt) => (mine && (mine.t || 0) > theirsAt) ? "keep" : "take";
+
+const attBody = (key, rec) => {
+  const [on_date, slot] = key.split("|");
+  const row = { on_date, slot: Number(slot), mark: rec.m, subject: rec.s };
+  /* name the owner when the session knows it: the primary key is (user_id, on_date,
+     slot), and an upsert that leaves a key column out has to be inferred instead */
+  if (sess && sess.user && sess.user.id) row.user_id = sess.user.id;
+  return row;
+};
+
+/* the upsert target, spelled out rather than inferred from the payload */
+const ATT_UPSERT = "/rest/v1/attendance?on_conflict=user_id,on_date,slot";
+
+/* what the last sync did, so a failure is visible instead of silent */
+let syncState = null;
+function renderSyncNote() {
+  const n = document.getElementById("syncNote");
+  if (!n) return;
+  n.textContent = "";
+  n.className = "syncnote";
+  if (!profile) {
+    n.textContent = "On this device only";
+    return;
+  }
+  if (!syncState) { n.textContent = "Syncing…"; return; }
+  n.appendChild(el("i"));
+  if (syncState.ok) {
+    n.classList.add("ok");
+    n.appendChild(document.createTextNode(syncState.dropped
+      ? "Cleared from your account on another device"
+      : "Saved to your account"
+        + (syncState.pulled ? " · " + syncState.pulled + " pulled" : "")
+        + (syncState.pushed ? " · " + syncState.pushed + " sent" : "")));
+  } else {
+    n.classList.add("bad");
+    n.appendChild(document.createTextNode(syncState.msg));
+  }
+}
+
+async function pushMark(id, rec) {
+  if (!profile) return;
+  const t = await token();
+  if (!t) return;
+  if (!rec) {
+    const [on_date, slot] = id.split("|");
+    return call("/rest/v1/attendance?on_date=eq." + on_date + "&slot=eq." + slot,
+      { method:"DELETE", headers:{ Prefer:"return=minimal" } }, t);
+  }
+  return call(ATT_UPSERT, {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify([attBody(id, rec)]),
+  }, t);
+}
+
+/* pull everything, decide each collision, push back whatever the cloud is missing */
+async function syncAttendance() {
+  if (!profile) return;
+  const t = await token();
+  if (!t) return;
+  try {
+    const out = await runSync(t);
+    syncState = { ok:true, pulled:out.pulled, pushed:out.pushed, dropped:out.dropped };
+    renderSyncNote();
+    return out;
+  } catch (err) {
+    const [what, fix] = explain(err);
+    syncState = { ok:false, msg: what + " — " + fix };
+    renderSyncNote();
+    console.warn("attendance sync failed:", err);   // the detail, for when the note is not enough
+    throw err;
+  }
+}
+
+async function runSync(t) {
+  /* a clear on another device outranks anything this one is holding from before it */
+  const wiped = await clearedAt(t);
+  let dropped = 0;
+  if (wiped) {
+    Object.keys(att).forEach(id => {
+      if ((att[id].t || 0) <= wiped) { delete att[id]; dropped++; }
+    });
+    if (dropped) saveAtt();
+  }
+
+  const rows = await call("/rest/v1/attendance?select=on_date,slot,mark,subject,updated_at", {}, t);
+  const remote = {};
+  let pulled = 0;
+  rows.forEach(r => {
+    const id = r.on_date + "|" + r.slot, theirs = Date.parse(r.updated_at) || 0;
+    remote[id] = theirs;
+    if (mergeMark(att[id], theirs) === "keep") return;   // ours is newer: it goes up below
+    const mine = att[id];
+    if (!mine || mine.m !== r.mark) pulled++;
+    att[id] = { m:r.mark, s:r.subject, t:theirs };
+  });
+  saveAtt();
+  if (pulled || dropped) renderAll();
+
+  /* whatever the cloud has never seen, or has an older copy of */
+  const send = Object.keys(att).filter(id =>
+    remote[id] === undefined || (att[id].t || 0) > remote[id]);
+  for (let i = 0; i < send.length; i += 100) {        // PostgREST takes a batch in one call
+    await call(ATT_UPSERT, {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify(send.slice(i, i + 100).map(id => attBody(id, att[id]))),
+    }, t);
+  }
+  if (pulled || send.length || dropped) pushScore().catch(() => {});
+  return { pulled, pushed: send.length, dropped };
+}
+
+/* Clearing on the device clears it everywhere. The stamp is the whole trick: an
+   empty table alone reads exactly like "the cloud has not seen my marks yet", so
+   the next device to sync would upload all of them again. A cleared_at says which
+   of the two it is, and every device drops what it holds from before that moment. */
+async function wipeAttendance() {
+  const t = await token();
+  if (!t) return;
+  await call("/rest/v1/attendance?on_date=gte.2000-01-01",
+    { method:"DELETE", headers:{ Prefer:"return=minimal" } }, t);
+  try {
+    await call("/rest/v1/students?sno=eq." + profile.sno, {
+      method: "PATCH",
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify({ attendance_cleared_at: new Date().toISOString() }),
+    }, t);
+  } catch (err) {
+    /* the records are gone either way; without the stamp another device that is
+       still holding them will put them back, which is worth saying out loud */
+    err.stampOnly = true;
+    throw err;
+  }
+}
+
+/* when this account last wiped its attendance, or 0 if it never has */
+async function clearedAt(t) {
+  try {
+    const rows = await call("/rest/v1/students?select=attendance_cleared_at&sno=eq." + profile.sno, {}, t);
+    return rows && rows[0] && rows[0].attendance_cleared_at
+      ? Date.parse(rows[0].attendance_cleared_at) || 0 : 0;
+  } catch (e) { return 0; }      // column not added yet: behave as before
+}
+
+const CONTACTS = [
+  ["email",     "Email",     "you@gmail.com",            v => "mailto:" + v],
+  ["mobile",    "Mobile",    "+91 98xxxxxxxx",           v => "tel:" + v.replace(/[^+\d]/g, "")],
+  ["instagram", "Instagram", "handle, no @",             v => "https://instagram.com/" + v.replace(/^@/, "")],
+  ["github",    "GitHub",    "username",                 v => "https://github.com/" + v.replace(/^@/, "")],
+  ["linkedin",  "LinkedIn",  "profile name or full URL", v => /^https?:/.test(v) ? v : "https://linkedin.com/in/" + v],
+];
+
+/* three independent reports and a class counts as cancelled; tune here */
+const CANCEL_MIN = 3;
+let cancelVotes = {}, myReports = {};
+
+async function loadCancelled(fromISO, toISO) {
+  const q = "on_date=gte." + fromISO + "&on_date=lte." + toISO;
+  const rows = await call("/rest/v1/cancelled?select=on_date,period,votes&" + q);
+  cancelVotes = {};
+  rows.forEach(r => { cancelVotes[r.on_date + "|" + r.period] = r.votes; });
+  const t = await token();
+  if (!t) return;
+  const mine = await call("/rest/v1/cancellations?select=on_date,period&" + q, {}, t);
+  myReports = {};
+  mine.forEach(r => { myReports[r.on_date + "|" + r.period] = true; });
+}
+const votesFor = (iso, period) => cancelVotes[iso + "|" + period] || 0;
+const isCancelled = (iso, period) => votesFor(iso, period) >= CANCEL_MIN;
+
+async function reportCancelled(iso, period, on) {
+  const t = await token();
+  if (!t || !profile) throw new Error("Sign in first");
+  const key = iso + "|" + period;
+  if (on) {
+    await call("/rest/v1/cancellations", { method:"POST", headers:{ Prefer:"return=minimal" },
+      body: JSON.stringify({ on_date: iso, period, by_user: sess.user.id }) }, t);
+    myReports[key] = true; cancelVotes[key] = votesFor(iso, period) + 1;
+  } else {
+    await call("/rest/v1/cancellations?on_date=eq." + iso + "&period=eq." + period +
+               "&by_user=eq." + sess.user.id, { method:"DELETE", headers:{ Prefer:"return=minimal" } }, t);
+    delete myReports[key]; cancelVotes[key] = Math.max(0, votesFor(iso, period) - 1);
+  }
+}
+
+const isCR = () => !!(profile && profile.role === "cr");
+const fetchDirectory = async () => call("/rest/v1/directory?select=*&order=sno.asc", {}, await token());
+const crRelease = async sno => call("/rest/v1/rpc/cr_release", { method:"POST",
+  body: JSON.stringify({ p_sno: sno }) }, await token());
+const crAddStudent = async (name, batch) => call("/rest/v1/rpc/cr_add_student", { method:"POST",
+  body: JSON.stringify({ p_name: name, p_batch: batch }) }, await token());
+async function saveContacts(patch) {
+  const t = await token();
+  await call("/rest/v1/students?sno=eq." + profile.sno, { method:"PATCH",
+    headers:{ Prefer:"return=minimal" }, body: JSON.stringify(patch) }, t);
+  Object.assign(profile, patch); saveProfile();
+  directory = null; people = null;   // stale once your own row changed
+}
+const fetchRoster = () => call("/rest/v1/roster?select=sno,name,batch&claimed=is.false&order=sno.asc");
+
+/* every failure names the problem and the way out */
+function explain(err) {
+  const c = err.code, m = (err.message || "").toLowerCase();
+  if (c === "invalid_credentials" || err.status === 400 && m.includes("invalid login"))
+    return ["Wrong email or password", "Check both, or use Forgot password."];
+  if (c === "user_already_exists" || c === "email_exists")
+    return ["That email already has an account", "Sign in instead, or reset the password."];
+  if (c === "email_address_invalid") return ["That email address was rejected", "Use a real address you can open."];
+  if (c === "weak_password") return ["Password too short", "Use at least " + MIN_PASS + " characters."];
+  if (c === "23505" && m.includes("already claimed a name"))
+    return ["This account already has a name", "Sign in — you don't need to claim again."];
+  if (c === "23505") return ["Someone just took that", "Go back and pick another name or username."];
+  if (c === "PGRST205") return ["The roster is missing", "Run students-setup.sql in Supabase."];
+  if (c === "PGRST204" && m.includes("attendance_cleared_at"))
+    return ["Your account cannot record a clear", "Run STEP 5 of attendance-setup.sql in Supabase."];
+  if (c === "42501" && m.includes("row-level security"))
+    return ["The account rejected that record", "Run STEP 2 of attendance-setup.sql — the policies are missing."];
+  if (c === "42501" || m.includes("permission denied"))
+    return ["Your account cannot reach the attendance table", "Run STEP 2 of attendance-setup.sql in Supabase — the grant is missing."];
+  if (err.status === 401 || c === "PGRST301") return ["Your session expired", "Sign in again."];
+  if (c === "over_email_send_rate_limit") return ["Too many emails just now", "Wait an hour and try again."];
+  if (err.name === "TypeError") return ["Can't reach the server", "Check your connection — the timetable still works offline."];
+  return [err.message || "Something went wrong", "Try again in a moment."];
+}
+
+/* ---------- the section directory ---------- */
+let people = null;
+const fetchAllRoster = () => call("/rest/v1/roster?select=sno,name,batch,username,claimed&order=sno.asc");
+
+/* names and batches come from the roster and are always there; contact
+   details arrive only for students who have joined and filled them in */
+async function renderDirectory() {
+  const count = document.getElementById("dirCount");
+  const box = document.getElementById("dirList");
+  if (people) { drawDirectory(); return; }
+  count.textContent = "Loading…";
+  try {
+    const all = await fetchAllRoster();
+    let contacts = [];
+    try { contacts = await fetchDirectory(); } catch (e) { /* signed out: names only */ }
+    const byNo = {};
+    contacts.forEach(c => { byNo[c.sno] = c; });
+    people = all.map(r => Object.assign({}, r, byNo[r.sno] || {}));
+    const joined = people.filter(p => p.claimed).length;
+    count.textContent = joined + " of " + people.length + " joined";
+    drawDirectory();
+  } catch (err) {
+    const [what, fix] = explain(err);
+    count.textContent = what;
+    box.textContent = "";
+    box.appendChild(el("div", "none", fix));
+  }
+}
+/* 16px, one stroke weight, so a lit icon means something a dot never could */
+/* GitHub and LinkedIn get their own marks — a hand-drawn approximation of a logo
+   reads as a mistake. The rest stay line icons, which is what they are. */
+const CICON = {
+  email:     { vb:"0 0 16 16", p:'<path d="M2.2 4.2h11.6v7.6H2.2z"/><path d="M2.2 4.6 8 8.8l5.8-4.2"/>' },
+  mobile:    { vb:"0 0 16 16", p:'<rect x="4.8" y="1.8" width="6.4" height="12.4" rx="1.6"/><path d="M7 12.4h2"/>' },
+  instagram: { vb:"0 0 16 16", p:'<rect x="2.4" y="2.4" width="11.2" height="11.2" rx="3.4"/><circle cx="8" cy="8" r="2.5"/><circle cx="11.3" cy="4.7" r=".85" fill="currentColor" stroke="none"/>' },
+  github:    { vb:"0 0 24 24", solid:true, p:'<path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>' },
+  linkedin:  { vb:"0 0 24 24", solid:true, p:'<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>' },
+};
+function cicon(kind, title) {
+  const c = CICON[kind];
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", c.vb);
+  if (c.solid) {
+    svg.setAttribute("fill", "currentColor");
+    svg.setAttribute("stroke", "none");
+  } else {
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "1.5");
+    svg.setAttribute("stroke-linecap", "round");
+    svg.setAttribute("stroke-linejoin", "round");
+  }
+  svg.innerHTML = '<title>' + title + '</title>' + c.p;
+  return svg;
+}
+const initials = name => name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+
+let dirFilter = "all";
+
+function drawDirectory() {
+  const q = document.getElementById("dirSearch").value.trim().toLowerCase();
+  const box = document.getElementById("dirList");
+  box.textContent = "";
+  const hits = (people || []).filter(d => {
+    if (dirFilter === "joined" && !d.claimed) return false;
+    if (dirFilter === "F1" || dirFilter === "F2") { if (d.batch !== dirFilter) return false; }
+    return !q || d.name.toLowerCase().includes(q) || (d.username || "").includes(q);
+  });
+  if (!hits.length) {
+    box.appendChild(el("div", "dempty", q ? "Nobody matches that."
+      : dirFilter === "joined" ? "Nobody has joined yet. Send them the link."
+      : "Nothing here."));
+    return;
+  }
+  // the section reads as its two batches, not one flat wall of names
+  ["F1", "F2"].forEach(bt => {
+    const group = hits.filter(d => d.batch === bt);
+    if (!group.length) return;
+    const joined = group.filter(d => d.claimed).length;
+    const head = el("div", "dgroup");
+    head.appendChild(el("b", null, "Batch " + bt));
+    head.appendChild(el("span", null, group.length + " students · " + joined + " joined"));
+    box.appendChild(head);
+
+    const list = el("div", "dlist");
+    group.forEach(d => {
+      const row = el(d.claimed ? "button" : "div", "drow" + (d.claimed ? "" : " ghost"));
+      if (d.claimed) row.type = "button";
+      row.dataset.line = LINE_KEYS[d.sno % LINE_KEYS.length];
+      const disc = el("span", "dot2", initials(d.name));
+      disc.setAttribute("aria-hidden", "true");
+      row.appendChild(disc);
+      const who = el("div", "dwho");
+      who.appendChild(el("div", "n2", d.name));
+      who.appendChild(el("div", "u2", d.claimed ? "@" + d.username : "not joined yet"));
+      row.appendChild(who);
+      if (d.role === "cr") row.appendChild(el("span", "crtag", "CR"));
+      if (d.claimed) {
+        const filled = CONTACTS.filter(([k]) => d[k]);
+        if (filled.length) {
+          const ic = el("span", "dicons");
+          filled.forEach(([k, lbl]) => ic.appendChild(cicon(k, lbl)));
+          row.appendChild(ic);
+        } else {
+          row.appendChild(el("span", "dnone", "no details"));
+        }
+        row.addEventListener("click", () => openContact(d.username));
+      }
+      list.appendChild(row);
+    });
+    box.appendChild(list);
+  });
+}
+
+
+/* ---------- someone's contact card ---------- */
+let directory = null;
+async function openContact(username) {
+  const box = document.getElementById("dlgIn");
+  box.textContent = ""; box.dataset.line = "";
+  box.appendChild(el("div", "d-name", "…"));
+  document.getElementById("dlg").showModal();
+  try {
+    if (!directory) directory = await fetchDirectory();
+    const d = directory.find(x => x.username === username);
+    box.textContent = "";
+    if (!d) { box.appendChild(el("div", "d-name", "Not found")); box.appendChild(actions()); return; }
+    box.dataset.line = "pps";
+    const top = el("div", "d-top");
+    top.appendChild(el("span", "badge", "Batch " + d.batch));
+    if (d.role === "cr") top.appendChild(el("span", "badge ghost", "CR"));
+    box.appendChild(top);
+    const idrow = el("div", "d-idrow");
+    const disc = el("span", "dot2", initials(d.name));
+    disc.setAttribute("aria-hidden", "true");
+    idrow.dataset.line = LINE_KEYS[d.sno % LINE_KEYS.length];
+    idrow.appendChild(disc);
+    const nm = el("div");
+    nm.appendChild(el("div", "d-name", d.name));
+    nm.appendChild(el("div", "d-full", "@" + d.username + " · #" + d.sno));
+    idrow.appendChild(nm);
+    box.appendChild(idrow);
+    const rows = el("div", "clinks");
+    let any = false;
+    CONTACTS.forEach(([k, lbl, , href]) => {
+      if (!d[k]) return;
+      any = true;
+      const a = el("a", "clink");
+      a.dataset.k = k;
+      a.href = href(d[k]); a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.appendChild(cicon(k, lbl));
+      const m = el("div", "m");
+      m.appendChild(el("div", "l", lbl));
+      m.appendChild(el("div", "v", d[k]));
+      a.appendChild(m);
+      const go = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      go.setAttribute("viewBox", "0 0 16 16"); go.setAttribute("class", "go");
+      go.setAttribute("fill", "none"); go.setAttribute("stroke", "currentColor");
+      go.setAttribute("stroke-width", "1.6"); go.setAttribute("stroke-linecap", "round");
+      go.innerHTML = '<path d="M6 3.4 10.6 8 6 12.6"/>';
+      a.appendChild(go);
+      rows.appendChild(a);
+    });
+    if (!any) rows.appendChild(el("div", "d-note", "They haven't shared any contacts."));
+    box.appendChild(rows);
+    box.appendChild(actions());
+  } catch (err) {
+    const [what, fix] = explain(err);
+    box.textContent = "";
+    box.appendChild(el("div", "d-name", what));
+    box.appendChild(el("div", "d-full", fix));
+    box.appendChild(actions());
+  }
+}
+
+/* ---------- the gate ---------- */
+let picked = null;
+const VIEWS = { login:"vLogin", pick:"vPick", claim:"vClaim", forgot:"vForgot" };
+
+function gateShow(view) {
+  document.getElementById("gate").hidden = false;
+  document.body.style.overflow = "hidden";
+  Object.entries(VIEWS).forEach(([k, id]) => { document.getElementById(id).hidden = k !== view; });
+  if (view === "pick") loadRoster();
+  if (view === "claim") paintCard();
+  const first = document.querySelector("#" + VIEWS[view] + " input");
+  if (first) setTimeout(() => first.focus(), 60);
+}
+function gateClose() {
+  document.getElementById("gate").hidden = true;
+  document.body.style.overflow = "";
+}
+const say = (id, msg, bad) => {
+  const n = document.getElementById(id);
+  n.className = "hint" + (bad ? " err" : "");
+  n.textContent = msg || "";
+};
+
+let roster = [];
+async function loadRoster() {
+  const count = document.getElementById("pkCount");
+  try {
+    roster = await fetchRoster();
+    count.textContent = roster.length + " of 60 names left";
+    drawRoster();
+  } catch (err) {
+    const [what, fix] = explain(err);
+    count.textContent = what + " — " + fix;
+  }
+}
+function drawRoster() {
+  const q = document.getElementById("pkSearch").value.trim().toLowerCase();
+  const box = document.getElementById("pkList");
+  box.textContent = "";
+  const hits = roster.filter(r => !q || r.name.toLowerCase().includes(q));
+  if (!hits.length) {
+    box.appendChild(el("div", "none", roster.length ? "No name matches that." : "Every name has been claimed."));
+    return;
+  }
+  hits.forEach(r => {
+    const b = el("button", "pname");
+    b.type = "button";
+    b.appendChild(el("span", "sn", String(r.sno)));
+    b.appendChild(el("span", "n", r.name));
+    b.appendChild(el("span", "bt", r.batch));
+    b.addEventListener("click", () => { picked = r; gateShow("claim"); });
+    box.appendChild(b);
+  });
+}
+
+const LINE_KEYS = Object.keys(LINES);
+function paintCard() {
+  const u = document.getElementById("clUser").value.trim().toLowerCase();
+  document.getElementById("cardName").textContent = picked ? picked.name : "Your name";
+  document.getElementById("cardUser").textContent = "@" + (u || "username");
+  const st = document.getElementById("cardStripes");
+  if (!st.children.length) LINE_KEYS.forEach(k => {
+    const i = el("i"); i.style.background = "var(--l-" + k + ")"; st.appendChild(i);
+  });
+}
+
+/* ---------- the planner: what a skip would cost, no server involved ---------- */
+let plan = {};
+try { plan = JSON.parse(localStorage.getItem("adgips-plan") || "{}"); } catch (e) {}
+const savePlan = () => { try { localStorage.setItem("adgips-plan", JSON.stringify(plan)); } catch (e) {} };
+let planning = false;
+
+/* one planned skip = one of the classes still to come that you will not attend.
+   Everything is read against the end of term, the same line the budget uses. */
+function project() {
+  const b = termBudget(), o = b.overall;
+  const extra = Object.values(plan).reduce((n, v) => n + v, 0);
+  const worst = Object.entries(b.per).filter(([, v]) => v.total)
+    .map(([k, v]) => [k, pctOf(v.p + v.r - Math.min(v.r, plan[k] || 0), v.total)])
+    .sort((a, c) => a[1] - c[1])[0];
+  return {
+    best: o.best,
+    then: pctOf(o.p + o.r - Math.min(o.r, extra), o.total),
+    spare: o.canBunk - extra,
+    extra, worst,
+  };
+}
+
+function renderPlan() {
+  const bar = document.getElementById("planBar");
+  const btn = document.getElementById("planBtn");
+  btn.setAttribute("aria-pressed", planning);
+  btn.textContent = planning ? "Done" : "Plan a bunk";
+  bar.hidden = !planning;
+  if (!planning) return;
+  bar.textContent = "";
+  const { best, then, extra, spare, worst } = project();
+  if (then === null) {
+    bar.appendChild(el("div", "psum", "No classes left in the term — there is nothing to project."));
+    return;
+  }
+  const head = el("div", "psum");
+  head.appendChild(el("b", null, (extra ? then : best) + "%"));
+  head.appendChild(document.createTextNode(extra
+    ? " at the end of term after skipping " + extra + (extra === 1 ? " class" : " classes")
+    : " at the end of term if you attend everything left — tap classes to plan skips"));
+  bar.appendChild(head);
+  if (extra) {
+    const d = el("div", "pdelta" + (then < 75 ? " bad" : ""));
+    d.textContent = (then < 75
+      ? "That closes the term below 75% — " + Math.abs(spare) + " too many."
+      : "Still clear, with " + spare + (spare === 1 ? " class" : " classes") + " spare after it.")
+      + (worst ? " Weakest line: " + SUB[worst[0]].short + " at " + worst[1] + "%." : "");
+    bar.appendChild(d);
+    const clear = el("button", "link", "Clear plan");
+    clear.type = "button";
+    clear.addEventListener("click", () => { plan = {}; savePlan(); renderWeekRail(); renderNetwork(); renderPlan(); });
+    bar.appendChild(clear);
+  }
+}
+
+/* ---------- ranks ---------- */
+let ranksBusy = false;
+async function renderRanks() {
+  const state = document.getElementById("lbState");
+  const box = document.getElementById("lbBox");
+  const setState = (cls, txt) => { state.className = "lbstate " + cls; state.lastChild.textContent = txt; };
+  if (ranksBusy) return;
+  ranksBusy = true;
+  setState("", "Connecting…");
+  try {
+    if (profile) await pushScore();
+    const rows = await fetchRanks();
+    box.textContent = "";
+    setState("live", "Live · " + rows.length + (rows.length === 1 ? " student" : " students"));
+    if (!rows.length) {
+      const e = el("div", "empty");
+      e.appendChild(el("b", null, "Nobody on the board yet"));
+      e.appendChild(document.createTextNode("Mark a class on the Attendance page and you'll be the first."));
+      box.appendChild(e);
+    } else {
+      const list = el("div", "lb");
+      rows.forEach(row => {
+        const mine = profile && row.username === profile.username;
+        const r = el("div", "lbrow" + (row.rank <= 3 ? " podium" : "") + (mine ? " me" : ""));
+        r.appendChild(el("span", "rk", String(row.rank)));
+        const m = el("div");
+        m.appendChild(el("div", "nm", row.name));
+        m.appendChild(el("div", "un", "@" + row.username + " · " + row.batch));
+        r.appendChild(m);
+        if (mine) r.appendChild(el("span", "tag", "You"));
+        r.addEventListener("click", () => openContact(row.username));
+        list.appendChild(r);
+      });
+      box.appendChild(list);
+    }
+    const note = el("div", "setup");
+    note.style.marginTop = "12px";
+    note.textContent = profile && !rows.some(r => r.username === profile.username)
+      ? "You join the board once you mark your first class. Percentages are never shared — only positions."
+      : "Ranked by attendance. Percentages are never shared — only positions.";
+    box.appendChild(note);
+  } catch (err) {
+    const [what, fix] = explain(err);
+    setState("err", what);
+    box.textContent = "";
+    const d = el("div", "empty");
+    d.appendChild(el("b", null, what));
+    d.appendChild(document.createTextNode(fix));
+    box.appendChild(d);
+  } finally { ranksBusy = false; }
+}
+
+/* ============================================================
+   Wiring
+   ============================================================ */
+function renderAll() {
+  renderToday(); renderNetwork(); renderWeekRail(); renderAttendance();
+}
+
+document.querySelectorAll(".seg button").forEach(b => {
+  b.setAttribute("aria-pressed", b.dataset.batch === batch);
+  b.addEventListener("click", () => {
+    batch = b.dataset.batch;
+    try { localStorage.setItem("adgips-batch", batch); } catch (e) {}
+    document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x.dataset.batch === batch));
+    renderAll();
+  });
+});
+
+let theme = null;
+try { theme = localStorage.getItem("adgips-theme"); } catch (e) {}
+if (theme) document.documentElement.dataset.theme = theme;
+document.getElementById("themeBtn").addEventListener("click", () => {
+  const dark = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim().toLowerCase().startsWith("#07");
+  theme = dark ? "light" : "dark";
+  document.documentElement.dataset.theme = theme;
+  try { localStorage.setItem("adgips-theme", theme); } catch (e) {}
+});
+
+document.getElementById("attDate").addEventListener("change", renderAttendance);
+document.getElementById("lvFrom").addEventListener("change", renderLeave);
+document.getElementById("lvTo").addEventListener("change", renderLeave);
+document.getElementById("lvClear").addEventListener("click", () => {
+  document.getElementById("lvFrom").value = "";
+  document.getElementById("lvTo").value = "";
+  renderLeave();
+});
+document.getElementById("semEndInput").addEventListener("change", e => {
+  const v = e.currentTarget.value;
+  if (!v || v < SEM_START) { e.currentTarget.value = semEnd; return; }   /* a term cannot end before it opens */
+  semEnd = v; saveSemEnd(); renderAll();
+});
+document.getElementById("icsBtn").addEventListener("click", openICS);
+document.getElementById("attClear").addEventListener("click", async () => {
+  if (!confirm(profile
+    ? "Delete every attendance record, on this device and in your account? This cannot be undone."
+    : "Delete every attendance record on this device? This cannot be undone.")) return;
+  att = {}; saveAtt(); renderAttendance();
+  if (profile) {
+    try { await wipeAttendance(); await pushScore(); }
+    catch (err) {
+      const [what, fix] = explain(err);
+      alert(err.stampOnly
+        ? "Cleared here and in your account. Other devices may put the records back: " + fix
+        : "Cleared on this device. Your account could not be reached — " + what + ". Open the app again when you have signal.");
+      console.warn("clear did not finish:", err);
+    }
+  }
+});
+document.getElementById("resToggle").addEventListener("click", e => {
+  showRestricted = !showRestricted;
+  e.currentTarget.setAttribute("aria-pressed", showRestricted);
+  e.currentTarget.textContent = showRestricted ? "Hide restricted" : "Show restricted";
+  renderMonths(); renderHolidayList();
+});
+document.getElementById("dlg").addEventListener("click", e => {
+  if (e.target.id === "dlg") document.getElementById("dlg").close();   // click the backdrop to dismiss
+});
+
+/* ============================================================
+   Wrapped as an app. Everything below is inert in a browser: the
+   page is the same file either way, and the web version never sees it.
+   ============================================================ */
+const NATIVE = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
+const ALERT_LEAD = 10;                             /* minutes of warning before a class */
+
+let alerts = true;
+try { alerts = localStorage.getItem("adgips-alerts") !== "off"; } catch (e) {}
+
+function renderAlertBtn() {
+  const b = document.getElementById("alertBtn");
+  b.hidden = !NATIVE;
+  b.textContent = alerts ? "Class alerts on" : "Class alerts off";
+  b.setAttribute("aria-pressed", alerts);
+}
+
+/* Schedules a week of reminders on every open, after clearing the last lot, so the
+   only state is the timetable itself — nothing to drift, and holidays and the batch
+   split are already handled by classDays and resolve. */
+async function syncAlerts() {
+  if (!NATIVE) return;
+  const LN = Capacitor.Plugins.LocalNotifications;
+  if (!LN) return;
+  try {
+    let perm = await LN.checkPermissions();
+    if (perm.display !== "granted") perm = await LN.requestPermissions();
+
+    const pending = await LN.getPending();
+    if (pending.notifications.length)
+      await LN.cancel({ notifications: pending.notifications.map(n => ({ id: n.id })) });
+    if (!alerts || perm.display !== "granted") return;
+
+    const now = new Date(), until = new Date();
+    until.setDate(until.getDate() + 7);
+    const list = [];
+    classDays(isoOf(now), isoOf(until)).forEach(({ iso, di }) => {
+      DAYS[di].items.forEach((it, ii) => {
+        const key = resolve(it);
+        if (!key) return;                          /* a split practical, batch not chosen */
+        const m = startMin(it.i) - ALERT_LEAD, at = fromISO(iso);
+        at.setHours(Math.floor(m / 60), m % 60, 0, 0);
+        if (at <= now) return;
+        const d = fromISO(iso);
+        list.push({
+          id: (d.getMonth() + 1) * 10000 + d.getDate() * 100 + ii,   /* stable and unique */
+          title: SUB[key].short + " in " + ALERT_LEAD + " min",
+          body: SUB[key].fac + " · " + (SUB[key].lab ? "Lab" : "Room 2311")
+              + " · " + label(it.i, it.span || 1),
+          schedule: { at, allowWhileIdle: true },
+        });
+      });
+    });
+    if (list.length) await LN.schedule({ notifications: list });
+  } catch (err) {
+    console.warn("class alerts could not be scheduled:", err);
+  }
+}
+
+/* pages — clicks drive them; the hash is a bonus for back/forward and
+   deep links, and is unavailable from a data: URL */
+const PAGES = ["today", "week", "ranks", "directory", "attendance", "holidays"];
+function show(id) {
+  if (!PAGES.includes(id)) id = "today";
+  if (id === "ranks") renderRanks();
+  if (id === "directory") renderDirectory();
+  PAGES.forEach(p => {
+    const sec = document.getElementById(p);
+    sec.hidden = p !== id;
+    if (p === id) { sec.classList.remove("enter"); void sec.offsetWidth; sec.classList.add("enter"); }
+  });
+  document.querySelectorAll(".nav a").forEach(a =>
+    a.setAttribute("aria-current", a.dataset.p === id ? "page" : "false"));
+  requestAnimationFrame(() => window.scrollTo(0, 0));   // beats the browser's own fragment jump
+}
+document.querySelectorAll(".nav a").forEach(a => a.addEventListener("click", e => {
+  e.preventDefault();
+  show(a.dataset.p);
+  try { history.pushState(null, "", "#" + a.dataset.p); } catch (err) {}
+}));
+window.addEventListener("popstate", () => show(location.hash.slice(1)));
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+
+document.getElementById("alertBtn").addEventListener("click", () => {
+  alerts = !alerts;
+  try { localStorage.setItem("adgips-alerts", alerts ? "on" : "off"); } catch (e) {}
+  renderAlertBtn();
+  syncAlerts();
+});
+
+/* the hardware back key should close what is open and walk back to Today,
+   not drop the student out of the app from wherever they happen to be */
+if (NATIVE && Capacitor.Plugins.App) {
+  const App = Capacitor.Plugins.App;
+  App.addListener("backButton", () => {
+    const dlg = document.getElementById("dlg");
+    if (dlg.open) return dlg.close();
+    if (!document.getElementById("gate").hidden) return;      // sign in or get out
+    const open = PAGES.find(id => !document.getElementById(id).hidden);
+    if (open && open !== "today") return show("today");
+    App.exitApp();
+  });
+  App.addListener("resume", () => { renderAll(); syncAlerts(); });
+}
+
+/* ---------- auth wiring ---------- */
+document.querySelectorAll("[data-goto]").forEach(b =>
+  b.addEventListener("click", () => gateShow(b.dataset.goto)));
+
+const busy = (btn, txt) => { btn.disabled = true; btn.dataset.was = btn.textContent; btn.textContent = txt; };
+const idle = btn => { btn.disabled = false; btn.textContent = btn.dataset.was || btn.textContent; };
+
+const liGo = document.getElementById("liGo");
+liGo.addEventListener("click", async () => {
+  const email = document.getElementById("liEmail").value.trim();
+  const pass = document.getElementById("liPass").value;
+  if (!email || !pass) return say("liHint", "Enter your email and password.", true);
+  say("liHint", ""); busy(liGo, "Signing in…");
+  try {
+    await signIn(email, pass);
+    if (!profile) { gateShow("pick"); say("liHint", ""); return; }   // account with no name yet
+    gateClose(); afterSignIn();
+  } catch (err) {
+    const [what, fix] = explain(err);
+    say("liHint", what + " — " + fix, true);
+  } finally { idle(liGo); }
+});
+document.getElementById("liPass").addEventListener("keydown", e => { if (e.key === "Enter") liGo.click(); });
+
+document.getElementById("pkSearch").addEventListener("input", drawRoster);
+
+document.getElementById("dirSearch").addEventListener("input", drawDirectory);
+document.querySelectorAll("#dirFilter button").forEach(b =>
+  b.addEventListener("click", () => {
+    dirFilter = b.dataset.f;
+    document.querySelectorAll("#dirFilter button").forEach(x =>
+      x.setAttribute("aria-pressed", x.dataset.f === dirFilter));
+    drawDirectory();
+  }));
+
+document.getElementById("planBtn").addEventListener("click", () => {
+  planning = !planning;
+  renderWeekRail(); renderPlan();
+});
+
+const clUser = document.getElementById("clUser"), clEmail = document.getElementById("clEmail"),
+      clPass = document.getElementById("clPass"), clGo = document.getElementById("clGo");
+function claimCheck() {
+  const u = clUser.value.trim().toLowerCase();
+  clUser.value = u;
+  paintCard();
+  const okU = USERNAME_RE.test(u), okE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clEmail.value.trim());
+  const okP = clPass.value.length >= MIN_PASS;
+  say("clUserHint", !u ? "3–16 characters: lowercase letters, numbers, underscore."
+      : okU ? "Looks good." : "3–16 characters: lowercase letters, numbers, underscore only.", !!u && !okU);
+  say("clHint", clPass.value && !okP ? "At least " + MIN_PASS + " characters." : "", !!clPass.value && !okP);
+  clGo.disabled = !(okU && okE && okP && picked);
+  return { u, e: clEmail.value.trim(), p: clPass.value, ok: okU && okE && okP && !!picked };
+}
+[clUser, clEmail, clPass].forEach(i => i.addEventListener("input", claimCheck));
+clGo.addEventListener("click", async () => {
+  const { u, e, p, ok } = claimCheck();
+  if (!ok) return;
+  busy(clGo, "Claiming…");
+  try {
+    await claimName(picked.sno, u, e, p);
+    gateClose(); afterSignIn();
+  } catch (err) {
+    const [what, fix] = explain(err);
+    say("clHint", what + " — " + fix, true);
+  } finally { idle(clGo); }
+});
+
+const fgGo = document.getElementById("fgGo");
+fgGo.addEventListener("click", async () => {
+  const email = document.getElementById("fgEmail").value.trim();
+  if (!email) return say("fgHint", "Enter the email you signed up with.", true);
+  busy(fgGo, "Sending…");
+  try {
+    await auth("/auth/v1/recover", { email });
+    say("fgHint", "Link sent. Check your inbox, and your spam folder.");
+  } catch (err) {
+    const [what, fix] = explain(err);
+    say("fgHint", what + " — " + fix, true);
+  } finally { idle(fgGo); }
+});
+document.getElementById("fgEmail").addEventListener("keydown", e => { if (e.key === "Enter") fgGo.click(); });
+
+document.getElementById("cardEdit").addEventListener("click", () => {
+  if (!profile) return gateShow("login");
+  const box = document.getElementById("dlgIn");
+  box.textContent = ""; box.dataset.line = "pps";
+  const top = el("div", "d-top");
+  top.appendChild(el("span", "badge", "Batch " + profile.batch));
+  top.appendChild(el("span", "plate-when", "Roll #" + profile.sno));
+  box.appendChild(top);
+  box.appendChild(el("div", "d-name", profile.name));
+  box.appendChild(el("div", "d-full", "@" + profile.username));
+  const rows = el("div", "d-rows");
+  [["Practical batch", profile.batch], ["On the list as", "#" + profile.sno]].forEach(([a, b]) => {
+    const r = el("div", "d-row");
+    r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b));
+    rows.appendChild(r);
+  });
+  box.appendChild(rows);
+  const hint = el("div", "d-note", "Fill in what you want your section to have. Blank means not shared.");
+  box.appendChild(hint);
+  const inputs = {};
+  CONTACTS.forEach(([k, lbl, ph]) => {
+    const f = el("div", "field");
+    const id = "ct_" + k;
+    const l = el("label", null, lbl); l.setAttribute("for", id);
+    f.appendChild(l);
+    const i = el("input"); i.id = id; i.type = "text"; i.placeholder = ph;
+    i.value = profile[k] || "";
+    i.autocapitalize = "off"; i.spellcheck = false;
+    inputs[k] = i; f.appendChild(i);
+    box.appendChild(f);
+  });
+  const save = el("button", "btn pri", "Save");
+  save.type = "button";
+  save.addEventListener("click", async () => {
+    save.disabled = true; save.textContent = "Saving…";
+    const patch = {};
+    CONTACTS.forEach(([k]) => { patch[k] = inputs[k].value.trim() || null; });
+    try { await saveContacts(patch); hint.textContent = "Saved."; }
+    catch (err) { hint.textContent = explain(err).join(" — "); }
+    save.disabled = false; save.textContent = "Save";
+  });
+  box.appendChild(save);
+
+  if (isCR()) {
+    const cr = el("button", "btn", "CR tools");
+    cr.type = "button";
+    cr.addEventListener("click", openCR);
+    box.appendChild(cr);
+  }
+  const out = el("button", "btn", "Sign out");
+  out.type = "button";
+  out.addEventListener("click", () => { if (confirm("Sign out on this device?")) signOut(); });
+  box.appendChild(actions(out));
+  document.getElementById("dlg").showModal();
+});
+
+/* ---------- CR tools: add someone the list missed, undo a wrong claim ---------- */
+async function openCR() {
+  const box = document.getElementById("dlgIn");
+  box.textContent = ""; box.dataset.line = "pps";
+  box.appendChild(el("div", "d-name", "CR tools"));
+  const note = el("div", "d-note", "Only you can see this.");
+  box.appendChild(note);
+
+  const nf = el("div", "field");
+  const nl = el("label", null, "Add a student"); nl.setAttribute("for", "crName");
+  nf.appendChild(nl);
+  const ni = el("input"); ni.id = "crName"; ni.type = "text"; ni.placeholder = "Full name";
+  nf.appendChild(ni);
+  box.appendChild(nf);
+  const bf = el("div", "seg"); bf.style.marginTop = "8px";
+  let nb = "F1";
+  ["F1","F2"].forEach(v => {
+    const b = el("button", null, v); b.type = "button";
+    b.setAttribute("aria-pressed", v === nb);
+    b.addEventListener("click", () => {
+      nb = v; [...bf.children].forEach(c => c.setAttribute("aria-pressed", c.textContent === v));
+    });
+    bf.appendChild(b);
+  });
+  box.appendChild(bf);
+  const add = el("button", "btn pri", "Add to roster");
+  add.type = "button";
+  add.addEventListener("click", async () => {
+    if (!ni.value.trim()) return;
+    add.disabled = true; add.textContent = "Adding…";
+    try {
+      const sno = await crAddStudent(ni.value.trim(), nb);
+      note.textContent = "Added as #" + sno + ". They can claim it now.";
+      ni.value = "";
+    } catch (err) { note.textContent = explain(err).join(" — "); }
+    add.disabled = false; add.textContent = "Add to roster";
+  });
+  box.appendChild(add);
+
+  const list = el("div", "d-rows");
+  list.appendChild(el("div", "d-note", "Loading claimed names…"));
+  box.appendChild(list);
+  box.appendChild(actions());
+  document.getElementById("dlg").showModal();
+
+  try {
+    const dir = await fetchDirectory();
+    list.textContent = "";
+    list.appendChild(el("div", "d-note", "Release a wrong claim — the name goes back on the list."));
+    dir.forEach(d => {
+      const r = el("div", "d-row");
+      r.appendChild(el("span", null, "#" + d.sno + " " + d.name));
+      const b = el("button", "link", "Release");
+      b.type = "button";
+      b.addEventListener("click", async () => {
+        if (!confirm("Release " + d.name + "? Their account stays, but the name goes back on the list.")) return;
+        b.textContent = "…";
+        try { await crRelease(d.sno); r.remove(); }
+        catch (err) { b.textContent = explain(err)[0]; }
+      });
+      r.appendChild(b);
+      list.appendChild(r);
+    });
+  } catch (err) { list.textContent = explain(err).join(" — "); }
+}
+
+/* ---------- user pill in the top bar ---------- */
+const userPill = document.getElementById("userPill");
+const userDrop = document.getElementById("userDrop");
+
+function updateUserPill() {
+  if (!profile) { userPill.hidden = true; return; }
+  userPill.hidden = false;
+  document.getElementById("userAvatar").textContent = initials(profile.name);
+  document.getElementById("userName").textContent = profile.name.split(/\s+/)[0];
+}
+userPill.addEventListener("click", e => {
+  if (e.target.closest(".user-drop")) return;        // let button handlers fire
+  userDrop.classList.toggle("open");
+});
+document.addEventListener("click", e => {
+  if (!userPill.contains(e.target)) userDrop.classList.remove("open");
+});
+document.getElementById("dropProfile").addEventListener("click", () => {
+  userDrop.classList.remove("open");
+  document.getElementById("cardEdit").click();
+});
+document.getElementById("dropLogout").addEventListener("click", () => {
+  userDrop.classList.remove("open");
+  if (confirm("Sign out on this device?")) signOut();
+});
+
+/* batch defaults to your roster batch, and stays switchable */
+function afterSignIn() {
+  let saved = null;
+  try { saved = localStorage.getItem("adgips-batch"); } catch (e) {}
+  batch = saved || (profile && profile.batch) || "both";
+  document.querySelectorAll(".seg button").forEach(x =>
+    x.setAttribute("aria-pressed", x.dataset.batch === batch));
+  updateUserPill();
+  renderAll();
+  renderRanks();
+  const iso = isoOf(new Date());
+  loadCancelled(iso, iso).then(renderToday).catch(() => {});   // offline just means no reports
+
+  /* the account's records come down first, so a second device does not look empty
+     and the catch-up below does not offer days that are already marked elsewhere */
+  syncAttendance().catch(() => {}).then(() => {
+    let asked = null;
+    try { asked = localStorage.getItem("adgips-caught"); } catch (e) {}
+    if (!asked && batch !== "both" && untouchedDays().length) {
+      try { localStorage.setItem("adgips-caught", "1"); } catch (e) {}
+      show("attendance");
+      openCatchup();
+    }
+  });
+}
+
+renderMonths();
+renderHolidayList();
+renderLineKey();
+renderAlertBtn();
+show(location.hash.slice(1));
+syncAlerts();
+
+/* signed in, signed out, or half way through claiming a name */
+(async () => {
+  const t = await token();
+  if (!t) { renderAll(); return gateShow("login"); }
+  try {
+    await loadProfile();
+  } catch (e) { /* offline: fall back to the cached profile */ }
+  if (!profile) { renderAll(); return gateShow("pick"); }
+  gateClose();
+  afterSignIn();
+})();
+
+/* the line keeps moving whether or not you are looking at it */
+setInterval(() => { renderToday(); renderNetwork(); }, 30000);
+</script>
+</body>
+</html>
