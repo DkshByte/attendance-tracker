@@ -1063,8 +1063,12 @@ dialog .btn { margin-top:8px; }
 .bk-row .w { flex:1; min-width:0; }
 .bk-row .w b { display:block; font-size:14.5px; font-weight:600; }
 .bk-row .w span { display:block; font-size:12px; color:var(--ink-3); margin-top:2px; }
-.bk-row .n { flex:none; font-family:"Barlow Condensed",sans-serif; font-weight:700;
-             font-size:27px; line-height:1; min-width:26px; text-align:right; }
+.bk-row .n { flex:none; min-width:30px; text-align:right; }
+.bk-row .n b { display:block; font-family:"Barlow Condensed",sans-serif; font-weight:700;
+               font-size:27px; line-height:1; }
+.bk-row .n span { display:block; font-size:9px; font-weight:700; letter-spacing:.07em;
+                  text-transform:uppercase; color:var(--ink-3); margin-top:3px; }
+.bk-hint { font-size:12.5px; color:var(--ink-3); line-height:1.55; margin:2px 0 4px; }
 .bk-step { flex:none; display:flex; gap:5px; }
 .bk-step button { width:31px; height:31px; border-radius:9px; border:1px solid var(--rule);
                   background:var(--plate); color:var(--ink); font:inherit; font-size:16px;
@@ -2669,13 +2673,18 @@ function bunkPlan() {
 }
 
 /* what one more skip in this subject means, right now */
+/* Said the way a first-year would say it. `v` drives the colour, `say` is the
+   chip on the ledger row, `full` is the sentence on the next-classes list. */
 function skipCall(s) {
-  if (!s)        return { v:"none", say:"Nothing scheduled" };
-  if (s.lost)    return { v:"lost", say:"75% is out of reach here" };
-  if (s.over)    return { v:"over", say:s.over + " past the line" };
-  if (s.left > 1) return { v:"safe", say:s.left + " to spare" };
-  if (s.left === 1) return { v:"last", say:"Your last one" };
-  return { v:"no", say:"None left — attend it" };
+  if (!s)          return { v:"none", say:"Nothing scheduled",    full:"Nothing scheduled" };
+  if (s.lost)      return { v:"lost", say:"Can't reach 75% now",  full:"Too late — this subject can't reach 75% any more" };
+  if (s.over)      return { v:"over", say:s.over + " too many planned",
+                            full:"You've planned " + s.over + " too many in this subject" };
+  if (s.left > 1)  return { v:"safe", say:s.left + " left",
+                            full:"Safe to skip — " + (s.left - 1) + " still left after this one" };
+  if (s.left === 1) return { v:"last", say:"Only 1 left",
+                            full:"OK, but it's your last one in this subject" };
+  return { v:"no", say:"Don't skip any more", full:"Don't skip this — you have none left in this subject" };
 }
 
 /* the next few classes genuinely still to come, in order */
@@ -4060,9 +4069,9 @@ function renderBunk() {
 
   if (!g.subs.length) {
     const e = el("div", "empty");
-    e.appendChild(el("b", null, "Nothing to weigh yet"));
+    e.appendChild(el("b", null, "Nothing to work out yet"));
     e.appendChild(document.createTextNode(
-      "No classes are marked and none are scheduled before " + longDate(semEnd) + "."));
+      "You haven't marked any classes, and none are scheduled before " + longDate(semEnd) + "."));
     box.appendChild(e);
     return;
   }
@@ -4070,8 +4079,8 @@ function renderBunk() {
     const e = el("div", "cu");
     e.appendChild(el("b", null, "Pick F1 or F2 first"));
     e.appendChild(document.createTextNode(
-      " — until then the split practicals cannot be counted, and a bunk budget "
-      + "built on half a timetable is worse than none."));
+      " — use the buttons at the top. Your batch decides which practicals you actually sit, "
+      + "and until Bunkr knows, any number it shows you here would be wrong."));
     box.appendChild(e);
     return;
   }
@@ -4081,36 +4090,37 @@ function renderBunk() {
   const state = g.lost.length ? "bad" : g.left ? "ok" : "warn";
   head.appendChild(el("div", "bk-big " + state, String(g.left)));
   head.appendChild(el("div", "bk-cap", g.left === 1
-    ? "class you can still miss and finish every subject on 75%"
-    : "classes you can still miss and finish every subject on 75%"));
+    ? "class you can still skip"
+    : "classes you can still skip"));
   box.appendChild(head);
 
   /* the one number the old headline got wrong is worth naming, not hiding */
   const why = el("div", "bk-why");
   if (g.lost.length) {
-    why.textContent = g.lost.map(s => SUB[s.k].short).join(", ")
-      + (g.lost.length === 1 ? " cannot reach 75% any more" : " cannot reach 75% any more between them")
-      + ", even by attending everything left. Everything below is the rest of the term.";
-  } else if (g.cap > g.safe) {
-    why.textContent = "Averaged across every subject the term would allow " + g.cap
-      + ". It is " + g.safe + " here because 75% has to hold in each subject on its own, "
-      + "and the last " + (g.cap - g.safe) + " could only come out of a subject that has no room.";
+    why.textContent = "You can no longer reach 75% in "
+      + g.lost.map(s => SUB[s.k].short).join(", ")
+      + ", even if you attend every class left. Keep going anyway — every class you attend "
+      + "still pulls the number up.";
   } else {
-    why.textContent = "Counted per subject, not on average — a skip is only free in the "
-      + "subject that has room for it. Spend them where the line below says you can.";
+    why.textContent = "You need 75% in every subject, not 75% overall. So a spare class in one "
+      + "subject can't cover a missed one in another — check the list below before you skip.";
   }
   box.appendChild(why);
 
   if (g.spent) {
     const d = el("div", "bk-cap");
     d.textContent = g.over
-      ? g.spent + " planned, and " + g.over + " of them break a subject."
-      : g.spent + " already planned, " + g.left + " still free.";
+      ? "You've planned " + g.spent + " skips, and " + g.over + " of them go too far."
+      : "You've planned " + g.spent + (g.spent === 1 ? " skip." : " skips.")
+        + " You can still afford " + g.left + " more.";
     box.appendChild(d);
   }
 
   /* per subject: the ledger, tightest first, with the plan editable in place */
-  box.appendChild(el("div", "h2row")).appendChild(el("h2", null, "Where the room is"));
+  box.appendChild(el("div", "h2row")).appendChild(el("h2", null, "How many you can skip"));
+  box.appendChild(el("div", "bk-hint",
+    "Tap + to pencil in a skip you're planning and watch the numbers move. Nothing here is "
+    + "marked as absent — it's only a what-if until the class actually happens."));
   const rows = el("div", "bk-rows");
   g.subs.forEach(s => {
     const row = el("div", "bk-row");
@@ -4121,7 +4131,7 @@ function renderBunk() {
     const w = el("div", "w");
     w.appendChild(el("b", null, SUB[s.k].name));
     w.appendChild(el("span", null,
-      s.v.p + " of " + s.v.h + " so far · " + s.v.r + " left · ends at " + s.end + "%"));
+      "Been to " + s.v.p + " of " + s.v.h + " · " + s.v.r + " still to come · you'd finish at " + s.end + "%"));
     /* the count column already says "3"; the tag only speaks when it knows something
        the number does not — that this is the last one, or that there is none to take */
     const call = skipCall(s);
@@ -4147,7 +4157,10 @@ function renderBunk() {
       savePlan(); renderWeekRail(); renderPlan(); renderBunk();
     });
     step.appendChild(minus); step.appendChild(plus);
-    row.appendChild(el("div", "n", String(s.left)));
+    const nc = el("div", "n");
+    nc.appendChild(el("b", null, String(s.left)));
+    nc.appendChild(el("span", null, "can skip"));
+    row.appendChild(nc);
     row.appendChild(step);
     rows.appendChild(row);
   });
@@ -4165,7 +4178,7 @@ function renderBunk() {
   /* and the question actually being asked: this class, on this day — can I? */
   const next = upcomingClasses(8);
   if (!next.length) return;
-  box.appendChild(el("div", "h2row")).appendChild(el("h2", null, "Can I miss this one?"));
+  box.appendChild(el("div", "h2row")).appendChild(el("h2", null, "Your next classes"));
   const nx = el("div", "bk-rows bk-next");
   const by = {};
   g.subs.forEach(s => by[s.k] = s);
@@ -4178,11 +4191,7 @@ function renderBunk() {
     const w = el("div", "w");
     w.appendChild(el("b", null, SUB[c.k].short + " · " + TIMES[c.it.i]));
     w.appendChild(el("span", null, longDate(c.iso)));
-    w.appendChild(el("i", "bk-tag " + call.v,
-      call.v === "safe" ? "Yes — " + call.say
-      : call.v === "last" ? "Yes, but it is your last in this subject"
-      : call.v === "no" ? "No — attend it"
-      : call.say));
+    w.appendChild(el("i", "bk-tag " + call.v, call.full));
     row.appendChild(w);
     nx.appendChild(row);
   });
