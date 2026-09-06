@@ -1233,6 +1233,22 @@ dialog .btn { margin-top:8px; }
       </div>
     </div>
 
+    <!-- ---------- conflict: another device is active ---------- -->
+    <div id="vConflict" class="gate-view" hidden>
+      <h1>Device in use</h1>
+      <div class="sub">Your account is currently active on another device. Sec F IT-I only permits one active device at a time.</div>
+      <div style="margin:16px 0;padding:16px;background:var(--plate);border-radius:14px;border:1px solid var(--rule)">
+        <div style="font-size:11.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;font-weight:600">Currently active on</div>
+        <div id="cfDeviceName" style="font-size:16px;font-weight:600;margin-top:4px;color:var(--ink)">Another device</div>
+        <div id="cfDeviceTime" style="font-size:12px;color:var(--ink-2);margin-top:3px">Recently active</div>
+      </div>
+      <div class="hint" id="cfHint" style="margin-bottom:12px"></div>
+      <button class="go" id="cfKick" type="button">Log out other device & sign in</button>
+      <div class="authlinks">
+        <button class="link" id="cfCancel" type="button">Cancel and sign in as someone else</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2840,6 +2856,99 @@ async function token() {
 }
 const auth = (path, body) => call(path, { method: "POST", body: JSON.stringify(body) });
 
+/* ---------- single active device per student ----------
+   Each install generates a unique device identifier. When a student signs
+   in from another phone or browser, the new device prompts whether to kick
+   the existing session, calls Supabase Auth logout?scope=others, and updates
+   the active device in PostgreSQL. The evicted device notices on its next
+   heartbeat and safely signs out. */
+function getDeviceId() {
+  let id = null;
+  try { id = localStorage.getItem("adgips-device-id"); } catch (e) {}
+  if (!id) {
+    id = "dev_" + (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36));
+    try { localStorage.setItem("adgips-device-id", id); } catch (e) {}
+  }
+  return id;
+}
+
+function getDeviceName() {
+  if (typeof Capacitor !== "undefined" && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) return "Android App";
+  const ua = navigator.userAgent || "";
+  if (/iPhone/i.test(ua)) return "iPhone";
+  if (/iPad/i.test(ua)) return "iPad";
+  if (/Android/i.test(ua)) return "Android Phone";
+  if (/Windows/i.test(ua)) return "Windows PC";
+  if (/Macintosh|Mac OS/i.test(ua)) return "Mac";
+  if (/Linux/i.test(ua)) return "Linux";
+  return "Web Browser";
+}
+
+function timeAgo(iso) {
+  if (!iso) return "recently";
+  const sec = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+  if (sec < 60) return "just now";
+  const min = Math.floor(sec / 60);
+  if (min < 60) return min + "m ago";
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return hr + "h ago";
+  const day = Math.floor(hr / 24);
+  return day + "d ago";
+}
+
+async function claimThisDevice(tok) {
+  const t = tok || await token();
+  if (!t) return;
+  try {
+    const devId = getDeviceId(), devName = getDeviceName();
+    await call("/rest/v1/rpc/claim_device", {
+      method: "POST",
+      body: JSON.stringify({ p_device_id: devId, p_device_name: devName })
+    }, t);
+    if (profile) {
+      profile.active_device_id = devId;
+      profile.active_device_name = devName;
+      profile.active_device_at = new Date().toISOString();
+      saveProfile();
+    }
+  } catch (e) {}
+}
+
+async function releaseThisDevice(tok) {
+  const t = tok || (sess && sess.access_token);
+  if (!t) return;
+  try {
+    await call("/rest/v1/rpc/release_device", {
+      method: "POST",
+      body: JSON.stringify({ p_device_id: getDeviceId() })
+    }, t);
+  } catch (e) {}
+}
+
+let checkingDev = false;
+async function heartbeatDevice() {
+  if (checkingDev || !sess || !profile) return;
+  const t = await token();
+  if (!t) return;
+  checkingDev = true;
+  try {
+    const res = await call("/rest/v1/rpc/check_device", {
+      method: "POST",
+      body: JSON.stringify({ p_device_id: getDeviceId() })
+    }, t);
+    if (res && res.valid === false) {
+      const other = res.other_device || "another device";
+      sess = null; profile = null; saveSess(); saveProfile();
+      att = {}; plan = {}; uid = null;
+      gateShow("login");
+      say("liHint", "You were signed out because your account was logged in on " + other + ".", true);
+    }
+  } catch (e) {
+  } finally {
+    checkingDev = false;
+  }
+}
+
 async function signIn(email, password) {
   sess = await auth("/auth/v1/token?grant_type=password", { email: email.trim(), password });
   saveSess();
@@ -2852,6 +2961,7 @@ async function signUp(email, password) {
 }
 async function signOut() {
   const t = sess && sess.access_token;
+  if (t) await releaseThisDevice(t).catch(() => {});
   sess = null; profile = null; saveSess(); saveProfile();
   att = {}; plan = {}; uid = null;                 /* the records stay in their own bucket */
   /* a shared phone is the normal case here: the refresh token has to die on the
@@ -2864,7 +2974,7 @@ async function signOut() {
 async function loadProfile() {
   const t = await token();
   if (!t) { profile = null; saveProfile(); return null; }
-  const rows = await call("/rest/v1/students?select=sno,name,batch,username,role,present,held,github,linkedin,instagram,mobile,email", {}, t);
+  const rows = await call("/rest/v1/students?select=sno,name,batch,username,role,present,held,github,linkedin,instagram,mobile,email,active_device_id,active_device_name,active_device_at", {}, t);
   profile = rows && rows.length ? rows[0] : null;
   saveProfile();
   return profile;
@@ -3343,7 +3453,7 @@ function recoveryFromHash() {
 let recovery = null;
 
 let picked = null;
-const VIEWS = { login:"vLogin", pick:"vPick", claim:"vClaim", forgot:"vForgot", reset:"vReset" };
+const VIEWS = { login:"vLogin", pick:"vPick", claim:"vClaim", forgot:"vForgot", reset:"vReset", conflict:"vConflict" };
 
 /* an overlay that covers the app has to take it out of the tab order too, or the
    keyboard walks straight off the sign-in form into the timetable underneath */
@@ -4036,6 +4146,15 @@ liGo.addEventListener("click", async () => {
     await signIn(email, pass);
     passed("in");
     if (!profile) { gateShow("pick"); say("liHint", ""); return; }   // account with no name yet
+    const myDev = getDeviceId();
+    if (profile.active_device_id && profile.active_device_id !== myDev) {
+      document.getElementById("cfDeviceName").textContent = profile.active_device_name || "Another device";
+      document.getElementById("cfDeviceTime").textContent = "Last active " + timeAgo(profile.active_device_at);
+      say("cfHint", "");
+      gateShow("conflict");
+      return;
+    }
+    await claimThisDevice();
     gateClose(); afterSignIn();
   } catch (err) {
     /* only a real answer counts against you — no signal is not a wrong password */
@@ -4083,6 +4202,7 @@ clGo.addEventListener("click", async () => {
   busy(clGo, "Claiming…");
   try {
     await claimName(picked.sno, u, e, p);
+    await claimThisDevice();
     gateClose(); afterSignIn();
   } catch (err) {
     const [what, fix] = explain(err);
@@ -4127,6 +4247,7 @@ rsGo.addEventListener("click", async () => {
     passed("in");                                  /* a new password clears an old lockout */
     await loadProfile();
     if (!profile) return gateShow("pick");         // signed in, but no name claimed yet
+    await claimThisDevice();
     gateClose(); afterSignIn();
   } catch (err) {
     const [what, fix] = explain(err);
@@ -4134,6 +4255,38 @@ rsGo.addEventListener("click", async () => {
   } finally { idle(rsGo); }
 });
 document.getElementById("rsPass").addEventListener("keydown", e => { if (e.key === "Enter") rsGo.click(); });
+
+/* Kick other device and claim this one */
+const cfKick = document.getElementById("cfKick");
+cfKick.addEventListener("click", async () => {
+  busy(cfKick, "Logging out other device…");
+  say("cfHint", "");
+  try {
+    const t = sess && sess.access_token;
+    if (t) {
+      await call("/auth/v1/logout?scope=others", { method: "POST" }, t).catch(() => {});
+    }
+    await claimThisDevice(t);
+    gateClose();
+    afterSignIn();
+  } catch (err) {
+    const [what, fix] = explain(err);
+    say("cfHint", what + " — " + fix, true);
+  } finally {
+    idle(cfKick);
+  }
+});
+
+/* Cancel conflict sign-in and return to login */
+const cfCancel = document.getElementById("cfCancel");
+cfCancel.addEventListener("click", async () => {
+  const t = sess && sess.access_token;
+  if (t) {
+    await call("/auth/v1/logout?scope=local", { method: "POST" }, t).catch(() => {});
+  }
+  sess = null; profile = null; saveSess(); saveProfile();
+  gateShow("login");
+});
 
 /* ---------- your profile: the travelcard, where you stand, and what you share ---------- */
 function openProfile() {
@@ -4434,6 +4587,17 @@ syncAlerts();
     await loadProfile();
   } catch (e) { /* offline: fall back to the cached profile */ }
   if (!profile) { renderAll(); return gateShow("pick"); }
+
+  /* Check if our session was claimed by another device while we were closed */
+  const myDev = getDeviceId();
+  if (profile.active_device_id && profile.active_device_id !== myDev) {
+    renderAll();
+    sess = null; profile = null; saveSess(); saveProfile();
+    gateShow("login");
+    return say("liHint", "You were signed out because your account was logged in on " + (profile.active_device_name || "another device") + ".", true);
+  }
+
+  claimThisDevice(t).catch(() => {});
   gateClose();
   afterSignIn();
 })();
@@ -4442,7 +4606,12 @@ syncAlerts();
 setInterval(() => {
   renderToday(); renderNetwork();
   if (NATIVE) dropStaleCards(Capacitor.Plugins.LocalNotifications || {}).catch(() => {});
+  heartbeatDevice();
 }, 30000);
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) heartbeatDevice();
+});
 
 /* The loader wrote this copy but has not yet seen it work. Reaching this line is the
    proof — the whole script parsed and ran. Anything that throws above here leaves the
