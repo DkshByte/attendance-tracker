@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+d476d8b-->
+<!--secf-app--><!--build:1.0.1+2dee234-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -2843,6 +2843,16 @@ function classCard(s, key, dayIdx) {
    ============================================================ */
 /* Sunday is not in DAYS at all — the week runs Mon(0) to Sat(5). Anything that needs
    "the next day the line runs" asks here, so nobody has to guess with an index again. */
+/* Which calendar date a weekday column means right now. Mon..Sat are 0..5; Sunday
+   has no column, so it points at the week that is about to start rather than the
+   one that just ended — which is also what "next" means to someone opening the app
+   on a Sunday evening. */
+function isoOfWeekday(di) {
+  const d = new Date(), js = d.getDay();
+  d.setDate(d.getDate() + (js === 0 ? 1 + di : di - (js - 1)));
+  return isoOf(d);
+}
+
 function nextRunningDay(fromIso) {
   const to = fromISO(fromIso);
   to.setDate(to.getDate() + 9);                    /* a week, plus room for closures */
@@ -2925,10 +2935,11 @@ function renderPlate() {
       else if (startMin(item.i) > now && !next) next = item;
     });
   }
+  let nextIso = isoOf(new Date());
   if (!next) {                                     /* nothing left today: roll on to the next day that runs */
     const t = new Date(); t.setDate(t.getDate() + 1);
     const up = nextRunningDay(isoOf(t));
-    if (up) { nextDay = DAYS[up.di]; next = nextDay.items[0]; }
+    if (up) { nextDay = DAYS[up.di]; next = nextDay.items[0]; nextIso = up.iso; }
   }
 
   /* ---------------- SLIDE 1: Status Tile ---------------- */
@@ -3017,7 +3028,7 @@ function renderPlate() {
       : SUB[next.split.F1].fac + " / " + SUB[next.split.F2].fac));
     b.appendChild(m);
     b.appendChild(el("span", "t", TIMES[next.i < 3 ? next.i : next.i + 1]));
-    b.addEventListener("click", () => openDetail(next, DAYS.indexOf(nextDay)));
+    b.addEventListener("click", () => openDetail(next, DAYS.indexOf(nextDay), nextIso));
     plate.appendChild(b);
   }
 
@@ -3259,7 +3270,7 @@ function renderNetwork() {
           c.appendChild(el("div", "n", "F2 " + SUB[it.split.F2].short));
           c.appendChild(el("div", "b", "Batches split"));
         }
-        c.addEventListener("click", () => openDetail(it, di));
+        c.addEventListener("click", () => openDetail(it, di, isoOfWeekday(di)));
         slot.appendChild(c);
         trk.appendChild(slot);
         p += sp - 1; continue;
@@ -3318,7 +3329,7 @@ function renderLineKey() {
 /* ============================================================
    Detail
    ============================================================ */
-function openDetail(item, dayIdx) {
+function openDetail(item, dayIdx, onIso) {
   const span = item.span || 1, key = resolve(item);
   const box = document.getElementById("dlgIn");
   box.textContent = "";
@@ -3355,11 +3366,13 @@ function openDetail(item, dayIdx) {
   });
   box.appendChild(list);
 
-  /* An override and a vote are both pinned to a date, and only today has one here —
-     the sheet is reached from a weekday, not from a calendar. */
-  const iso = isoOf(new Date());
-  const onToday = profile && new Date().getDay() - 1 === dayIdx;
-  if (!onToday) { box.appendChild(actions()); openDlg(); return; }
+  /* Both a verdict and a vote are pinned to a date. The sheet is reached from a
+     weekday, so unless the caller knew better, resolve that weekday against the week
+     being shown. Without this the CR could only rule on a class that was running the
+     moment they looked — and on a Sunday, on nothing at all. */
+  const iso = onIso || isoOfWeekday(dayIdx);
+  const isToday = iso === isoOf(new Date());
+  if (!profile) { box.appendChild(actions()); openDlg(); return; }
 
   const period = item.i;
   const ovr = overrideAt(iso, period);
@@ -3372,7 +3385,7 @@ function openDetail(item, dayIdx) {
       note.textContent = "Called off by the CR." + (o.note ? " " + o.note : "");
     else if (o && o.kind === "swap")
       note.textContent = "Arranged by the CR — " + (SUB[o.subject] ? SUB[o.subject].name : o.subject)
-        + " ran in this slot." + (o.note ? " " + o.note : "");
+        + (isToday ? " ran in this slot." : " runs in this slot.") + (o.note ? " " + o.note : "");
     else if (v >= CANCEL_MIN) note.textContent = "Cancelled — " + v + " students reported it.";
     else if (v) note.textContent = v + " of " + CANCEL_MIN + " reported this cancelled.";
     else note.textContent = "Running as timetabled.";
@@ -3381,8 +3394,9 @@ function openDetail(item, dayIdx) {
   box.appendChild(note);
 
   if (!isCR()) {
-    /* Everyone else still votes — but not against a verdict that already exists. */
-    if (ovr) { box.appendChild(actions()); openDlg(); return; }
+    /* A vote is a report of something you saw, so it stays on the day itself — and it
+       is never taken against a verdict that already exists. */
+    if (ovr || !isToday) { box.appendChild(actions()); openDlg(); return; }
     const mine = myReports[iso + "|" + period];
     if (!votesFor(iso, period)) note.textContent = "Not running today? Tell the section.";
     const b = el("button", "btn", mine ? "Undo my report" : "Report cancelled");
@@ -3409,8 +3423,9 @@ function crPanel(iso, period, ovr, note) {
   const wrap = el("div", "crx");
 
   const head = el("div", "crx-head");
+  const today = iso === isoOf(new Date());
   head.appendChild(el("span", "crx-tag", "CR"));
-  head.appendChild(el("span", "crx-title", "What actually happened"));
+  head.appendChild(el("span", "crx-title", today ? "What actually happened" : "What happens on " + longDate(iso)));
   wrap.appendChild(head);
 
   let kind = ovr ? ovr.kind : "on";
@@ -3471,7 +3486,8 @@ function crPanel(iso, period, ovr, note) {
     hint.textContent =
       kind === "on"   ? (ovr ? "Clears your verdict. The section goes back to reporting it themselves."
                              : "Nothing to change — this is the timetable as published.")
-    : kind === "off"  ? "Counts against nobody, including students who already marked it."
+    : kind === "off"  ? (today ? "Counts against nobody, including students who already marked it."
+                               : "Counts against nobody. The section sees it before the day.")
     :                   "Marks for this period count towards the subject you pick, for everyone.";
     save.hidden = kind === "on" && !ovr;
   };
@@ -3747,6 +3763,16 @@ function demo() {                                   // run demo() in the console
 
   /* The CR's verdict rewrites a percentage that is already on screen, so it is worth
      proving it does exactly that and nothing more. Real att/overrides, put back after. */
+  /* The weekday-to-date map. It read the wrong week on a Sunday once, which hid every
+     CR control in the app on the one day a CR is most likely to be planning. */
+  const _js = new Date().getDay();
+  if (_js === 1) {                                  /* only assertable on a known weekday */
+    ok(isoOfWeekday(0), isoOf(new Date()), "on Monday, the Monday column is today");
+  }
+  ok(isoOfWeekday(0) < isoOfWeekday(5), true, "Monday always lands before Saturday");
+  ok(classDays(isoOfWeekday(0), isoOfWeekday(5)).every(d => d.iso >= isoOfWeekday(0)),
+     true, "the fetched week never reaches behind its own Monday");
+
   const keptAtt = att, keptOvr = overrides;
   const sub1 = Object.keys(SUB)[0], sub2 = Object.keys(SUB)[1];
   att = {
@@ -7274,8 +7300,11 @@ function afterSignIn() {
   updateUserPill();
   renderAll();
   renderRanks();
+  /* The week the app can actually show, not just today — the CR can now rule on a
+     class before it runs, and a verdict nobody fetches is a verdict nobody sees. */
   const iso = isoOf(new Date());
-  loadCancelled(iso, iso).then(renderToday).catch(() => {});   // offline just means no reports
+  loadCancelled(isoOfWeekday(0), isoOfWeekday(5))
+    .then(renderAll).catch(() => {});                          // offline just means no reports
 
   /* the account's records come down first, so a second device does not look empty
      and the catch-up below does not offer days that are already marked elsewhere */
