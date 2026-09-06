@@ -1,7 +1,7 @@
 {
   "appId": "in.adgips.secf",
   "appName": "Sec F IT-I",
-  "webDir": "deploy",
+  "webDir": "boot",
   "server": {
     "androidScheme": "https"
   },

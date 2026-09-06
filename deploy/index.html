@@ -1,4 +1,5 @@
 <!doctype html>
+<!--secf-app-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -612,7 +613,7 @@ dialog {
 dialog::backdrop { background:color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter:blur(4px); }
 dialog[open] { animation:dlg .34s var(--ease); }
 @keyframes dlg { from { opacity:0; transform:translateY(14px) scale(.98); } }
-.d-in { padding:20px 22px 20px; position:relative; }
+.d-in { padding:20px 22px 20px; position:relative; max-height:86vh; overflow-y:auto; overscroll-behavior:contain; }
 .d-top { display:flex; align-items:center; gap:9px; margin-bottom:10px; flex-wrap:wrap; }
 .d-name { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:29px; line-height:1.05;
           color:var(--line, var(--ink)); letter-spacing:-.005em; margin-bottom:2px; text-wrap:balance; }
@@ -823,7 +824,7 @@ dialog .btn { margin-top:8px; }
 .lb { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft);
       border-radius:12px; overflow:hidden; }
 .lbrow { display:grid; grid-template-columns:34px 1fr auto; gap:14px; align-items:center;
-         padding:12px 15px; background:var(--plate); }
+         padding:12px 15px; background:var(--plate); border:0; width:100%; text-align:left; }
 .lbrow .rk { display:grid; place-items:center; width:30px; height:30px; border-radius:50%;
              font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:15px;
              color:var(--ink-2); box-shadow:inset 0 0 0 2px var(--rule); }
@@ -1202,6 +1203,21 @@ dialog .btn { margin-top:8px; }
       </div>
     </div>
 
+    <!-- ---------- the link in the reset email lands here ---------- -->
+    <div id="vReset" class="gate-view" hidden>
+      <h1>Set a new password</h1>
+      <div class="sub">You came in from the link in your email. Pick a new password and you're straight back in.</div>
+      <div class="field">
+        <label for="rsPass">New password</label>
+        <input id="rsPass" type="password" autocomplete="new-password" placeholder="at least 8 characters" enterkeyhint="go">
+        <div class="hint" id="rsHint"></div>
+      </div>
+      <button class="go" id="rsGo" type="button">Save and sign in</button>
+      <div class="authlinks">
+        <button class="link" type="button" data-goto="login">Back to sign in</button>
+      </div>
+    </div>
+
     <!-- ---------- forgot ---------- -->
     <div id="vForgot" class="gate-view" hidden>
       <h1>Reset your password</h1>
@@ -1268,22 +1284,23 @@ const SUB = {
   PD:    { line:"pd",  short:"Personality Dev", code:"PD",       name:"Personality Development", fac:"Ms. Isha" },
   EVSL:  { line:"evs", short:"EVS",            code:"EM 117 T",  name:"Environment Studies (lecture)", fac:"Dr. Kavita Gupta" },
   EVSP:  { line:"evs", short:"EVS Lab",        code:"ICT 117 P", name:"Environment Studies Lab", fac:"Dr. Kavita Gupta", lab:true },
-  EVSLP: { line:"evs", short:"EVS L/P",        code:"EM 117 T / ICT 117 P", name:"Environment Studies (lecture / practical)", fac:"Dr. Kavita Gupta" },
 };
 
 /* period index 0-6; lunch sits between period 2 and period 3 */
 const TIMES = ["8:15","9:10","10:05","11:00","11:30","12:25","1:20","2:15","3:10"];
 const MINS  = [495, 550, 605, 660, 690, 745, 800, 855, 910];
-const DAY_OPEN = MINS[0], DAY_CLOSE = MINS[8], LUNCH_FROM = MINS[3], LUNCH_TO = MINS[4];
+const LUNCH_FROM = MINS[3], LUNCH_TO = MINS[4];
 const startMin = i => MINS[i < 3 ? i : i + 1];
 const endMin   = (i, span) => MINS[(i + span - 1 < 3 ? i + span - 1 : i + span) + 1];
+/* the day is over when its last class ends, which is not the same hour every day */
+const dayEndMin = day => day.items.reduce((m, it) => Math.max(m, endMin(it.i, it.span || 1)), 0);
 const label    = (i, span) => TIMES[i < 3 ? i : i + 1] + "–" + TIMES[(i + span - 1 < 3 ? i + span - 1 : i + span) + 1];
 
 const DAYS = [
   { d:"Monday",    short:"Mon", items:[ {i:1,k:"EM"}, {i:2,k:"BEE"}, {i:3,k:"PPS"}, {i:4,k:"CSL"}, {i:5,k:"EVSL"} ] },
   { d:"Tuesday",   short:"Tue", items:[ {i:0,k:"CSL"}, {i:1,span:2,split:{F1:"PHP",F2:"EVSP"}}, {i:3,k:"PHL"}, {i:4,k:"SMT"}, {i:5,span:2,k:"PPSLAB"} ] },
   { d:"Wednesday", short:"Wed", items:[ {i:0,k:"PHL"}, {i:1,k:"EM"}, {i:2,k:"SMT"}, {i:3,k:"PPS"}, {i:4,k:"BEE"}, {i:5,k:"CSL"} ] },
-  { d:"Thursday",  short:"Thu", items:[ {i:0,k:"PPS"}, {i:1,span:2,split:{F1:"BEELAB",F2:"PHP"}}, {i:3,k:"EVSLP"}, {i:4,k:"BEE"}, {i:5,k:"PHL"}, {i:6,k:"PD"} ] },
+  { d:"Thursday",  short:"Thu", items:[ {i:0,k:"PPS"}, {i:1,span:2,split:{F1:"BEELAB",F2:"PHP"}}, {i:3,k:"EVSL"}, {i:4,k:"BEE"}, {i:5,k:"PHL"}, {i:6,k:"PD"} ] },
   { d:"Friday",    short:"Fri", items:[ {i:0,k:"SMT"}, {i:1,span:2,split:{F1:"EVSP",F2:"BEELAB"}}, {i:3,k:"EM"}, {i:4,k:"EVSL"}, {i:5,span:2,k:"EGL"} ] },
   { d:"Saturday",  short:"Sat", items:[] },
 ];
@@ -1296,6 +1313,15 @@ const DAYS = [
 let uid = null;
 const nsKey = base => uid ? base + ":" + uid : base;
 const readMap = k => { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch (e) { return {}; } };
+
+/* Thursday's EVS slot was entered as a subject of its own, which split one theory
+   percentage into two and read the 75% line against each half. It is the same subject
+   as Monday's and Friday's, so a record written under the old key is read as the
+   subject it always meant — on this device, and on anything pulled from the cloud. */
+const ALIAS = { EVSLP: "EVSL" };
+const subOf = k => ALIAS[k] || k;
+const readAtt = k => { const m = readMap(k);
+  Object.values(m).forEach(r => { r.s = subOf(r.s); }); return m; };
 
 let batch = "both";
 try { batch = localStorage.getItem("adgips-batch") || "both"; } catch (e) {}
@@ -1624,7 +1650,7 @@ function renderPlate() {
     const lunching = day && now >= LUNCH_FROM && now < LUNCH_TO;
     const closed = !day || !day.items.length;
     const before = day && day.items.length && now < startMin(day.items[0].i);
-    const after = day && day.items.length && now >= DAY_CLOSE;
+    const after = day && day.items.length && now >= dayEndMin(day);
     row.appendChild(el("span", "badge ghost", lunching ? "Lunch" : closed ? "No service" : "Between classes"));
     when.textContent = new Date().toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long" });
     row.appendChild(when);
@@ -2000,7 +2026,7 @@ function openHoliday(iso) {
 /* ============================================================
    Attendance. 75% is the line; everything reports against it.
    ============================================================ */
-let att = readMap("adgips-att");                 /* signed out until adoptUser says otherwise */
+let att = readAtt("adgips-att");                 /* signed out until adoptUser says otherwise */
 const saveAtt = () => { try { localStorage.setItem(nsKey("adgips-att"), JSON.stringify(att)); } catch (e) {} };
 
 function demo() {                                   // run demo() in the console to check the 75% math
@@ -2020,6 +2046,30 @@ function demo() {                                   // run demo() in the console
   ok(budgetOf(0, 20, 20).canBunk, -10, "20 missed with only 20 left cannot reach 75%");
   ok(budgetOf(0, 20, 20).best, 50, "...50% is the ceiling, and it is worth saying so");
   ok(budgetOf(90, 100, 20).canBunk, 20, "far enough ahead that the rest is optional");
+  ok(dayEndMin(DAYS[0]), 855, "Monday is over at 2:15, not at the last slot of the grid");
+  ok(dayEndMin(DAYS[1]), 910, "...and Tuesday runs to 3:10");
+  /* the lab kit: the answer is per lab, and a split practical depends on the batch */
+  const wasBatch = batch;
+  batch = "F1";
+  ok(kitLines(labsOn(4)).join(" | "),
+     "EVS Lab — Lab coat and your practical file | Graphics Lab — Roller scale, drafter, sheet holder and your sheets",
+     "Friday F1 carries a coat for EVS and a drafter for drawing");
+  batch = "F2";
+  ok(kitLines(labsOn(4))[0], "BEE Lab — Your practical file", "F2 sits a different Friday lab, and it only wants the file");
+  batch = wasBatch;
+  ok(labsOn(0).length, 0, "Monday has no lab and nothing to pack");
+  /* the sign-in backoff: two misses are free, then it climbs and later forgets */
+  ok(holdFor(1), 0, "the first miss costs nothing");
+  ok(holdFor(2), 5, "the second one waits");
+  ok(holdFor(99), 300, "and the wait is capped at five minutes");
+  ok(throttled("demo"), 0, "nothing is held against an untried key");
+  failed("demo"); ok(throttled("demo"), 0, "one miss still does not lock anything");
+  failed("demo"); ok(throttled("demo") > 0, true, "two in a row does");
+  passed("demo"); ok(throttled("demo"), 0, "and getting in clears the count");
+  ok(SUB.EVSLP, undefined, "Thursday's EVS is theory, not a subject of its own");
+  ok(subOf("EVSLP"), "EVSL", "a mark left under the old key reads as EVS");
+  ok(classesIn("2026-08-17", "2026-08-21").per.EVSL, 3, "EVS theory runs three times a week, counted as one");
+  ok(nid("2026-09-07", 2, 3) - nid("2026-09-07", 1, 3), 1000000, "each kind of alert owns its own id space");
   ok(classDays("2026-08-15", "2026-08-21").length, 5, "Saturday, Sunday and Independence Day hold no class");
   ok(classDays("2026-09-04", "2026-09-04").length, 0, "a gazetted holiday is not a class day");
   ok(classesIn("2026-08-17", "2026-08-17").total, 5, "Monday runs five classes");
@@ -2186,6 +2236,9 @@ function markDay(iso, di, mk) {
 
 function renderAttendance() {
   const input = document.getElementById("attDate");
+  /* a class you have not sat through cannot be marked, and nothing before the
+     session opened is yours to mark either */
+  input.min = SEM_START; input.max = isoOf(new Date());
   if (!input.value) input.value = isoOf(new Date());
   const iso = input.value;
   const date = fromISO(iso);
@@ -2262,6 +2315,27 @@ function markRow(s, key, iso, ii) {
   return row;
 }
 
+/* The one place a mark is written. The rail, today's line and the Present/Absent
+   buttons on a notification all come through here, so a mark made anywhere is the
+   same record, saved and pushed the same way. Tapping the mark it already has
+   clears it. */
+function setMark(id, key, mk) {
+  const rec = att[id];
+  if (rec && rec.m === mk) delete att[id]; else att[id] = { m:mk, s:key, t:Date.now() };
+  saveAtt();
+  renderToday(); renderAttendance();
+  if (!profile) return;
+  pushMark(id, att[id]).then(() => {
+    if (syncState && !syncState.ok) { syncState = { ok:true, pulled:0, pushed:0 }; renderSyncNote(); }
+  }).catch(err => {
+    const [what, fix] = explain(err);
+    syncState = { ok:false, msg: what + " — " + fix };
+    renderSyncNote();
+    console.warn("mark not saved to the account:", err);
+  });
+  pushScore().catch(() => {});
+}
+
 /* The P / A / C strip. Shared by the attendance rail and today's line, so a class
    marked in either place is the same record and both views redraw together. */
 function markStrip(key, iso, ii, when, preview) {
@@ -2282,22 +2356,7 @@ function markStrip(key, iso, ii, when, preview) {
       b.addEventListener("pointerleave", hide);
       b.addEventListener("blur", hide);
     }
-    b.addEventListener("click", () => {
-      if (rec && rec.m === mk) delete att[id]; else att[id] = { m:mk, s:key, t:Date.now() };
-      saveAtt();
-      renderToday(); renderAttendance();           // one record, both pages
-      if (profile) {
-        pushMark(id, att[id]).then(() => {
-          if (syncState && !syncState.ok) { syncState = { ok:true, pulled:0, pushed:0 }; renderSyncNote(); }
-        }).catch(err => {
-          const [what, fix] = explain(err);
-          syncState = { ok:false, msg: what + " — " + fix };
-          renderSyncNote();
-          console.warn("mark not saved to the account:", err);
-        });
-        pushScore().catch(() => {});
-      }
-    });
+    b.addEventListener("click", () => setMark(id, key, mk));
     marks.appendChild(b);
   });
   return marks;
@@ -2791,9 +2850,13 @@ async function signUp(email, password) {
   if (!out.access_token) throw new Error("Check your email to confirm the account, then sign in.");
   sess = out; saveSess();
 }
-function signOut() {
+async function signOut() {
+  const t = sess && sess.access_token;
   sess = null; profile = null; saveSess(); saveProfile();
   att = {}; plan = {}; uid = null;                 /* the records stay in their own bucket */
+  /* a shared phone is the normal case here: the refresh token has to die on the
+     server too, or the next person can still be signed in as you */
+  if (t) await call("/auth/v1/logout", { method:"POST" }, t).catch(() => {});
   location.hash = ""; location.reload();
 }
 
@@ -2952,7 +3015,7 @@ async function runSync(t) {
     if (mergeMark(att[id], theirs) === "keep") return;   // ours is newer: it goes up below
     const mine = att[id];
     if (!mine || mine.m !== r.mark) pulled++;
-    att[id] = { m:r.mark, s:r.subject, t:theirs };
+    att[id] = { m:r.mark, s:subOf(r.subject), t:theirs };
   });
   saveAtt();
   if (pulled || dropped) renderAll();
@@ -3080,6 +3143,8 @@ function explain(err) {
     return ["Your account cannot reach the attendance table", "Run STEP 2 of attendance-setup.sql in Supabase — the grant is missing."];
   if (err.status === 401 || c === "PGRST301") return ["Your session expired", "Sign in again."];
   if (c === "over_email_send_rate_limit") return ["Too many emails just now", "Wait an hour and try again."];
+  if (err.status === 429 || c === "over_request_rate_limit")
+    return ["Too many attempts from this network", "The whole section shares one connection here — wait a few minutes."];
   if (err.name === "TypeError") return ["Can't reach the server", "Check your connection — the timetable still works offline."];
   return [err.message || "Something went wrong", "Try again in a moment."];
 }
@@ -3260,12 +3325,35 @@ async function openContact(username) {
 }
 
 /* ---------- the gate ---------- */
+/* A reset email does not open a page of its own: Supabase bounces the browser back
+   here with a live session in the fragment, or with the reason it would not. Read it
+   once, scrub it out of the address bar so it is not left in history or over a
+   shoulder, and hand back what it said. */
+function recoveryFromHash() {
+  let h;
+  try { h = new URLSearchParams(location.hash.slice(1)); } catch (e) { return null; }
+  const tok = h.get("access_token"), err = h.get("error_description") || h.get("error");
+  if (!err && !(tok && h.get("type") === "recovery")) return null;
+  try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+  return err ? { err } : {
+    tok, refresh: h.get("refresh_token"),
+    exp: Math.floor(Date.now() / 1000) + Number(h.get("expires_in") || 3600),
+  };
+}
+let recovery = null;
+
 let picked = null;
-const VIEWS = { login:"vLogin", pick:"vPick", claim:"vClaim", forgot:"vForgot" };
+const VIEWS = { login:"vLogin", pick:"vPick", claim:"vClaim", forgot:"vForgot", reset:"vReset" };
+
+/* an overlay that covers the app has to take it out of the tab order too, or the
+   keyboard walks straight off the sign-in form into the timetable underneath */
+const behind = on => document.querySelectorAll(".top, .nav, .page")
+  .forEach(n => { n.inert = on; });
 
 function gateShow(view) {
   document.getElementById("gate").hidden = false;
   document.body.style.overflow = "hidden";
+  behind(true);
   Object.entries(VIEWS).forEach(([k, id]) => { document.getElementById(id).hidden = k !== view; });
   if (view === "pick") loadRoster();
   if (view === "claim") paintCard();
@@ -3275,6 +3363,7 @@ function gateShow(view) {
 function gateClose() {
   document.getElementById("gate").hidden = true;
   document.body.style.overflow = "";
+  behind(false);
 }
 const say = (id, msg, bad) => {
   const n = document.getElementById(id);
@@ -3412,7 +3501,8 @@ async function renderRanks() {
       const list = el("div", "lb");
       rows.forEach(row => {
         const mine = profile && row.username === profile.username;
-        const r = el("div", "lbrow" + (row.rank <= 3 ? " podium" : "") + (mine ? " me" : ""));
+        const r = el("button", "lbrow" + (row.rank <= 3 ? " podium" : "") + (mine ? " me" : ""));
+        r.type = "button";
         r.appendChild(el("span", "rk", String(row.rank)));
         const m = el("div");
         m.appendChild(el("div", "nm", row.name));
@@ -3529,6 +3619,31 @@ function paintStatusBar() {
   SB.setStyle({ style: darkNow() ? "DARK" : "LIGHT" }).catch(() => {});
 }
 const ALERT_LEAD = 10;                             /* minutes of warning before a class */
+const KIT_EVE  = 20 * 60;                          /* pack-it-tonight, 8pm the day before */
+const KIT_MORN =  7 * 60;                          /* and again at 7am, before you leave */
+
+/* What a lab actually asks you to carry. A practical not named here wants nothing
+   but the file; a lecture wants nothing at all. Kept as a table because the answer
+   is per lab and never per subject family — EVS lecture needs no coat, EVS lab does. */
+const KIT = {
+  EVSP: "Lab coat and your practical file",
+  EGL:  "Roller scale, drafter, sheet holder and your sheets",
+};
+const KIT_ANY = "Your practical file";
+const labsOn = di => [...new Set(DAYS[di].items.map(it => resolve(it)))]
+  .filter(k => k && SUB[k].lab);
+const kitLines = labs => labs.map(k => SUB[k].short + " — " + (KIT[k] || KIT_ANY));
+
+/* One id space per kind of alert, so a reschedule replaces its own kind and never
+   collides with another. Kind 0 keeps the ids the class alert already used. */
+const nid = (iso, kind, ii) => { const d = fromISO(iso);
+  return kind * 1000000 + (d.getMonth() + 1) * 10000 + d.getDate() * 100 + (ii || 0); };
+const clockAt = (iso, min) => { const d = fromISO(iso);
+  d.setHours(Math.floor(min / 60), min % 60, 0, 0); return d; };
+
+/* Present and Absent, on the notification itself. Marking is the one thing this app
+   needs from a student every day, and the shade is where they already are. */
+const MARK_ACTIONS = "secf-mark";
 
 let alerts = true;
 try { alerts = localStorage.getItem("adgips-alerts") !== "off"; } catch (e) {}
@@ -3536,13 +3651,17 @@ try { alerts = localStorage.getItem("adgips-alerts") !== "off"; } catch (e) {}
 function renderAlertBtn() {
   const b = document.getElementById("alertBtn");
   b.hidden = !NATIVE;
-  b.textContent = alerts ? "Class alerts on" : "Class alerts off";
+  b.textContent = alerts ? "Reminders on" : "Reminders off";
   b.setAttribute("aria-pressed", alerts);
 }
 
 /* Schedules a week of reminders on every open, after clearing the last lot, so the
    only state is the timetable itself — nothing to drift, and holidays and the batch
-   split are already handled by classDays and resolve. */
+   split are already handled by classDays and resolve.
+
+   Four kinds, in the order a class day actually goes: the kit you have to pack the
+   night before, the kit again on the way out, the ten-minute warning, the card for
+   the class you are sitting in, and the one question worth asking at the end of it. */
 async function syncAlerts() {
   if (!NATIVE) return;
   const LN = Capacitor.Plugins.LocalNotifications;
@@ -3554,32 +3673,105 @@ async function syncAlerts() {
     const pending = await LN.getPending();
     if (pending.notifications.length)
       await LN.cancel({ notifications: pending.notifications.map(n => ({ id: n.id })) });
+    await dropStaleCards(LN);
     if (!alerts || perm.display !== "granted") return;
+
+    await LN.registerActionTypes({ types: [{ id: MARK_ACTIONS, actions: [
+      { id: "P", title: "Present" },
+      { id: "A", title: "Absent" },
+    ] }] }).catch(() => {});
 
     const now = new Date(), until = new Date();
     until.setDate(until.getDate() + 7);
     const list = [];
+    /* nothing already in the past is worth scheduling */
+    const soon = (when, n) => { if (when > now) list.push(Object.assign(n,
+      { schedule: { at: when, allowWhileIdle: true } })); };
+
     classDays(isoOf(now), isoOf(until)).forEach(({ iso, di }) => {
       DAYS[di].items.forEach((it, ii) => {
         const key = resolve(it);
         if (!key) return;                          /* a split practical, batch not chosen */
-        const m = startMin(it.i) - ALERT_LEAD, at = fromISO(iso);
-        at.setHours(Math.floor(m / 60), m % 60, 0, 0);
-        if (at <= now) return;
-        const d = fromISO(iso);
-        list.push({
-          id: (d.getMonth() + 1) * 10000 + d.getDate() * 100 + ii,   /* stable and unique */
+        const span = it.span || 1, when = label(it.i, span);
+        const where = SUB[key].fac + " · " + (SUB[key].lab ? "Lab" : "Room 2311");
+
+        soon(clockAt(iso, startMin(it.i) - ALERT_LEAD), {
+          id: nid(iso, 0, ii), group: "secf-next",
           title: SUB[key].short + " in " + ALERT_LEAD + " min",
-          body: SUB[key].fac + " · " + (SUB[key].lab ? "Lab" : "Room 2311")
-              + " · " + label(it.i, it.span || 1),
-          schedule: { at, allowWhileIdle: true },
+          body: where + " · " + when,
+        });
+
+        /* the class you are in, so the shade answers "what is this" without opening
+           anything. ponytail: dismissible rather than Android-ongoing — a sticky card
+           this app cannot clear while it is killed would outlive the class. */
+        soon(clockAt(iso, startMin(it.i)), {
+          id: nid(iso, 1, ii), group: "secf-now", autoCancel: true,
+          title: SUB[key].short + " now",
+          body: where + " · ends " + when.split("–")[1],
+        });
+
+        /* the honest moment to mark it, and only while it is still unmarked — marking
+           it anywhere is what makes the next sync stop asking */
+        if (!att[iso + "|" + ii]) soon(clockAt(iso, endMin(it.i, span)), {
+          id: nid(iso, 2, ii), group: "secf-mark", autoCancel: true,
+          actionTypeId: MARK_ACTIONS,
+          extra: { mark: iso + "|" + ii, key },
+          title: "Were you in " + SUB[key].short + "?",
+          body: when + " · " + SUB[key].fac,
         });
       });
+
+      /* a lab you turned up to without the kit is a lab you sat out, so this is asked
+         the night before, while it is still fixable, and again on the way out */
+      const labs = labsOn(di);
+      if (!labs.length) return;
+      const lines = kitLines(labs), one = labs.length === 1;
+      const card = (kind, at, head) => soon(at, {
+        id: nid(iso, kind, 0), group: "secf-kit",
+        title: (one ? SUB[labs[0]].short : labs.length + " labs") + " " + head,
+        body: lines.join("  ·  "), largeBody: lines.join("\n"),
+        summaryText: kind === 3 ? "Pack it tonight" : "Before you leave",
+      });
+      card(3, clockAt(dayBefore(iso), KIT_EVE), "tomorrow");
+      card(4, clockAt(iso, KIT_MORN), "today");
     });
     if (list.length) await LN.schedule({ notifications: list });
   } catch (err) {
     console.warn("class alerts could not be scheduled:", err);
   }
+}
+
+/* A delivered card is not a pending one, so cancelling the schedule leaves it on
+   screen. Anything for a class that has already ended is noise: clear it. */
+async function dropStaleCards(LN) {
+  if (!LN.getDeliveredNotifications) return;
+  try {
+    const iso = nowISO(), di = new Date().getDay() - 1, now = nowMin();
+    const live = new Set();
+    if (di >= 0 && di < 6) DAYS[di].items.forEach((it, ii) => {
+      if (now < endMin(it.i, it.span || 1)) live.add(nid(iso, 1, ii));
+    });
+    const { notifications } = await LN.getDeliveredNotifications();
+    const gone = notifications.filter(n => Math.floor(n.id / 1000000) === 1 && !live.has(n.id))
+                              .map(n => n.id);
+    if (gone.length) await LN.removeDeliveredNotificationsById({ ids: gone });
+  } catch (e) {}
+}
+
+/* Present / Absent straight from the shade. The record is written through setMark,
+   the same call the buttons in the app make, and the card that asked is taken down
+   so the question is not still sitting there answered. */
+if (NATIVE && Capacitor.Plugins.LocalNotifications) {
+  const LN = Capacitor.Plugins.LocalNotifications;
+  LN.addListener("localNotificationActionPerformed", ev => {
+    const x = ev.notification && ev.notification.extra;
+    if (!x || !x.mark || (ev.actionId !== "P" && ev.actionId !== "A")) return;
+    if (att[x.mark] && att[x.mark].m === ev.actionId) return;   /* setMark toggles; this must not */
+    setMark(x.mark, x.key, ev.actionId);
+    buzz("confirm");
+    LN.cancel({ notifications: [{ id: ev.notification.id }] }).catch(() => {});
+    LN.removeDeliveredNotificationsById({ ids: [ev.notification.id] }).catch(() => {});
+  });
 }
 
 /* ---------- the fingerprint lock ----------
@@ -3628,6 +3820,7 @@ async function askUnlock() {
 function showLock(on) {
   const el2 = document.getElementById("lockScreen");
   el2.hidden = !on;
+  behind(on || !document.getElementById("gate").hidden);
   if (on) {
     document.getElementById("lockName").textContent =
       profile ? "Hi, " + profile.name.split(/\s+/)[0] : "Locked";
@@ -3793,20 +3986,63 @@ document.querySelectorAll("[data-goto]").forEach(b =>
 const busy = (btn, txt) => { btn.disabled = true; btn.dataset.was = btn.textContent; btn.textContent = txt; };
 const idle = btn => { btn.disabled = false; btn.textContent = btn.dataset.was || btn.textContent; };
 
+/* ---------- backing off after a failed attempt ----------
+   Not a security control: the server's own limit is that, and anything enforced in
+   this file can be walked around with curl. What this fixes is a shared-network
+   problem. Supabase rate-limits auth per IP, and this whole section signs in from
+   one college connection — so one student mashing a password they have forgotten
+   spends everybody's budget and locks the room out with an error none of them can
+   explain. The wait is taken here instead, where it can say what it is and who it
+   is for. Two misses are free; a lost connection is never one of them. */
+const BACKOFF = [0, 0, 5, 15, 45, 120, 300];       /* seconds, by consecutive failures */
+const FORGET_AFTER = 15 * 60 * 1000;               /* a clean quarter hour and it resets */
+const holdFor = n => BACKOFF[Math.min(n, BACKOFF.length - 1)];
+const tkey = what => "adgips-try-" + what;
+
+function tries(what) {
+  let t = null;
+  try { t = JSON.parse(localStorage.getItem(tkey(what)) || "null"); } catch (e) {}
+  return t && Date.now() < (t.until || 0) + FORGET_AFTER ? t : { n:0, until:0 };
+}
+/* seconds still owed before `what` may be tried again; 0 when it is free */
+const throttled = what => Math.max(0, Math.ceil((tries(what).until - Date.now()) / 1000));
+function failed(what) {
+  const n = tries(what).n + 1;
+  try { localStorage.setItem(tkey(what), JSON.stringify({ n, until: Date.now() + holdFor(n) * 1000 })); } catch (e) {}
+}
+const passed = what => { try { localStorage.removeItem(tkey(what)); } catch (e) {} };
+
+/* The button carries the wait and counts it down. A control that is simply dead
+   gets tapped harder; one that says "try again in 12s" gets left alone. */
+function holdOff(btn, what) {
+  const left = throttled(what);
+  clearTimeout(btn.holdTimer);
+  if (!left) { btn.disabled = false; btn.textContent = btn.dataset.was || btn.textContent; return false; }
+  btn.dataset.was = btn.dataset.was || btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Try again in " + left + "s";
+  btn.holdTimer = setTimeout(() => holdOff(btn, what), 1000);
+  return true;
+}
+
 const liGo = document.getElementById("liGo");
 liGo.addEventListener("click", async () => {
   const email = document.getElementById("liEmail").value.trim();
   const pass = document.getElementById("liPass").value;
+  if (holdOff(liGo, "in")) return;
   if (!email || !pass) return say("liHint", "Enter your email and password.", true);
   say("liHint", ""); busy(liGo, "Signing in…");
   try {
     await signIn(email, pass);
+    passed("in");
     if (!profile) { gateShow("pick"); say("liHint", ""); return; }   // account with no name yet
     gateClose(); afterSignIn();
   } catch (err) {
+    /* only a real answer counts against you — no signal is not a wrong password */
+    if (err.status) failed("in");
     const [what, fix] = explain(err);
     say("liHint", what + " — " + fix, true);
-  } finally { idle(liGo); }
+  } finally { idle(liGo); holdOff(liGo, "in"); }
 });
 document.getElementById("liPass").addEventListener("keydown", e => { if (e.key === "Enter") liGo.click(); });
 
@@ -3857,17 +4093,47 @@ clGo.addEventListener("click", async () => {
 const fgGo = document.getElementById("fgGo");
 fgGo.addEventListener("click", async () => {
   const email = document.getElementById("fgEmail").value.trim();
+  if (holdOff(fgGo, "mail")) return;
   if (!email) return say("fgHint", "Enter the email you signed up with.", true);
   busy(fgGo, "Sending…");
   try {
-    await auth("/auth/v1/recover", { email });
+    /* on the web the link should land on the page it was asked from; in the wrapped
+       app it cannot, so it goes to the project's Site URL and you sign in here after */
+    await auth("/auth/v1/recover" + (NATIVE ? ""
+      : "?redirect_to=" + encodeURIComponent(location.origin + location.pathname)), { email });
     say("fgHint", "Link sent. Check your inbox, and your spam folder.");
+    failed("mail");        /* a sent mail is the cost here, so it counts like a miss */
   } catch (err) {
+    if (err.status) failed("mail");
     const [what, fix] = explain(err);
     say("fgHint", what + " — " + fix, true);
-  } finally { idle(fgGo); }
+  } finally { idle(fgGo); holdOff(fgGo, "mail"); }
 });
 document.getElementById("fgEmail").addEventListener("keydown", e => { if (e.key === "Enter") fgGo.click(); });
+
+/* The recovery token is a real session, so once the password is changed there is no
+   reason to ask for it again — save it and walk straight in. */
+const rsGo = document.getElementById("rsGo");
+rsGo.addEventListener("click", async () => {
+  const pass = document.getElementById("rsPass").value;
+  if (pass.length < MIN_PASS) return say("rsHint", "At least " + MIN_PASS + " characters.", true);
+  if (!recovery || !recovery.tok) return say("rsHint", "That link has expired. Ask for a new one.", true);
+  say("rsHint", ""); busy(rsGo, "Saving…");
+  try {
+    await call("/auth/v1/user", { method:"PUT", body: JSON.stringify({ password: pass }) }, recovery.tok);
+    sess = { access_token: recovery.tok, refresh_token: recovery.refresh, expires_at: recovery.exp };
+    saveSess();
+    recovery = null;
+    passed("in");                                  /* a new password clears an old lockout */
+    await loadProfile();
+    if (!profile) return gateShow("pick");         // signed in, but no name claimed yet
+    gateClose(); afterSignIn();
+  } catch (err) {
+    const [what, fix] = explain(err);
+    say("rsHint", what + " — " + fix, true);
+  } finally { idle(rsGo); }
+});
+document.getElementById("rsPass").addEventListener("keydown", e => { if (e.key === "Enter") rsGo.click(); });
 
 /* ---------- your profile: the travelcard, where you stand, and what you share ---------- */
 function openProfile() {
@@ -4095,8 +4361,8 @@ function adoptUser(id) {
   if (uid === id) return;
   uid = id || null;
   if (uid) {
-    const mine = readMap(nsKey("adgips-att"));
-    const loose = readMap("adgips-att");
+    const mine = readAtt(nsKey("adgips-att"));
+    const loose = readAtt("adgips-att");
     if (!Object.keys(mine).length && Object.keys(loose).length) {
       att = loose;
       saveAtt();                                   /* now writes to this account's key */
@@ -4105,7 +4371,7 @@ function adoptUser(id) {
       att = mine;
     }
   } else {
-    att = readMap("adgips-att");
+    att = readAtt("adgips-att");
   }
   plan = readMap(nsKey("adgips-plan"));
   let saved = null;
@@ -4148,11 +4414,20 @@ renderLineKey();
 renderAlertBtn();
 paintHero();
 paintStatusBar();
+recovery = recoveryFromHash();                   /* before show() reads the hash */
 show(location.hash.slice(1));
 syncAlerts();
 
 /* signed in, signed out, or half way through claiming a name */
 (async () => {
+  /* an expired link is the common failure, and it has to say so rather than dump
+     the student back on a sign-in form with no explanation */
+  if (recovery) {
+    renderAll();
+    if (!recovery.err) return gateShow("reset");
+    gateShow("login");
+    return say("liHint", "That reset link has expired or was already used. Ask for a new one.", true);
+  }
   const t = await token();
   if (!t) { renderAll(); return gateShow("login"); }
   try {
@@ -4164,7 +4439,18 @@ syncAlerts();
 })();
 
 /* the line keeps moving whether or not you are looking at it */
-setInterval(() => { renderToday(); renderNetwork(); }, 30000);
+setInterval(() => {
+  renderToday(); renderNetwork();
+  if (NATIVE) dropStaleCards(Capacitor.Plugins.LocalNotifications || {}).catch(() => {});
+}, 30000);
+
+/* The loader wrote this copy but has not yet seen it work. Reaching this line is the
+   proof — the whole script parsed and ran. Anything that throws above here leaves the
+   flag set, and the next start rolls back to the last copy that got this far. */
+try {
+  const fresh = localStorage.getItem("adgips-app-try");
+  if (fresh) { localStorage.setItem("adgips-app", fresh); localStorage.removeItem("adgips-app-try"); }
+} catch (e) {}
 </script>
 </body>
 </html>

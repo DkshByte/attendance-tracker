@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prep": "cp timetable.html deploy/index.html",
+    "prep": "cp timetable.html deploy/index.html && cp timetable.html boot/app.html",
     "sync": "npm run prep && npx cap sync",
     "open": "npm run sync && npx cap open android",
     "build": "npm run sync && cd android && ./gradlew assembleDebug"

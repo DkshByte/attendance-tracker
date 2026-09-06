@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>Sec F IT-I</title>
+<style>
+  /* the loader's only visual job is to not flash white before the app paints over it */
+  html { background:#070C1C; }
+  @media (prefers-color-scheme: light) { html:not([data-theme="dark"]) { background:#EEF1F7; } }
+  body { margin:0; }
+</style>
+</head>
+<body>
+<script>
+/* ============================================================
+   Loader — the app's entry point in the APK, and the only file in
+   the bundle that is not the app.
+
+   The app itself ships alongside as app.html, so a brand new install
+   with no signal works on first open. Every start after that prefers
+   the live copy, so a push reaches the section without a rebuild and
+   without anyone reinstalling anything.
+
+   It declares nothing at the top level, deliberately. Whatever it
+   ends up running is written with document.open()/write(), which
+   reuses this same window — and the app's own top-level consts
+   (LINES, SUB, DAYS, CLOUD…) would collide with anything named out
+   here, throw SyntaxError, and kill the app script outright with no
+   visible error. An IIFE with vars inside is the whole defence.
+   ============================================================ */
+(async function () {
+  "use strict";
+  var LIVE   = "https://deploy-hazel-three-81.vercel.app/index.html";
+  var MARK   = "<!--secf-app-->";     /* only the real app carries this */
+  var MIN    = 100000;                /* anything smaller is not the app */
+  var GOOD   = "adgips-app";          /* the last copy seen to boot */
+  var TRY    = "adgips-app-try";      /* written, not yet seen to boot */
+  var BUDGET = 1500;                  /* ms to wait when there is a cache behind us */
+  var COLD   = 8000;                  /* ...and when there is not */
+
+  var get = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  var set = function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} };
+  var del = function (k) { try { localStorage.removeItem(k); } catch (e) {} };
+
+  /* document.write, not innerHTML: innerHTML never executes a script tag, which would
+     leave the new markup being driven by this file's JavaScript instead of its own. */
+  var run = function (html) { document.open(); document.write(html); document.close(); };
+
+  /* College wifi answers 200 with its own login page. Without this check that page
+     gets cached as the app and every offline start shows a wifi gate, permanently. */
+  var sane = function (h) { return !!h && h.length > MIN && h.indexOf(MARK) > -1; };
+
+  var live = async function (ms) {
+    var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, ms);
+    try {
+      var r = await fetch(LIVE, { cache: "no-store", signal: ctl.signal });
+      if (!r.ok) return null;
+      var h = await r.text();
+      return sane(h) ? h : null;
+    } catch (e) { return null; } finally { clearTimeout(t); }
+  };
+  var bundled = async function () {
+    try { return await (await fetch("app.html", { cache: "no-store" })).text(); }
+    catch (e) { return null; }
+  };
+  var fallback = async function (good) {
+    run(good || await bundled() ||
+      "<body style='font:15px system-ui;padding:40px;color:#A6B3CE'>Nothing to load.<br>Reinstall the app.</body>");
+  };
+
+  var good = get(GOOD);
+
+  /* A copy was written last start and never reached the end of its own script, so it
+     did not boot. Roll back to the last one that did, and leave the network alone this
+     once — otherwise a bad push loops on every launch. */
+  if (get(TRY)) { del(TRY); return fallback(good); }
+
+  var fresh = await live(good ? BUDGET : COLD);
+  if (fresh) { set(TRY, fresh); return run(fresh); }
+  fallback(good);
+})();
+</script>
+</body>
+</html>
