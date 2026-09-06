@@ -88,6 +88,29 @@ if m:
           if (root / "deploy" / served).exists() else False,
           "sane() rejects it and the OTA path silently never updates")
 
+# 8. The OTA path is only debuggable if you can see which copy is running, and only
+#    recoverable if a stuck phone can force a refetch. Both have shipped broken once.
+check("app carries a build stamp",
+      bool(re.search(r"<!--build:[^>]+-->", html)),
+      "no way to tell from a screenshot which copy a phone is running")
+check("app clears the loader's fail counter on a good boot",
+      'removeItem("adgips-app-fails")' in html,
+      "the counter only ever climbs, so the OTA path stops updating for good")
+check("loader counts failures before rolling back",
+      "adgips-app-fails" in loader and "GIVEUP" in loader,
+      "one backgrounded launch is enough to block an update")
+check("app offers a way to force a refetch",
+      'id="buildRefresh"' in html,
+      "a phone stuck on a bad copy can only be fixed by reinstalling")
+
+# 9. The download buttons must point at an asset that exists. The landing page spent a
+#    release pointing at a filename the release did not have.
+landing = (root / "deploy/landing.html").read_text()
+apk_links = set(re.findall(r'https://github\.com/[^"\s]+?\.apk', landing + html))
+check("every APK link uses releases/latest/download/bunkr.apk",
+      apk_links == {"https://github.com/DkshByte/attendance-tracker/releases/latest/download/bunkr.apk"},
+      f"a pinned or misnamed asset 404s: {sorted(apk_links)}")
+
 print()
 if fail:
     print(f"{len(fail)} check(s) failed.")

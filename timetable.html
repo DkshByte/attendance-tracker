@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app-->
+<!--secf-app--><!--build:1.0.1-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -901,6 +901,9 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
   color: var(--ink);
   text-decoration: underline;
 }
+.build-stamp { font-size:11px; color:var(--ink-3); opacity:.55; font-variant-numeric:tabular-nums; }
+.build-refresh { font-size:11px; color:var(--ink-3); opacity:.55; }
+.build-refresh:hover { opacity:1; color:var(--ink); }
 .app-footer .heart, .gate-foot .heart {
   color: #ff3b30;
   display: inline-block;
@@ -2383,6 +2386,8 @@ input[type="date"] { padding:12px 14px; }
 
   <footer class="app-footer">
     <span>made with <span class="heart" aria-hidden="true">♥</span> by <a href="https://github.com/DkshByte" target="_blank" rel="noopener noreferrer">daksh sharma</a></span>
+    <span class="build-stamp" id="buildStamp"></span>
+    <button class="link build-refresh" id="buildRefresh" type="button" hidden>Check for update</button>
   </footer>
 </main>
 
@@ -7082,6 +7087,33 @@ document.addEventListener("visibilitychange", () => {
 try {
   const fresh = localStorage.getItem("adgips-app-try");
   if (fresh) { localStorage.setItem("adgips-app", fresh); localStorage.removeItem("adgips-app-try"); }
+  localStorage.removeItem("adgips-app-fails");
+} catch (e) {}
+
+/* Which copy is actually running. Without this, "did the update land?" can only be
+   answered by diffing byte counts against the server, which is no way to debug a
+   phone you are not holding. */
+const BUILD = (document.documentElement.innerHTML.match(/<!--build:([^>]*)-->/) || [, "dev"])[1];
+try {
+  const stamp = document.getElementById("buildStamp");
+  if (stamp) stamp.textContent = "· v" + BUILD;
+
+  /* The loader keeps the last good copy in localStorage, so a phone stuck on a bad
+     or stale one had no way back short of reinstalling. This is that way back. */
+  const refresh = document.getElementById("buildRefresh");
+  if (refresh && NATIVE) {
+    refresh.hidden = false;
+    refresh.addEventListener("click", () => {
+      refresh.textContent = "Fetching…";
+      refresh.disabled = true;
+      try {
+        localStorage.removeItem("adgips-app");
+        localStorage.removeItem("adgips-app-try");
+        localStorage.removeItem("adgips-app-fails");
+      } catch (e) {}
+      location.reload();
+    });
+  }
 } catch (e) {}
 
 /* ============================================================

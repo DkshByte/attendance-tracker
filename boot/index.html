@@ -35,6 +35,8 @@
   var MIN    = 100000;                /* anything smaller is not the app */
   var GOOD   = "adgips-app";          /* the last copy seen to boot */
   var TRY    = "adgips-app-try";      /* written, not yet seen to boot */
+  var FAILS  = "adgips-app-fails";    /* consecutive starts that never confirmed */
+  var GIVEUP = 2;                     /* ...before we stop trusting the live copy */
   var BUDGET = 1500;                  /* ms to wait when there is a cache behind us */
   var COLD   = 2500;                  /* ...and when there is not. The fallback is a local
                                          file, so there is nothing to buy with a longer wait —
@@ -72,10 +74,16 @@
 
   var good = get(GOOD);
 
-  /* A copy was written last start and never reached the end of its own script, so it
-     did not boot. Roll back to the last one that did, and leave the network alone this
-     once — otherwise a bad push loops on every launch. */
-  if (get(TRY)) { del(TRY); return fallback(good); }
+  /* A copy was written last start and never reached the end of its own script. That is
+     usually a bad push — but it is also just what a launch looks like when the phone is
+     backgrounded mid-load, and one of those should not block an update. Count them, and
+     only stop trusting the live copy once it has failed to confirm twice running. */
+  if (get(TRY)) {
+    del(TRY);
+    var n = (parseInt(get(FAILS), 10) || 0) + 1;
+    set(FAILS, String(n));
+    if (n >= GIVEUP) return fallback(good);
+  }
 
   var fresh = await live(good ? BUDGET : COLD);
   if (fresh) { set(TRY, fresh); return run(fresh); }
