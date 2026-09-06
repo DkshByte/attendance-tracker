@@ -4,10 +4,11 @@
   "description": "Universal glassmorphic attendance tracker, 75% bunk budget calculator, and real-time smart timetable for college & university students",
   "main": "timetable.html",
   "scripts": {
-    "prep": "cp timetable.html deploy/index.html && cp timetable.html boot/app.html",
+    "prep": "cp timetable.html deploy/index.html && cp timetable.html deploy/app.html && cp timetable.html boot/app.html",
     "sync": "npm run prep && npx cap sync",
     "open": "npm run sync && npx cap open android",
-    "build": "npm run sync && cd android && ./gradlew assembleDebug"
+    "build": "npm run sync && cd android && ./gradlew assembleDebug",
+    "release": "npm run sync && cd android && ./gradlew assembleRelease"
   },
   "keywords": [
     "bunkr",

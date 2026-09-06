@@ -1,5 +1,13 @@
 apply plugin: 'com.android.application'
 
+/* Release signing. Put the real values in android/keystore.properties, which is
+   gitignored and must never be committed — losing or leaking that key means every
+   future update is refused as a different app. Without the file the project still
+   configures and debug builds still work; only assembleRelease needs it. */
+def signProps = new Properties()
+def signFile = rootProject.file('keystore.properties')
+if (signFile.exists()) { signFile.withInputStream { signProps.load(it) } }
+
 android {
     namespace = "in.adgips.secf"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +24,31 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (signProps['storeFile']) {
+                storeFile     rootProject.file(signProps['storeFile'])
+                storePassword signProps['storePassword']
+                keyAlias      signProps['keyAlias']
+                keyPassword   signProps['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
+            if (signProps['storeFile']) { signingConfig signingConfigs.release }
+            /* Left off deliberately: ProGuard cannot shrink the part that matters
+               here (the app is a single HTML file in assets) and it does break
+               Capacitor's plugin lookup, which is reflective. */
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            /* A debug APK is android:debuggable, which opens the WebView to remote
+               inspection over adb and hands anyone with a cable the session token
+               out of localStorage. It is for this machine, never for the section. */
+            applicationIdSuffix '.debug'
+            versionNameSuffix  '-debug'
         }
     }
 }

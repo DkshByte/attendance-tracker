@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The WebView's localStorage holds a live Supabase refresh token, the
+  student's roster row and their term of marks. Android's cloud backup
+  and device-to-device transfer would copy all of it onto another phone,
+  which is exactly what the single-active-device rule and the fingerprint
+  lock exist to prevent. Nothing leaves the device.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+    </device-transfer>
+</data-extraction-rules>

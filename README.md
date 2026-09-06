@@ -74,7 +74,9 @@ flowchart TD
     end
 
     subgraph Edge["⚡ Vercel Edge CDN"]
-        Deploy["deploy/index.html (Live Deployed Build)"]
+        Landing["deploy/index.html (Marketing Landing Page)"]
+        Deploy["deploy/app.html (Live Deployed Build)"]
+        Landing -->|Open Web App| Deploy
     end
 
     subgraph Cloud["☁️ Supabase Cloud (PostgreSQL 15)"]
@@ -112,7 +114,8 @@ flowchart TD
 │   ├── app.html                # Pre-packaged offline fallback app
 │   └── favicon.svg             # Bootloader assets
 ├── deploy/                     # Static Vercel deployment directory
-│   ├── index.html              # Live web app served to production
+│   ├── index.html              # Marketing landing page (what people hit first)
+│   ├── app.html                # Live web app, linked from the landing page
 │   ├── vercel.json             # Cache-control & CORS headers
 │   └── _headers                # HTTP header rules
 ├── docs/                       # Project specifications & design system
@@ -166,7 +169,7 @@ Whenever edits are made to [`timetable.html`](./timetable.html), synchronize the
 ```bash
 npm run prep
 ```
-*This copies `timetable.html` to both `deploy/index.html` (Vercel) and `boot/app.html` (Android offline bundle).*
+*This copies `timetable.html` to both `deploy/app.html` (Vercel) and `boot/app.html` (Android offline bundle). `deploy/index.html` is the hand-authored landing page and is never overwritten by this script.*
 
 ### 3. Android Development (Capacitor)
 To build and run the Android app:

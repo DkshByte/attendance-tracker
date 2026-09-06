@@ -42,3 +42,9 @@ android/capacitor-cordova-android-plugins/
 android/app/src/main/assets/
 android/app/src/main/res/xml/config.xml
 
+
+# Android release signing — never commit the key or its passwords
+android/keystore.properties
+keystore.properties
+*.keystore
+*.jks
