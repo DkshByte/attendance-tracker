@@ -19,7 +19,7 @@
   --bg:#070C1C; --plate:#0F1830; --plate-2:#17223F; --plate-3:#1D2A4C;
   --rule:#26314F; --rule-soft:#1A2340; --rail:#2C3859;
   --ink:#F3F6FC; --ink-2:#A6B3CE; --ink-3:#6E7C99;
-  --focus:#7FB2FF;
+  --focus:var(--l-phy);        /* the Blue Line, not a browser blue */
   --l-pps:#FF4D40; --l-bee:#FFB92E; --l-phy:#4E96FF; --l-smt:#35D07F;
   --l-em:#B18CFF;  --l-csl:#FF6BB0; --l-evs:#29D6CD; --l-eg:#FF9147; --l-pd:#93A3C0;
   --ok:#35D07F; --warn:#FFB92E; --bad:#FF4D40;
@@ -34,7 +34,7 @@
     --bg:#EEF1F7; --plate:#FFFFFF; --plate-2:#F5F7FC; --plate-3:#EAEFF8;
     --rule:#D3DAE8; --rule-soft:#E4E9F2; --rail:#C3CCDE;
     --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580;
-    --focus:#1B5BD7;
+    --focus:var(--l-phy);
     --l-pps:#D62B1F; --l-bee:#9C6500; --l-phy:#1560D8; --l-smt:#0E8C4E;
     --l-em:#6B3FD4;  --l-csl:#C42B77; --l-evs:#0A857E; --l-eg:#BF5210; --l-pd:#5A6883;
     --ok:#0E8C4E; --warn:#9C6500; --bad:#D62B1F; --badge-ink:#FFFFFF;
@@ -47,7 +47,7 @@
   --bg:#EEF1F7; --plate:#FFFFFF; --plate-2:#F5F7FC; --plate-3:#EAEFF8;
   --rule:#D3DAE8; --rule-soft:#E4E9F2; --rail:#C3CCDE;
   --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580;
-  --focus:#1B5BD7;
+  --focus:var(--l-phy);
   --l-pps:#D62B1F; --l-bee:#9C6500; --l-phy:#1560D8; --l-smt:#0E8C4E;
   --l-em:#6B3FD4;  --l-csl:#C42B77; --l-evs:#0A857E; --l-eg:#BF5210; --l-pd:#5A6883;
   --ok:#0E8C4E; --warn:#9C6500; --bad:#D62B1F; --badge-ink:#FFFFFF;
@@ -143,6 +143,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
   min-height:58px; padding:10px 1px 9px; text-decoration:none; color:var(--ink-3);
   font-size:10px; font-weight:700; letter-spacing:.02em; text-transform:uppercase;
+  white-space:nowrap;
   position:relative; transition:color .2s var(--ease), transform .16s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }
@@ -302,6 +303,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 .travelled {
   position:absolute; left:20px; top:8px; width:2px; border-radius:1px;
   background:var(--ink-2); transition:height 1.2s var(--ease); z-index:1;
+  transform-origin:top center;
 }
 
 /* ============ section headings ============ */
@@ -680,8 +682,8 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 
 /* on a phone the form belongs under the thumb, not floating in the middle */
 @media (max-width:560px) {
-  .gate { place-items:stretch; align-content:stretch; padding-left:18px; padding-right:18px; }
-  .gate-in { max-width:none; display:flex; flex-direction:column; }
+  .gate { display:flex; flex-direction:column; padding-left:18px; padding-right:18px; }
+  .gate-in { flex:1; max-width:none; display:flex; flex-direction:column; }
   .gate .hero { margin-top:4vh; }
   .gate h1 { font-size:35px; }
   .gate .sub { margin-bottom:4px; }
@@ -887,6 +889,14 @@ dialog .btn { margin-top:8px; }
 .user-drop .drop-bad svg { color:var(--bad); }
 
 /* the bar is the first thing a phone shows: keep it to a line and no more */
+/* six labels across a 360px phone: at 10px with tracking they touch, and
+   DIRECTORY / ATTENDANCE / HOLIDAYS ran together. The icons carry the meaning
+   at this size, so the label steps down rather than the icon. */
+@media (max-width:400px) {
+  .nav a { font-size:9px; letter-spacing:0; gap:4px; }
+  .nav a svg { width:24px; height:24px; }
+}
+
 @media (max-width:560px) {
   .top { padding:calc(12px + env(safe-area-inset-top)) 14px 12px; gap:10px; }
   .mark .sub { display:none; }
@@ -1379,6 +1389,7 @@ function renderRail(box, dayIdx, opts) {
 
   segs.forEach(s => {
     const stop = el("div", "stop");
+    stop.style.setProperty("--i", segs.indexOf(s));
     stop.style.minHeight = s.h + "px";
     stop.style.marginBottom = "10px";
     stop.style.position = "relative";
@@ -1498,6 +1509,19 @@ function todayCard(s, key, iso, ii, dayIdx) {
   return f;
 }
 
+/* The top bar's height is not a constant: it grows with the safe-area inset and
+   changes at the breakpoint. Two sticky offsets depend on it, so it is measured
+   rather than guessed. */
+function measureTop() {
+  const top = document.querySelector(".top");
+  if (!top) return;
+  document.documentElement.style.setProperty("--top-h", Math.round(top.getBoundingClientRect().height) + "px");
+}
+window.addEventListener("resize", measureTop);
+window.addEventListener("orientationchange", () => setTimeout(measureTop, 120));
+
+let booted = false;
+
 function renderToday() {
   const di = new Date().getDay() - 1;
   const live = di >= 0 && di < 6;                  /* Sunday: di is -1, and it owns no rail */
@@ -1511,10 +1535,18 @@ function renderToday() {
   const iso = isoOf(new Date());
   const order = new Map();
   DAYS[dayIdx].items.forEach((it, ii) => order.set(it.i, ii));
-  renderRail(document.getElementById("todayRail"), dayIdx, {
+  const rail = document.getElementById("todayRail");
+  renderRail(rail, dayIdx, {
     live, mark: live,
     build: live ? (s, key) => todayCard(s, key, iso, order.get(s.i), dayIdx) : null,
   });
+
+  /* the line draws itself once, on the first paint of the session */
+  if (!booted) {
+    booted = true;
+    rail.classList.add("boot");
+    setTimeout(() => rail.classList.remove("boot"), 1600);
+  }
 }
 
 function renderPlate() {
@@ -4109,6 +4141,7 @@ function afterSignIn() {
 
 adoptUser(profile && profile.sno);               /* before a single number is drawn */
 if (NATIVE && locked && profile) { showLock(true); tryUnlock(); }
+measureTop();
 renderMonths();
 renderHolidayList();
 renderLineKey();
