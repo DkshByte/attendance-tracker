@@ -23,7 +23,7 @@
   ],
   "author": "Daksh Sharma <dakshsharma3758@gmail.com>",
   "license": "MIT",
-  "homepage": "https://deploy-hazel-three-81.vercel.app",
+  "homepage": "https://bunkr.website",
   "type": "commonjs",
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^10.0.0",

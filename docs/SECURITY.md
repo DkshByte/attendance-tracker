@@ -158,7 +158,7 @@ File: `timetable.html`.
 ## Not fixed — needs your decision
 
 ### A. The OTA loader is remote code execution by design
-`boot/index.html` fetches `https://deploy-hazel-three-81.vercel.app/index.html`
+`boot/index.html` fetches `https://bunkr.website/app.html`
 on every launch and `document.write()`s it into the WebView. Whatever that URL
 serves *is* the app: full access to session tokens, contacts and the biometric
 lock, on every installed phone, with no rebuild and no user action.
@@ -167,12 +167,7 @@ The only integrity check is `sane()` — length > 100000 and the presence of an
 HTML comment. That is a captive-portal guard, not a signature. Anyone who can
 serve that URL owns every install.
 
-Two things make that more than theoretical:
-
-1. **The hostname is an auto-generated `*.vercel.app` subdomain.** If the Vercel
-   project is ever deleted, renamed, or the account lapses, the name goes back in
-   the pool and someone else can claim it. That is a documented subdomain-takeover
-   path, and here it lands as code execution on sixty phones.
+Now secured with custom domain ownership (`bunkr.website`).
 2. **Google Play forbids it.** Downloading and executing interpreted code from
    outside Play violates the Device and Network Abuse policy. If you ever list
    the app, this is what gets it pulled.

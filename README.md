@@ -7,13 +7,13 @@
 **Universal attendance tracker, 75% bunk budget engine, and real-time corridor timetable.**<br>
 *A modern, fast, offline-first attendance companion built for college and university students.*
 
-[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live%20Deploy-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://deploy-hazel-three-81.vercel.app)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live%20Deploy-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://bunkr.website)
 [![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20RLS-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
 [![Capacitor](https://img.shields.io/badge/Capacitor-Android%20APK-119EFF?style=for-the-badge&logo=capacitor&logoColor=white)](https://capacitorjs.com)
 [![Architecture](https://img.shields.io/badge/Architecture-Single--File%20%26%20Zero--Build-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](#-architecture--zero-build-philosophy)
 [![License: MIT](https://img.shields.io/badge/License-MIT-6366F1?style=for-the-badge)](./LICENSE)
 
-[🚀 **Launch Web App**](https://deploy-hazel-three-81.vercel.app) •
+[🚀 **Launch Web App**](https://bunkr.website) •
 [✨ **Features**](#-key-features) •
 [🏗️ **Architecture**](#-system-architecture) •
 [📂 **Structure**](#-project-structure) •

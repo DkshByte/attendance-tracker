@@ -294,6 +294,101 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 .upnext .fac { font-size:12.5px; color:var(--ink-2); }
 .upnext .t { font-size:15px; color:var(--ink); font-weight:700; flex:none; }
 
+/* ============ Today Slidable Attendance Carousel ============ */
+.att-carousel-wrap {
+  margin:14px 0 6px; position:relative;
+}
+.att-carousel {
+  display:flex; gap:12px; overflow-x:auto;
+  scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+  scrollbar-width:none; padding:4px 2px 8px;
+}
+.att-carousel::-webkit-scrollbar { display:none; }
+.att-card {
+  flex:0 0 calc(100% - 36px); min-width:calc(100% - 36px); max-width:380px;
+  scroll-snap-align:start; scroll-snap-stop:always;
+  background:var(--glass-plate); border:1px solid var(--glass-border); border-radius:16px;
+  backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:var(--lift), var(--glass-highlight);
+  padding:16px 18px 14px; display:flex; flex-direction:column; justify-content:space-between;
+  box-sizing:border-box; transition:border-color .2s var(--ease), transform .18s var(--ease);
+}
+@media (min-width:640px) {
+  .att-card { flex:0 0 320px; min-width:320px; }
+}
+.att-card-top {
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;
+}
+.att-card-lbl {
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-3);
+}
+.att-badge {
+  font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:.05em; font-family:'Blinker', sans-serif;
+  background:var(--plate-2); color:var(--ink-2);
+}
+.att-badge.good { background:color-mix(in srgb, var(--good) 16%, transparent); color:var(--good); }
+.att-badge.warn { background:color-mix(in srgb, var(--bad) 16%, transparent); color:var(--bad); }
+.att-badge.ghost { background:transparent; border:1px solid var(--rule); }
+.att-card-hero {
+  display:flex; align-items:baseline; gap:8px; margin:2px 0 6px;
+}
+.att-card-val {
+  font-family:'Blinker', sans-serif; font-weight:800; font-size:32px; letter-spacing:-.02em;
+  line-height:1; color:var(--ink);
+}
+.att-card-val.good { color:var(--good); }
+.att-card-val.warn { color:var(--bad); }
+.att-diff {
+  font-size:11.5px; font-weight:700; padding:2px 7px; border-radius:999px;
+}
+.att-diff.good { background:color-mix(in srgb, var(--good) 15%, transparent); color:var(--good); }
+.att-diff.warn { background:color-mix(in srgb, var(--bad) 15%, transparent); color:var(--bad); }
+.att-card-unit { font-size:13px; font-weight:600; color:var(--ink-3); }
+.att-card-sub { font-size:12.5px; line-height:1.4; color:var(--ink-2); margin-bottom:8px; }
+.att-mini-gauge {
+  width:100%; height:5px; background:var(--plate-2); border-radius:999px; overflow:hidden; margin-top:4px;
+}
+.att-mini-gauge i { display:block; height:100%; border-radius:999px; transition:width .3s var(--ease); }
+.att-mini-gauge i.good { background:var(--good); }
+.att-mini-gauge i.warn { background:var(--bad); }
+
+.att-card-subs {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin:4px 0 10px;
+}
+.att-sub-pill {
+  display:flex; align-items:center; gap:6px; background:var(--plate-2);
+  border:1px solid var(--rule-soft); border-radius:8px; padding:4px 8px;
+}
+.att-sub-dot { width:7px; height:7px; border-radius:50%; flex:none; background:var(--line, var(--ink)); }
+.att-sub-name {
+  font-size:11px; font-weight:700; color:var(--ink); flex:1;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.att-sub-pct { font-size:10.5px; font-weight:700; }
+.att-sub-pct.good { color:var(--good); }
+.att-sub-pct.warn { color:var(--bad); }
+.att-empty-note { font-size:11.5px; color:var(--ink-3); grid-column:1 / -1; padding:6px 0; }
+
+.att-card-act {
+  margin-top:auto; align-self:flex-start; border:0; background:transparent;
+  color:var(--focus); font-size:12px; font-weight:700; cursor:pointer; padding:4px 0;
+  transition:opacity .15s var(--ease);
+}
+.att-card-act:hover { opacity:.8; }
+.att-card-act.pri {
+  background:var(--ink); color:var(--bg); padding:6px 12px; border-radius:999px;
+  font-size:11.5px; margin-top:4px;
+}
+
+.att-carousel-dots {
+  display:flex; align-items:center; justify-content:center; gap:6px; margin-top:6px;
+}
+.att-dot {
+  border:0; background:var(--rule); width:6px; height:6px; border-radius:50%;
+  cursor:pointer; padding:0; transition:width .25s var(--ease), background .25s var(--ease), border-radius .25s var(--ease);
+}
+.att-dot.active { background:var(--ink); width:18px; border-radius:999px; }
+
 /* ============ vertical rail (Today / mobile week) ============ */
 .railwrap { position:relative; margin-top:22px; padding-left:44px; }
 .railwrap::before {
@@ -1657,6 +1752,7 @@ input[type="date"] { padding:12px 14px; }
 
   <section id="today">
     <div id="plateBox"></div>
+    <div id="todayAttCardsBox"></div>
     <div id="eodNoticeBox"></div>
     <div id="taskDueBox"></div>
     <div class="h2row" style="margin-top:24px">
@@ -2297,6 +2393,7 @@ function renderToday() {
   const di = new Date().getDay() - 1;
   const live = di >= 0 && di < 6;                  /* Sunday: di is -1, and it owns no rail */
   renderPlate();
+  renderTodayAttCards();
   const up = live ? null : nextRunningDay(isoOf(new Date()));
   const dayIdx = live ? di : (up ? up.di : 0);
   document.getElementById("todayHead").textContent =
@@ -2431,6 +2528,231 @@ function renderPlate() {
     plate.appendChild(b);
   }
   box.appendChild(plate);
+}
+
+function renderTodayAttCards() {
+  const box = document.getElementById("todayAttCardsBox");
+  if (!box) return;
+
+  /* Remember scroll position if re-rendering */
+  let activeIdx = 0;
+  const oldCarousel = document.getElementById("todayAttCarousel");
+  if (oldCarousel && oldCarousel.offsetWidth) {
+    const cardW = (oldCarousel.firstElementChild ? oldCarousel.firstElementChild.offsetWidth : 0) + 12;
+    if (cardW > 0) activeIdx = Math.min(3, Math.max(0, Math.round(oldCarousel.scrollLeft / cardW)));
+  }
+
+  box.textContent = "";
+
+  const t = tally(), tb = termBudget();
+  const keys = Object.keys(t);
+  const totalP = keys.reduce((n, k) => n + t[k].p, 0);
+  const totalH = keys.reduce((n, k) => n + t[k].h, 0);
+  const overall = pctOf(totalP, totalH);
+  const isClear = clear(totalP, totalH);
+  const bp = bunkPlan();
+
+  const wrap = el("div", "att-carousel-wrap");
+  const carousel = el("div", "att-carousel");
+  carousel.id = "todayAttCarousel";
+
+  /* ---------------- CARD 1: Overall Attendance ---------------- */
+  const c1 = el("div", "att-card");
+  const c1Top = el("div", "att-card-top");
+  c1Top.appendChild(el("span", "att-card-lbl", "Overall Attendance"));
+  const c1Badge = el("span", "att-badge " + (!totalH ? "ghost" : (isClear ? "good" : "warn")),
+    !totalH ? "Not Started" : (isClear ? "On Track" : "Below Target"));
+  c1Top.appendChild(c1Badge);
+  c1.appendChild(c1Top);
+
+  const c1Hero = el("div", "att-card-hero");
+  const c1Val = el("span", "att-card-val" + (totalH ? (isClear ? " good" : " warn") : ""),
+    totalH ? (overall + "%") : "—");
+  c1Hero.appendChild(c1Val);
+  if (totalH) {
+    const diff = overall - targetPct;
+    const diffEl = el("span", "att-diff " + (diff >= 0 ? "good" : "warn"),
+      (diff >= 0 ? "+" : "") + diff + "% vs " + targetPct + "%");
+    c1Hero.appendChild(diffEl);
+  } else {
+    c1Hero.appendChild(el("span", "att-card-unit", "Target " + targetPct + "%"));
+  }
+  c1.appendChild(c1Hero);
+
+  const c1Sub = el("div", "att-card-sub",
+    totalH ? (totalP + " attended · " + (totalH - totalP) + " missed · " + totalH + " held so far")
+           : "Mark your classes on today's line or the attendance board to start tracking.");
+  c1.appendChild(c1Sub);
+
+  const c1Gauge = el("div", "att-mini-gauge");
+  const c1Fill = el("i", isClear ? "good" : "warn");
+  c1Fill.style.width = Math.min(100, Math.max(0, overall || 0)) + "%";
+  c1Gauge.appendChild(c1Fill);
+  c1.appendChild(c1Gauge);
+
+  const c1Act = el("button", "att-card-act", "View attendance board →");
+  c1Act.type = "button";
+  c1Act.addEventListener("click", () => { show("attendance"); showATab("board"); });
+  c1.appendChild(c1Act);
+  carousel.appendChild(c1);
+
+  /* ---------------- CARD 2: Safe Bunk Budget ---------------- */
+  const c2 = el("div", "att-card");
+  const c2Top = el("div", "att-card-top");
+  c2Top.appendChild(el("span", "att-card-lbl", "Safe Bunk Budget"));
+  const hasLost = bp.lost.length > 0;
+  const safeSkips = bp.left;
+  const c2Badge = el("span", "att-badge " + (hasLost ? "warn" : (safeSkips > 0 ? "good" : "ghost")),
+    hasLost ? "Attention" : (safeSkips > 0 ? "Safe Room" : "Zero Margin"));
+  c2Top.appendChild(c2Badge);
+  c2.appendChild(c2Top);
+
+  const c2Hero = el("div", "att-card-hero");
+  const c2Val = el("span", "att-card-val" + (hasLost ? " warn" : (safeSkips > 0 ? " good" : "")),
+    hasLost ? "Deficit" : String(safeSkips));
+  c2Hero.appendChild(c2Val);
+  c2Hero.appendChild(el("span", "att-card-unit",
+    hasLost ? "needs recovery" : (safeSkips === 1 ? "safe bunk left" : "safe bunks left")));
+  c2.appendChild(c2Hero);
+
+  const c2Sub = el("div", "att-card-sub",
+    hasLost ? (bp.lost.map(x => SUB[x.k].short).join(", ") + " cannot reach " + targetPct + "% — attend upcoming classes to recover.")
+            : (!safeSkips ? ("Attend all " + tb.overall.r + " remaining classes to stay at or above " + targetPct + "%.")
+                          : (safeSkips + " classes you can safely skip across subjects while staying ≥ " + targetPct + "%.")));
+  c2.appendChild(c2Sub);
+
+  const c2Act = el("button", "att-card-act", "Open bunk planner →");
+  c2Act.type = "button";
+  c2Act.addEventListener("click", () => { show("attendance"); showATab("bunk"); });
+  c2.appendChild(c2Act);
+  carousel.appendChild(c2);
+
+  /* ---------------- CARD 3: Subject Snapshot ---------------- */
+  const c3 = el("div", "att-card");
+  const c3Top = el("div", "att-card-top");
+  c3Top.appendChild(el("span", "att-card-lbl", "Subject Snapshot"));
+  const belowCount = keys.filter(k => !clear(t[k].p, t[k].h)).length;
+  const c3Badge = el("span", "att-badge " + (!keys.length ? "ghost" : (belowCount ? "warn" : "good")),
+    !keys.length ? "0 Tracked" : (belowCount ? (belowCount + " below " + targetPct + "%") : "All Clear"));
+  c3Top.appendChild(c3Badge);
+  c3.appendChild(c3Top);
+
+  const c3Hero = el("div", "att-card-hero");
+  const c3Val = el("span", "att-card-val",
+    keys.length ? (keys.length - belowCount) + "/" + keys.length : "0");
+  c3Hero.appendChild(c3Val);
+  c3Hero.appendChild(el("span", "att-card-unit", "subjects at or above target"));
+  c3.appendChild(c3Hero);
+
+  const c3Subs = el("div", "att-card-subs");
+  if (!keys.length) {
+    c3Subs.appendChild(el("div", "att-empty-note", "No subjects marked yet. Tap a class on today's line to log attendance."));
+  } else {
+    /* Show tightest / lowest percentages first */
+    const sorted = [...keys].sort((a, b) => (t[a].p / (t[a].h || 1)) - (t[b].p / (t[b].h || 1))).slice(0, 4);
+    sorted.forEach(k => {
+      const { p, h } = t[k];
+      const pct = pctOf(p, h);
+      const isSubClear = clear(p, h);
+      const pill = el("div", "att-sub-pill");
+      pill.dataset.line = (SUB[k] && SUB[k].line) || "";
+      const dot = el("span", "att-sub-dot");
+      pill.appendChild(dot);
+      pill.appendChild(el("span", "att-sub-name", SUB[k].short));
+      pill.appendChild(el("span", "att-sub-pct " + (isSubClear ? "good" : "warn"), pct + "%"));
+      c3Subs.appendChild(pill);
+    });
+  }
+  c3.appendChild(c3Subs);
+
+  const c3Act = el("button", "att-card-act", "All subjects ledger →");
+  c3Act.type = "button";
+  c3Act.addEventListener("click", () => { show("attendance"); showATab("board"); });
+  c3.appendChild(c3Act);
+  carousel.appendChild(c3);
+
+  /* ---------------- CARD 4: Today's Status & Action ---------------- */
+  const c4 = el("div", "att-card");
+  const c4Top = el("div", "att-card-top");
+  c4Top.appendChild(el("span", "att-card-lbl", "Today's Status"));
+
+  const todayIso = nowISO();
+  const dToday = fromISO(todayIso);
+  const diToday = dToday.getDay() - 1;
+  const isSchoolDay = diToday >= 0 && diToday < 6 && DAYS[diToday] && DAYS[diToday].items.length && !gazettedOn(todayIso);
+  const items = isSchoolDay ? DAYS[diToday].items.map((it, ii) => ({ it, ii, k: resolve(it) })).filter(x => x.k) : [];
+  const attendedToday = items.filter(x => att[todayIso + "|" + x.ii] && att[todayIso + "|" + x.ii].m === "P").length;
+  const absentToday = items.filter(x => att[todayIso + "|" + x.ii] && att[todayIso + "|" + x.ii].m === "A").length;
+  const unmarkedToday = items.filter(x => !att[todayIso + "|" + x.ii]).length;
+  const allMarkedP = items.length > 0 && attendedToday === items.length;
+
+  const upDay = isSchoolDay ? null : nextRunningDay(todayIso);
+
+  const c4Badge = el("span", "att-badge " + (isSchoolDay ? (allMarkedP ? "good" : "ghost") : "ghost"),
+    isSchoolDay ? (DAYS[diToday].d + " · " + items.length + " classes") : (upDay ? (DAYS[upDay.di].d + " next") : "Off Today"));
+  c4Top.appendChild(c4Badge);
+  c4.appendChild(c4Top);
+
+  const c4Hero = el("div", "att-card-hero");
+  const c4Val = el("span", "att-card-val" + (attendedToday > 0 ? " good" : ""),
+    isSchoolDay ? (attendedToday + "/" + items.length) : (upDay ? String(DAYS[upDay.di].items.length) : "0"));
+  c4Hero.appendChild(c4Val);
+  c4Hero.appendChild(el("span", "att-card-unit",
+    isSchoolDay ? (allMarkedP ? "all attended ✓" : (unmarkedToday ? unmarkedToday + " left to mark" : "marked"))
+                : (upDay ? "classes on " + DAYS[upDay.di].d : "no classes")));
+  c4.appendChild(c4Hero);
+
+  const c4Sub = el("div", "att-card-sub",
+    isSchoolDay ? (attendedToday + " present" + (absentToday ? " · " + absentToday + " absent" : "") + (unmarkedToday ? " · " + unmarkedToday + " unrecorded" : " · all logged"))
+                : (upDay ? "Institute is off today. The next classes run on " + DAYS[upDay.di].d + "." : "No institute classes scheduled."));
+  c4.appendChild(c4Sub);
+
+  if (isSchoolDay && items.length > 0) {
+    const c4Act = el("button", "att-card-act pri", allMarkedP ? "✓ All present (undo)" : "⚡ Mark all present");
+    c4Act.type = "button";
+    c4Act.addEventListener("click", () => markAllDay(todayIso, "P"));
+    c4.appendChild(c4Act);
+  } else {
+    const c4Act = el("button", "att-card-act", "View schedule →");
+    c4Act.type = "button";
+    c4Act.addEventListener("click", () => show("week"));
+    c4.appendChild(c4Act);
+  }
+  carousel.appendChild(c4);
+
+  wrap.appendChild(carousel);
+
+  /* ---------------- Dots Pagination ---------------- */
+  const dotsBox = el("div", "att-carousel-dots");
+  const cards = [c1, c2, c3, c4];
+  const dots = cards.map((card, idx) => {
+    const dot = el("button", "att-dot" + (idx === activeIdx ? " active" : ""));
+    dot.type = "button";
+    dot.setAttribute("aria-label", "Slide " + (idx + 1));
+    dot.addEventListener("click", () => {
+      card.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+    });
+    dotsBox.appendChild(dot);
+    return dot;
+  });
+
+  /* Update active dot on scroll */
+  carousel.addEventListener("scroll", () => {
+    const scrollLeft = carousel.scrollLeft;
+    const cardW = (c1.offsetWidth || 280) + 12;
+    const curIdx = Math.min(cards.length - 1, Math.max(0, Math.round(scrollLeft / cardW)));
+    dots.forEach((d, i) => d.classList.toggle("active", i === curIdx));
+  }, { passive: true });
+
+  wrap.appendChild(dotsBox);
+  box.appendChild(wrap);
+
+  if (activeIdx > 0 && cards[activeIdx]) {
+    requestAnimationFrame(() => {
+      cards[activeIdx].scrollIntoView({ inline: "start", block: "nearest" });
+      dots.forEach((d, i) => d.classList.toggle("active", i === activeIdx));
+    });
+  }
 }
 
 /* ============================================================
