@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1-->
+<!--secf-app--><!--build:1.0.1+d476d8b-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1256,6 +1256,38 @@ button.drow:hover { background:var(--glass-plate-hover); }
 .planbar .link { margin-top:9px; }
 .skipmark { align-self:flex-start; margin-top:5px; font-size:10.5px; font-weight:700;
             letter-spacing:.09em; text-transform:uppercase; color:var(--bad); }
+/* --- CR verdict: the arranged period, and the CR's own panel --- */
+.stop.arranged .card::after {
+  content:"Arranged";
+  position:absolute; top:10px; right:12px;
+  font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--badge-ink); background:var(--ink-3);
+  padding:2px 7px; border-radius:999px;
+}
+.stop.arranged .card { position:relative; }
+
+.crx { margin-top:14px; padding-top:14px; border-top:1px solid var(--rule-soft, rgba(255,255,255,.07)); }
+.crx-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.crx-tag {
+  font-size:10px; font-weight:800; letter-spacing:.06em;
+  color:var(--bg); background:var(--ink);
+  padding:2px 7px; border-radius:999px;
+}
+.crx-title { font-size:13px; font-weight:700; color:var(--ink); }
+.crx-seg { width:100%; margin-bottom:10px; }
+.crx-seg button { flex:1; }
+.crx-row { margin-bottom:8px; }
+.crx-pick, .crx-note {
+  width:100%; box-sizing:border-box;
+  font:inherit; font-size:13px;
+  padding:10px 12px; border-radius:12px;
+  color:var(--ink); background:var(--plate);
+  border:1px solid var(--rule-soft, rgba(255,255,255,.09));
+}
+.crx-pick:focus-visible, .crx-note:focus-visible { outline:2px solid var(--ink-2); outline-offset:1px; }
+.crx-note { margin-bottom:8px; }
+.crx-hint { font-size:12px; line-height:1.45; color:var(--ink-3); margin-bottom:4px; }
+
 .stop.suspended .card { opacity:.55; }
 .stop.suspended .card .name { text-decoration:line-through; }
 .stop.suspended .node { box-shadow:inset 0 0 0 2px var(--ink-3) !important; }
@@ -2707,13 +2739,17 @@ function renderRail(box, dayIdx, opts) {
     stop.style.position = "relative";
 
     if (s.kind === "class") {
-      const key = resolve(s.item);
+      /* An override is pinned to a date, and only the live view has one — the weekly
+         grid is every Monday at once, so it stays the timetable as published. */
+      const swapped = live ? swapAt(isoOf(new Date()), s.i) : null;
+      const key = swapped || resolve(s.item);
       const ln = key ? lineOf(key) : lineOf(s.item.split.F1);
       stop.dataset.line = ln;
       const isLive = live && now >= s.from && now < s.to;
       const isPast = live && now >= s.to;
       if (isLive) stop.classList.add("live");
       if (isPast) stop.classList.add("past");
+      if (swapped) stop.classList.add("arranged");
       if (live && isCancelled(isoOf(new Date()), s.i)) stop.classList.add("suspended");
       stop.appendChild(el("span", "node"));
       if (s.h > 92) stop.appendChild(el("span", "span"));
@@ -3319,29 +3355,154 @@ function openDetail(item, dayIdx) {
   });
   box.appendChild(list);
 
-  // reporting only makes sense for a class that is actually on today
+  /* An override and a vote are both pinned to a date, and only today has one here —
+     the sheet is reached from a weekday, not from a calendar. */
   const iso = isoOf(new Date());
   const onToday = profile && new Date().getDay() - 1 === dayIdx;
-  if (onToday) {
-    const v = votesFor(iso, item.i), mine = myReports[iso + "|" + item.i];
-    const note = el("div", "d-note");
-    note.textContent = isCancelled(iso, item.i)
-      ? "Cancelled — " + v + " students reported it."
-      : v ? v + " of " + CANCEL_MIN + " reported this cancelled."
-          : "Not running today? Tell the section.";
-    box.appendChild(note);
+  if (!onToday) { box.appendChild(actions()); openDlg(); return; }
+
+  const period = item.i;
+  const ovr = overrideAt(iso, period);
+
+  /* What the section is being told, whoever is reading. */
+  const note = el("div", "d-note");
+  const sayState = () => {
+    const o = overrideAt(iso, period), v = votesFor(iso, period);
+    if (o && o.kind === "off")
+      note.textContent = "Called off by the CR." + (o.note ? " " + o.note : "");
+    else if (o && o.kind === "swap")
+      note.textContent = "Arranged by the CR — " + (SUB[o.subject] ? SUB[o.subject].name : o.subject)
+        + " ran in this slot." + (o.note ? " " + o.note : "");
+    else if (v >= CANCEL_MIN) note.textContent = "Cancelled — " + v + " students reported it.";
+    else if (v) note.textContent = v + " of " + CANCEL_MIN + " reported this cancelled.";
+    else note.textContent = "Running as timetabled.";
+  };
+  sayState();
+  box.appendChild(note);
+
+  if (!isCR()) {
+    /* Everyone else still votes — but not against a verdict that already exists. */
+    if (ovr) { box.appendChild(actions()); openDlg(); return; }
+    const mine = myReports[iso + "|" + period];
+    if (!votesFor(iso, period)) note.textContent = "Not running today? Tell the section.";
     const b = el("button", "btn", mine ? "Undo my report" : "Report cancelled");
     b.type = "button";
     b.addEventListener("click", async () => {
       b.disabled = true; b.textContent = "…";
-      try { await reportCancelled(iso, item.i, !mine); document.getElementById("dlg").close(); renderToday(); }
+      try { await reportCancelled(iso, period, !mine); document.getElementById("dlg").close(); renderToday(); }
       catch (err) { note.textContent = explain(err).join(" — "); b.disabled = false; }
     });
     box.appendChild(actions(b));
-  } else {
-    box.appendChild(actions());
+    openDlg();
+    return;
   }
+
+  box.appendChild(crPanel(iso, period, ovr, note));
   openDlg();
+}
+
+/* ---------- the CR's panel ----------
+   Three states, one row, because a period is exactly one of them. The subject picker
+   only exists while it means something, so there is never a stale subject sitting
+   under a "Cancelled" verdict waiting to be saved by mistake. */
+function crPanel(iso, period, ovr, note) {
+  const wrap = el("div", "crx");
+
+  const head = el("div", "crx-head");
+  head.appendChild(el("span", "crx-tag", "CR"));
+  head.appendChild(el("span", "crx-title", "What actually happened"));
+  wrap.appendChild(head);
+
+  let kind = ovr ? ovr.kind : "on";
+  let subject = (ovr && ovr.subject) || "";
+
+  const seg = el("div", "seg crx-seg");
+  seg.setAttribute("role", "group");
+  seg.setAttribute("aria-label", "What happened in this period");
+  const buttons = {};
+  [["on", "Ran"], ["off", "Cancelled"], ["swap", "Arranged"]].forEach(([k, lbl]) => {
+    const b = el("button", null, lbl);
+    b.type = "button";
+    b.setAttribute("aria-pressed", String(k === kind));
+    b.addEventListener("click", () => {
+      kind = k;
+      Object.entries(buttons).forEach(([kk, bb]) => bb.setAttribute("aria-pressed", String(kk === k)));
+      paint();
+    });
+    buttons[k] = b;
+    seg.appendChild(b);
+  });
+  wrap.appendChild(seg);
+
+  /* Which subject ran instead. Only the ones this section actually has. */
+  const pickRow = el("div", "crx-row");
+  const pick = document.createElement("select");
+  pick.className = "crx-pick";
+  pick.setAttribute("aria-label", "Subject that ran instead");
+  const ph = document.createElement("option");
+  ph.value = ""; ph.textContent = "Which subject ran?";
+  pick.appendChild(ph);
+  Object.keys(SUB).forEach(k => {
+    const o = document.createElement("option");
+    o.value = k; o.textContent = SUB[k].short + " · " + SUB[k].fac;
+    if (k === subject) o.selected = true;
+    pick.appendChild(o);
+  });
+  pick.addEventListener("change", () => { subject = pick.value; paint(); });
+  pickRow.appendChild(pick);
+  wrap.appendChild(pickRow);
+
+  const why = document.createElement("input");
+  why.className = "crx-note";
+  why.type = "text";
+  why.maxLength = 80;
+  why.placeholder = "Add a reason (optional)";
+  why.value = (ovr && ovr.note) || "";
+  wrap.appendChild(why);
+
+  const hint = el("div", "crx-hint");
+  const save = el("button", "btn crx-save", "Save");
+  save.type = "button";
+
+  const paint = () => {
+    pickRow.hidden = kind !== "swap";
+    why.hidden = kind === "on";
+    save.disabled = kind === "swap" && !subject;
+    hint.textContent =
+      kind === "on"   ? (ovr ? "Clears your verdict. The section goes back to reporting it themselves."
+                             : "Nothing to change — this is the timetable as published.")
+    : kind === "off"  ? "Counts against nobody, including students who already marked it."
+    :                   "Marks for this period count towards the subject you pick, for everyone.";
+    save.hidden = kind === "on" && !ovr;
+  };
+  paint();
+
+  wrap.appendChild(hint);
+
+  save.addEventListener("click", async () => {
+    save.disabled = true;
+    const was = save.textContent;
+    save.textContent = "Saving…";
+    try {
+      await setOverride(iso, period, kind === "on" ? null : kind, subject, why.value);
+      sayStateAfterSave(note, iso, period);
+      document.getElementById("dlg").close();
+      renderToday(); renderAttendance();
+    } catch (err) {
+      hint.textContent = explain(err).join(" — ");
+      save.textContent = was;
+      save.disabled = false;
+    }
+  });
+
+  wrap.appendChild(actions(save));
+  return wrap;
+}
+
+/* Split out so the panel does not close over the sheet's own render closure. */
+function sayStateAfterSave(note, iso, period) {
+  const o = overrideAt(iso, period);
+  if (!o) note.textContent = "Running as timetabled.";
 }
 
 /* Every dialog goes through here. The profile asks for a sheet; nothing else does,
@@ -3584,6 +3745,41 @@ function demo() {                                   // run demo() in the console
   ok(nextRunningDay("2026-10-25").iso, "2026-10-27", "a gazetted Monday is skipped for Tuesday");
   ok(nextRunningDay("2026-08-29").di, 0, "Saturday rolls past Sunday to Monday");
 
+  /* The CR's verdict rewrites a percentage that is already on screen, so it is worth
+     proving it does exactly that and nothing more. Real att/overrides, put back after. */
+  const keptAtt = att, keptOvr = overrides;
+  const sub1 = Object.keys(SUB)[0], sub2 = Object.keys(SUB)[1];
+  att = {
+    "2026-09-07|0": { m:"P", s:sub1 },
+    "2026-09-07|1": { m:"A", s:sub1 },
+    "2026-09-07|2": { m:"P", s:sub1 },
+  };
+  overrides = {};
+  ok(tally()[sub1].h, 3, "with no verdict, every marked class is held");
+  ok(tally()[sub1].p, 2, "...and present is counted as marked");
+
+  overrides = { "2026-09-07|1": { kind:"off" } };
+  ok(tally()[sub1].h, 2, "a class the CR called off is held against nobody");
+  ok(tally()[sub1].p, 2, "...and calling one off never removes a present");
+
+  overrides = { "2026-09-07|2": { kind:"swap", subject:sub2 } };
+  ok(tally()[sub1].h, 2, "an arranged period leaves the subject that did not run");
+  ok(tally()[sub2].h, 1, "...and lands on the one that did");
+  ok(tally()[sub2].p, 1, "...carrying the mark with it");
+
+  overrides = { "2026-09-07|2": { kind:"swap", subject:"NOSUCHSUBJECT" } };
+  ok(tally()[sub1].h, 3, "a swap to a subject the app does not know is ignored, not dropped");
+
+  overrides = { "2026-09-07|0": { kind:"swap", subject:sub2 } };
+  ok(isCancelled("2026-09-07", 0), false, "an arranged period is not a cancelled one");
+  cancelVotes = { "2026-09-07|0": CANCEL_MIN };
+  ok(isCancelled("2026-09-07", 0), false, "the CR's verdict outranks the section's votes");
+  overrides = {};
+  ok(isCancelled("2026-09-07", 0), true, "...and with no verdict the votes decide again");
+  cancelVotes = {};
+
+  att = keptAtt; overrides = keptOvr;
+
   /* the sync merge: records are irreplaceable, so this only ever resolves a collision */
   ok(mergeMark(undefined, 5), "take", "a class only the cloud has comes down");
   ok(mergeMark({ m:"P" }, 5), "take", "an undated local mark loses to a dated cloud one");
@@ -3595,9 +3791,17 @@ function demo() {                                   // run demo() in the console
 
 function tally() {
   const t = {};
-  Object.values(att).forEach(({ m, s }) => {
-    if (!SUB[s] || m === "C") return;
-    const e = t[s] = t[s] || { p:0, h:0 };
+  Object.entries(att).forEach(([id, { m, s }]) => {
+    if (m === "C") return;
+    /* The CR's verdict outranks what was marked at the time. A class called off was
+       held against nobody, and an arranged period counts towards the subject that
+       actually ran — including for the students who marked it before the CR said so. */
+    const bar = id.indexOf("|");
+    const iso = id.slice(0, bar), period = +id.slice(bar + 1);
+    if (isCancelled(iso, period)) return;
+    const key = swapAt(iso, period) || s;
+    if (!SUB[key]) return;
+    const e = t[key] = t[key] || { p:0, h:0 };
     e.h++; if (m === "P") e.p++;
   });
   return t;
@@ -5191,12 +5395,36 @@ async function loadCancelled(fromISO, toISO) {
   rows.forEach(r => { cancelVotes[r.on_date + "|" + r.period] = r.votes; });
   const t = await token();
   if (!t) return;
+  /* Same window, same trip. Signed-in only — the table is not granted to anon. */
+  const ov = await call("/rest/v1/class_overrides?select=on_date,period,kind,subject,note&" + q, {}, t);
+  overrides = {};
+  ov.forEach(r => { overrides[r.on_date + "|" + r.period] = r; });
   const mine = await call("/rest/v1/cancellations?select=on_date,period&" + q, {}, t);
   myReports = {};
   mine.forEach(r => { myReports[r.on_date + "|" + r.period] = true; });
 }
 const votesFor = (iso, period) => cancelVotes[iso + "|" + period] || 0;
-const isCancelled = (iso, period) => votesFor(iso, period) >= CANCEL_MIN;
+
+/* ---- what the CR says actually happened ----
+   A vote is what the section believes; an override is what the CR knows. So an
+   override answers on its own and the votes are not consulted — otherwise a class
+   the CR has already called off would still read "2 of 3 reported this". */
+let overrides = {};
+const overrideAt = (iso, period) => overrides[iso + "|" + period] || null;
+
+/* The subject that actually ran in a slot, or null if the timetable was right.
+   Unknown keys are ignored: the timetable lives in the HTML and the row does not,
+   so a subject renamed in one place must not blank the other. */
+const swapAt = (iso, period) => {
+  const o = overrideAt(iso, period);
+  return o && o.kind === "swap" && SUB[o.subject] ? o.subject : null;
+};
+
+const isCancelled = (iso, period) => {
+  const o = overrideAt(iso, period);
+  if (o) return o.kind === "off";
+  return votesFor(iso, period) >= CANCEL_MIN;
+};
 
 async function reportCancelled(iso, period, on) {
   const t = await token();
@@ -5214,6 +5442,37 @@ async function reportCancelled(iso, period, on) {
 }
 
 const isCR = () => !!(profile && profile.role === "cr");
+
+/* Write the CR's verdict. kind null clears it and the section falls back to votes.
+   POST with merge-duplicates is an upsert on (on_date, period), so changing a verdict
+   is the same call as setting one — there is no "already exists" branch to get wrong.
+   RLS refuses all of this for anyone who is not the CR; this is convenience, not the
+   check. */
+async function setOverride(iso, period, kind, subject, note) {
+  const t = await token();
+  if (!t || !profile) throw new Error("Sign in first");
+  const key = iso + "|" + period;
+  const where = "?on_date=eq." + iso + "&period=eq." + period;
+
+  if (!kind) {
+    await call("/rest/v1/class_overrides" + where,
+      { method:"DELETE", headers:{ Prefer:"return=minimal" } }, t);
+    delete overrides[key];
+    return;
+  }
+  const row = {
+    on_date: iso, period, kind,
+    subject: kind === "swap" ? subject : null,
+    note: (note || "").trim() || null,
+    by_user: sess.user.id
+  };
+  await call("/rest/v1/class_overrides", {
+    method:"POST",
+    headers:{ Prefer:"return=minimal,resolution=merge-duplicates" },
+    body: JSON.stringify(row)
+  }, t);
+  overrides[key] = row;
+}
 const fetchDirectory = async () => call("/rest/v1/directory?select=*&order=sno.asc", {}, await token());
 const crRelease = async sno => call("/rest/v1/rpc/cr_release", { method:"POST",
   body: JSON.stringify({ p_sno: sno }) }, await token());

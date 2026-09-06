@@ -90,9 +90,19 @@ if m:
 
 # 8. The OTA path is only debuggable if you can see which copy is running, and only
 #    recoverable if a stuck phone can force a refetch. Both have shipped broken once.
-check("app carries a build stamp",
-      bool(re.search(r"<!--build:[^>]+-->", html)),
+m = re.search(r"<!--build:([^>]+)-->", html)
+check("app carries a build stamp", bool(m),
       "no way to tell from a screenshot which copy a phone is running")
+if m:
+    # The stamp is derived, so it can be recomputed. If it does not match, someone
+    # edited the app and shipped without `npm run prep` — and the footer is now lying
+    # about which copy is running, which is worse than having no stamp at all.
+    import hashlib, json as _json
+    want = hashlib.sha256(
+        re.sub(r"<!--build:[^>]*-->", "<!--build:-->", html).encode()).hexdigest()[:7]
+    ver = _json.loads((root / "package.json").read_text())["version"]
+    check("build stamp matches the file it is stamped on", m.group(1) == f"{ver}+{want}",
+          f"stamp says {m.group(1)}, content is {ver}+{want} — run `npm run prep`")
 check("app clears the loader's fail counter on a good boot",
       'removeItem("adgips-app-fails")' in html,
       "the counter only ever climbs, so the OTA path stops updating for good")
@@ -102,6 +112,21 @@ check("loader counts failures before rolling back",
 check("app offers a way to force a refetch",
       'id="buildRefresh"' in html,
       "a phone stuck on a bad copy can only be fixed by reinstalling")
+
+# 8b. The CR's verdict changes everyone's percentage, so writing one must be locked to
+#     the CR at the database and not merely hidden in the UI.
+ovr = (root / "supabase/07-overrides-setup.sql").read_text()
+check("class_overrides has RLS enabled",
+      "alter table public.class_overrides enable row level security" in ovr,
+      "without it any signed-in student can cancel a class for the whole section")
+for op in ("insert", "update", "delete"):
+    pol = re.search(rf"for {op}\s+(?:using|with check)[\s\S]*?;", ovr)
+    check(f"class_overrides {op} is gated on is_cr()",
+          bool(pol) and "public.is_cr()" in pol.group(0),
+          f"{op} would be open to anyone signed in")
+check("class_overrides is not granted to anon",
+      "revoke all on public.class_overrides from anon" in ovr,
+      "the publishable key is public, and the note is free text")
 
 # 9. The download buttons must point at an asset that exists. The landing page spent a
 #    release pointing at a filename the release did not have.
