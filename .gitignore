@@ -48,3 +48,4 @@ android/keystore.properties
 keystore.properties
 *.keystore
 *.jks
+*.apk

@@ -1650,8 +1650,293 @@ input[type="date"] { padding:12px 14px; }
 
 /* Reduced motion should mean less motion, not no feedback: the global
    rule above kills animation, this keeps colour and opacity legible. */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration:.12s !important; }
+/* ============================================================
+   Bunkr Web Interstitial: Native APK Download Front
+   Only shown on web browsers after splash animation finishes
+   ============================================================ */
+#bunkr-apk-front {
+  position: fixed;
+  inset: 0;
+  z-index: 999990;
+  background: #000000;
+  display: none;
+  opacity: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#bunkr-apk-front.front-visible {
+  opacity: 1;
+}
+
+#bunkr-apk-front.front-leaving {
+  opacity: 0;
+  transform: scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apk-front-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.apk-front-glow-1 {
+  position: absolute;
+  top: -12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 460px;
+  height: 460px;
+  background: radial-gradient(circle, rgba(255, 77, 64, 0.18) 0%, rgba(255, 77, 64, 0) 70%);
+  filter: blur(48px);
+}
+
+.apk-front-glow-2 {
+  position: absolute;
+  bottom: -15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(78, 150, 255, 0.14) 0%, rgba(78, 150, 255, 0) 70%);
+  filter: blur(55px);
+}
+
+.apk-front-card {
+  position: relative;
+  z-index: 1;
+  max-width: 420px;
+  width: 100%;
+  margin: auto;
+  background: linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.018) 100%), rgba(13,13,17,0.92);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 20px 50px -12px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.05) inset;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border-radius: 24px;
+  padding: 32px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transform: translateY(14px) scale(0.97);
+  transition: transform 0.45s cubic-bezier(0.16, 1.25, 0.3, 1);
+}
+
+#bunkr-apk-front.front-visible .apk-front-card {
+  transform: translateY(0) scale(1);
+}
+
+.apk-front-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 77, 64, 0.12);
+  border: 1px solid rgba(255, 77, 64, 0.28);
+  color: var(--l-pps, #FF4D40);
+  font-family: "Blinker", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.apk-front-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF4D40;
+  box-shadow: 0 0 8px #FF4D40;
+}
+
+.apk-front-emblem {
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #181922, #0e0f14);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 24px rgba(255,77,64,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.apk-front-emblem svg {
+  width: 42px;
+  height: 42px;
+  fill: #FFFFFF;
+}
+
+.apk-front-title {
+  font-family: "Blinker", sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.15;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+}
+
+.apk-front-desc {
+  font-family: "Blinker", sans-serif;
+  font-size: 13.5px;
+  color: #9DA3B4;
+  line-height: 1.45;
+  margin: 0 0 22px;
+  max-width: 320px;
+}
+
+.apk-front-perks {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 26px;
+  text-align: left;
+}
+
+.apk-front-perk {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 13px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+}
+
+.apk-front-perk-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FF4D40;
+}
+
+.apk-front-perk-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.apk-front-perk-text {
+  flex: 1;
+}
+
+.apk-front-perk-title {
+  font-family: "Blinker", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.apk-front-perk-sub {
+  font-family: "Blinker", sans-serif;
+  font-size: 11.5px;
+  color: #848A9C;
+  line-height: 1.3;
+}
+
+.apk-front-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.apk-front-btn-download {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #FF4D40 0%, #D82F24 100%);
+  color: #FFFFFF;
+  font-family: "Blinker", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  box-shadow: 0 4px 20px rgba(255, 77, 64, 0.35), 0 1px 0 rgba(255,255,255,0.2) inset;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.apk-front-btn-download:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 6px 26px rgba(255, 77, 64, 0.48), 0 1px 0 rgba(255,255,255,0.3) inset;
+}
+
+.apk-front-btn-download:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(255, 77, 64, 0.3);
+}
+
+.apk-front-btn-continue {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #C2C8D8;
+  font-family: "Blinker", sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.apk-front-btn-continue:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.22);
+  color: #FFFFFF;
+}
+
+.apk-front-meta {
+  margin-top: 14px;
+  font-size: 11px;
+  color: #63697B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.apk-front-meta a {
+  color: #8A92A6;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.apk-front-meta a:hover {
+  color: #FFFFFF;
 }
 </style>
 </head>
@@ -1680,6 +1965,97 @@ input[type="date"] { padding:12px 14px; }
           <path d="M1680.43 843.32C1697.26 841.762 1709.2 847.838 1722.33 857.244C1717.09 864.044 1712.14 871.774 1707.34 878.941C1682.76 862.584 1651.88 869.172 1646.85 898.965C1643.32 919.945 1645.03 952.045 1645.07 973.867C1645.2 976.921 1645.49 978.315 1644.41 981.209C1639.6 985.099 1627.27 983.243 1619.76 983.246L1619.92 844.992L1645.07 844.749L1645.02 861.189C1656.47 850.124 1664.75 845.917 1680.43 843.32Z"/>
         </svg>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bunkr Web Interstitial: Native APK Download Prompt (Only for Web Browser users) -->
+<div id="bunkr-apk-front" class="apk-front" style="display:none;" aria-modal="true" role="dialog" aria-labelledby="apkFrontTitle">
+  <div class="apk-front-backdrop" aria-hidden="true">
+    <div class="apk-front-glow-1"></div>
+    <div class="apk-front-glow-2"></div>
+  </div>
+
+  <div class="apk-front-card">
+    <div class="apk-front-badge">
+      <span class="apk-front-badge-dot"></span>
+      <span>Android App Available</span>
+    </div>
+
+    <div class="apk-front-emblem" aria-hidden="true">
+      <svg viewBox="695 770 252 245">
+        <path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
+        <path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/>
+      </svg>
+    </div>
+
+    <h1 id="apkFrontTitle" class="apk-front-title">Download Bunkr APK</h1>
+    <p class="apk-front-desc">Get the full native experience built specifically for your device with features not available in browsers.</p>
+
+    <div class="apk-front-perks">
+      <div class="apk-front-perk">
+        <div class="apk-front-perk-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div class="apk-front-perk-text">
+          <div class="apk-front-perk-title">Instant 4 PM & Class Alerts</div>
+          <div class="apk-front-perk-sub">Background notifications so you never forget to log attendance.</div>
+        </div>
+      </div>
+
+      <div class="apk-front-perk">
+        <div class="apk-front-perk-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        </div>
+        <div class="apk-front-perk-text">
+          <div class="apk-front-perk-title">120Hz Fluid Gestures & Haptics</div>
+          <div class="apk-front-perk-sub">Silky attendance swipe carousel with tactile vibration feedback.</div>
+        </div>
+      </div>
+
+      <div class="apk-front-perk">
+        <div class="apk-front-perk-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="apk-front-perk-text">
+          <div class="apk-front-perk-title">Biometric App Lock</div>
+          <div class="apk-front-perk-sub">Keep attendance logs secure with fingerprint or Face Unlock.</div>
+        </div>
+      </div>
+
+      <div class="apk-front-perk">
+        <div class="apk-front-perk-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        </div>
+        <div class="apk-front-perk-text">
+          <div class="apk-front-perk-title">100% Offline Capability</div>
+          <div class="apk-front-perk-sub">Never get blocked in basements or labs with zero mobile connectivity.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="apk-front-actions">
+      <a href="https://github.com/DkshByte/attendance-tracker/releases/latest/download/bunkr.apk" class="apk-front-btn-download" id="apkFrontDownloadBtn" download>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Download Bunkr APK</span>
+      </a>
+
+      <button type="button" class="apk-front-btn-continue" id="apkFrontContinueWeb">
+        <span>Continue on Web</span>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="apk-front-meta">
+      <span>Release v1.0.0 · ~7.0 MB</span>
+      <span>•</span>
+      <a href="https://github.com/DkshByte/attendance-tracker/releases/tag/v1.0.0" target="_blank" rel="noopener noreferrer">GitHub Release</a>
     </div>
   </div>
 </div>
@@ -6597,13 +6973,54 @@ try {
 } catch (e) {}
 
 /* ============================================================
-   Bunkr Splash Animation Lifecycle
-   - Logo pops up, wordmark slides out from the logo, holds, dissolves
-   - Tap/click or touch anywhere dismisses immediately to skip
+   Bunkr Splash Animation Lifecycle & Web Interstitial
+   - Splash animates on launch (pop emblem, expand wordmark)
+   - On web browsers: shows full-page native APK download front after splash
+   - On native app (Capacitor): completely suppressed and removed
+   - Continue on web button smoothly dismisses interstitial
    ============================================================ */
-(function initBunkrSplash() {
+(function initBunkrSplashAndWebInterstitial() {
   const splash = document.getElementById("bunkr-splash");
-  if (!splash) return;
+  const apkFront = document.getElementById("bunkr-apk-front");
+  const continueWebBtn = document.getElementById("apkFrontContinueWeb");
+
+  const isNativeApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+
+  // If running inside native Android app: NEVER show the front prompt, remove immediately!
+  if (isNativeApp && apkFront) {
+    try { apkFront.remove(); } catch (e) { apkFront.style.display = "none"; }
+  }
+
+  const showApkFront = () => {
+    if (isNativeApp || !apkFront) return;
+    try {
+      if (sessionStorage.getItem("bunkr_dismiss_apk_prompt") === "1") {
+        try { apkFront.remove(); } catch (e) { apkFront.style.display = "none"; }
+        return;
+      }
+    } catch (e) {}
+    apkFront.style.display = "flex";
+    void apkFront.offsetWidth; // force reflow for smooth CSS entrance
+    apkFront.classList.add("front-visible");
+  };
+
+  if (continueWebBtn && apkFront) {
+    continueWebBtn.addEventListener("click", () => {
+      try {
+        sessionStorage.setItem("bunkr_dismiss_apk_prompt", "1");
+      } catch (e) {}
+      apkFront.classList.add("front-leaving");
+      setTimeout(() => {
+        try { apkFront.remove(); } catch (e) { apkFront.style.display = "none"; }
+      }, 360);
+    });
+  }
+
+  if (!splash) {
+    showApkFront();
+    return;
+  }
+
   let closed = false;
   const dismiss = () => {
     if (closed) return;
@@ -6611,6 +7028,7 @@ try {
     splash.classList.add("splash-out");
     setTimeout(() => {
       try { splash.remove(); } catch (e) { splash.style.display = "none"; }
+      showApkFront();
     }, 420);
   };
   const timer = setTimeout(dismiss, 1950);

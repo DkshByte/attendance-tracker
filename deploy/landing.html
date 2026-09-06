@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Bunkr — Know Your Bunk Budget</title>
+<meta name="description" content="Real-time timetable, 75% bunk budget engine, and section leaderboard. Offline-first. Zero install. Built for students.">
+
+<!-- Font Awesome 6.5.2 -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+/>
+
+<!-- BubbledotICG-FinePos (retro dot-matrix, primary display) -->
+<link
+  href="https://db.onlinewebfonts.com/c/8cb707a9b8a73f8a7403336b861c3074?family=BubbledotICG-FinePos"
+  rel="stylesheet"
+/>
+
+<link rel="stylesheet" href="landing-styles.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+<!-- ── Background Video ─────────────────────────────────────── -->
+<div class="bg">
+  <video class="bg-video" autoplay muted loop playsinline>
+    <source
+      src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4"
+      type="video/mp4"
+    />
+  </video>
+</div>
+
+<!-- ── Mobile Overlay ───────────────────────────────────────── -->
+<div id="mobile-overlay" class="mobile-overlay" hidden>
+  <nav class="mobile-menu" role="dialog" aria-label="Navigation menu">
+    <ul class="mobile-nav-links">
+      <li><a href="landing.html" class="active">Home</a></li>
+      <li><a href="app.html">Timetable</a></li>
+      <li><a href="app.html#roster">Roster</a></li>
+      <li><a href="app.html#bunk">Bunk Planner</a></li>
+    </ul>
+    <a href="app.html" class="mobile-sign-in">Open App</a>
+  </nav>
+</div>
+
+<!-- ── Page ─────────────────────────────────────────────────── -->
+<div class="page">
+
+  <!-- 1) HEADER -->
+  <header class="header" role="banner">
+
+    <!-- Logo -->
+    <a href="landing.html" class="logo-btn" aria-label="Bunkr home">
+      <img src="bunkr-icon.svg" alt="" width="52" height="52">
+    </a>
+
+    <!-- Desktop nav -->
+    <ul class="nav-pill" role="navigation" aria-label="Main navigation">
+      <li><a href="landing.html" class="active">Home</a></li>
+      <li><a href="app.html">Timetable</a></li>
+      <li><a href="app.html#roster">Roster</a></li>
+      <li><a href="app.html#bunk">Bunk Planner</a></li>
+    </ul>
+
+    <!-- Desktop open app -->
+    <a href="app.html" class="sign-in-btn">Open App</a>
+
+    <!-- Mobile burger -->
+    <button
+      id="burger"
+      class="burger-btn"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="mobile-overlay"
+    >
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  </header>
+
+  <!-- 2) HERO -->
+  <main class="hero" role="main">
+
+    <!-- Trust row -->
+    <div class="trust-row" aria-label="Built for students">
+      <div class="avatar" aria-hidden="true">
+        <div class="avatar-inner">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+      </div>
+      <div class="avatar" aria-hidden="true">
+        <div class="avatar-inner">
+          <i class="fa-brands fa-android"></i>
+        </div>
+      </div>
+      <div class="avatar" aria-hidden="true">
+        <div class="avatar-inner">
+          <i class="fa-solid fa-wifi"></i>
+        </div>
+      </div>
+      <div class="trust-pill">Built for College Students</div>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="headline" aria-label="Track Bunks. Beat 75%.">
+      <span>Track Bunks.</span>
+      <span>Beat 75%.</span>
+    </h1>
+
+    <!-- Subhead -->
+    <p class="subhead">
+      Real-time class radar, precise bunk budget engine, and section
+      leaderboard — offline-first, zero-install, works on any device.
+    </p>
+
+    <!-- CTA -->
+    <a href="app.html" class="cta-btn">Open App</a>
+
+  </main>
+
+  <!-- 3) STATS FOOTER -->
+  <footer class="stats" role="contentinfo" aria-label="App statistics">
+
+    <div class="stat-item">
+      <span class="stat-icon" aria-hidden="true">&lt;</span>
+      <span class="stat-value" id="sv0">1s</span>
+      <span class="stat-label">Cold Start</span>
+    </div>
+
+    <div class="stat-item">
+      <span class="stat-icon" aria-hidden="true">%</span>
+      <span class="stat-value" id="sv1">75%</span>
+      <span class="stat-label">Bunk Threshold</span>
+    </div>
+
+    <div class="stat-item">
+      <span class="stat-icon" aria-hidden="true">*</span>
+      <span class="stat-value" id="sv2">24/7</span>
+      <span class="stat-label">Offline Access</span>
+    </div>
+
+    <div class="stat-item">
+      <span class="stat-icon" aria-hidden="true">#</span>
+      <span class="stat-value" id="sv3">100%</span>
+      <span class="stat-label">Works Offline</span>
+    </div>
+
+  </footer>
+
+</div>
+
+<script src="landing-main.js"></script>
+</body>
+</html>
