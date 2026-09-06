@@ -36,7 +36,9 @@
   var GOOD   = "adgips-app";          /* the last copy seen to boot */
   var TRY    = "adgips-app-try";      /* written, not yet seen to boot */
   var BUDGET = 1500;                  /* ms to wait when there is a cache behind us */
-  var COLD   = 8000;                  /* ...and when there is not */
+  var COLD   = 2500;                  /* ...and when there is not. The fallback is a local
+                                         file, so there is nothing to buy with a longer wait —
+                                         it is just a black screen on install day. */
 
   var get = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
   var set = function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} };

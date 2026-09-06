@@ -11,7 +11,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Blinker:wght@200;300;400;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Blinker:wght@200;300;400;600;700;800;900&display=swap">
 <style>
 /* ============================================================
    RED LINE — Sec F IT-I
@@ -21,9 +21,13 @@
 :root {
   /* Complete True Pitch Black (#000000) OLED Theme */
   --bg:#000000; --plate:#0D0D11; --plate-2:#14141A; --plate-3:#1C1C24;
-  --rule:rgba(255,255,255,0.09); --rule-soft:rgba(255,255,255,0.05); --rail:#1F2026;
-  --ink:#FFFFFF; --ink-2:#A0A4B0; --ink-3:#656978;
+  --rule:rgba(255,255,255,0.20); --rule-soft:rgba(255,255,255,0.10); --rail:#1F2026;
+  --ink:#FFFFFF; --ink-2:#A0A4B0; --ink-3:#8A8F9E;   /* 6.5:1 on #000, 5.6:1 on the glass plate */
   --focus:var(--l-phy);        /* the Blue Line, not a browser blue */
+  /* env(safe-area-inset-*) is the display cutout only. Android's status bar and
+     gesture pill are systemBars() insets and never reach CSS, so MainActivity
+     hands them over as these. 0 everywhere else, which is correct on the web. */
+  --sa-top:0px; --sa-bottom:0px; --sa-ime:0px;
   --l-pps:#FF4D40; --l-bee:#FFB92E; --l-phy:#4E96FF; --l-smt:#35D07F;
   --l-em:#B18CFF;  --l-csl:#FF6BB0; --l-evs:#29D6CD; --l-eg:#FF9147; --l-pd:#93A3C0;
   --ok:#35D07F; --warn:#FFB92E; --bad:#FF4D40;
@@ -34,7 +38,7 @@
   --line:var(--rail); --badge-ink:#000000;
   --glass-plate:linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.015) 100%), rgba(16,17,23,0.76);
   --glass-plate-hover:linear-gradient(145deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 100%), rgba(26,28,38,0.85);
-  --glass-border:rgba(255,255,255,0.12);
+  --glass-border:rgba(255,255,255,0.22);
   --glass-border-hover:rgba(255,255,255,0.24);
   --glass-highlight:inset 0 1px 0 0 rgba(255,255,255,0.11);
   --glass-shadow:0 4px 20px -2px rgba(0,0,0,0.75);
@@ -42,8 +46,8 @@
 }
 :root[data-theme="dark"] {
   --bg:#000000; --plate:#0D0D11; --plate-2:#14141A; --plate-3:#1C1C24;
-  --rule:rgba(255,255,255,0.09); --rule-soft:rgba(255,255,255,0.05); --rail:#1F2026;
-  --ink:#FFFFFF; --ink-2:#A0A4B0; --ink-3:#656978;
+  --rule:rgba(255,255,255,0.20); --rule-soft:rgba(255,255,255,0.10); --rail:#1F2026;
+  --ink:#FFFFFF; --ink-2:#A0A4B0; --ink-3:#8A8F9E;   /* 6.5:1 on #000, 5.6:1 on the glass plate */
   --focus:var(--l-phy);
   --l-pps:#FF4D40; --l-bee:#FFB92E; --l-phy:#4E96FF; --l-smt:#35D07F;
   --l-em:#B18CFF;  --l-csl:#FF6BB0; --l-evs:#29D6CD; --l-eg:#FF9147; --l-pd:#93A3C0;
@@ -54,7 +58,7 @@
   --line:var(--rail); --badge-ink:#000000;
   --glass-plate:linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.015) 100%), rgba(16,17,23,0.76);
   --glass-plate-hover:linear-gradient(145deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 100%), rgba(26,28,38,0.85);
-  --glass-border:rgba(255,255,255,0.12);
+  --glass-border:rgba(255,255,255,0.22);
   --glass-border-hover:rgba(255,255,255,0.24);
   --glass-highlight:inset 0 1px 0 0 rgba(255,255,255,0.11);
   --glass-shadow:0 4px 20px -2px rgba(0,0,0,0.75);
@@ -144,18 +148,18 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 /* --- top strip --- */
 .top {
   position:sticky; top:0; z-index:30;
-  display:flex; align-items:center; gap:12px;
-  padding:calc(11px + env(safe-area-inset-top)) 18px 11px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:calc(11px + max(env(safe-area-inset-top), var(--sa-top))) 18px 11px;
   background:color-mix(in srgb, var(--bg) 86%, transparent);
   backdrop-filter:blur(14px) saturate(1.4); border-bottom:1px solid var(--rule-soft);
 }
-.mark { display:flex; align-items:center; gap:9px; min-width:0; }
+.mark { display:flex; align-items:center; gap:8px; flex-shrink:0; min-width:max-content; }
 .mark .bullet { width:11px; height:11px; border-radius:50%; background:var(--l-pps); flex:none; }
-.mark .txt { font-family:'Blinker', sans-serif; font-weight:700; font-size:16px;
+.mark .txt { font-family:'Blinker', sans-serif; font-weight:800; font-size:16px;
              letter-spacing:.055em; text-transform:uppercase; white-space:nowrap; }
 .mark .sub { font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3);
              font-weight:600; white-space:nowrap; }
-.top .spacer { flex:1; }
+.top-acts { display:flex; align-items:center; gap:8px; flex-shrink:0; margin-left:auto; }
 
 .seg, .atabs {
   display:flex; gap:1px; padding:2px; background:var(--glass-plate); border:1px solid var(--glass-border);
@@ -165,8 +169,8 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 }
 .seg button, .atabs button {
   border:0; background:transparent; color:var(--ink-2); cursor:pointer;
-  padding:5px 11px; border-radius:999px; font-size:12.5px; font-weight:600;
-  letter-spacing:.04em; transition:color .18s var(--ease), background .18s var(--ease);
+  padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700;
+  letter-spacing:.03em; transition:color .18s var(--ease), background .18s var(--ease);
 }
 .seg button:hover, .atabs button:hover { color:var(--ink); }
 .seg button[aria-pressed="true"],
@@ -174,7 +178,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 .atabs { width:max-content; margin:16px 0 2px; }
 .apane[hidden] { display:none; }
 .iconbtn {
-  width:34px; height:34px; flex:none; display:grid; place-items:center; cursor:pointer;
+  width:34px; height:34px; min-width:34px; min-height:34px; flex:none; display:grid; place-items:center; cursor:pointer;
   border:1px solid var(--glass-border); border-radius:999px; background:var(--glass-plate); color:var(--ink-2);
   backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
   box-shadow:var(--glass-highlight);
@@ -196,7 +200,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
   background:color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter:blur(18px) saturate(1.4);
   border-top:1px solid var(--rule);
-  padding-bottom:env(safe-area-inset-bottom);
+  padding-bottom:max(env(safe-area-inset-bottom), var(--sa-bottom));
 }
 .nav a {
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
@@ -509,15 +513,16 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .marks { display:flex; gap:1px; padding:2px; background:var(--plate-2); border:1px solid var(--rule); border-radius:999px; flex:none; }
 .marks button {
   display:flex; align-items:center; gap:6px; cursor:pointer; border:0; background:transparent;
-  color:var(--ink-2); padding:6px 12px; border-radius:999px; font-size:12.5px; font-weight:600;
+  color:var(--ink-2); padding:11px 14px; border-radius:999px; font-size:12.5px; font-weight:600;
+  min-height:44px;   /* a mis-tap here writes a wrong mark into a record that cannot be rebuilt */
   transition:background .2s var(--ease), color .2s var(--ease);
 }
 .marks button:hover { color:var(--ink); }
 #todayRail .marks { margin-top:8px; }
-#todayRail .marks button { flex:1; justify-content:center; padding:6px 8px; font-size:12px; }
+#todayRail .marks button { flex:1; justify-content:center; padding:11px 8px; font-size:13px; min-height:44px; }
 .marks .glyph { width:15px; height:15px; flex:none; display:block; }
 .marks button[aria-pressed="true"][data-m="P"] { background:var(--ok); color:var(--badge-ink); }
-.marks button[aria-pressed="true"][data-m="A"] { background:var(--bad); color:#fff; }
+.marks button[aria-pressed="true"][data-m="A"] { background:var(--bad); color:var(--badge-ink); }
 .marks button[aria-pressed="true"][data-m="C"] { background:var(--ink-3); color:var(--bg); }
 
 .preview {
@@ -571,7 +576,7 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .empty b { display:block; font-family:'Blinker', sans-serif; font-size:20px; color:var(--ink); margin-bottom:4px; font-weight:700; }
 
 /* --- the 75% engine: budget, leave, catch-up --- */
-.cu { display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:13px 15px; margin:16px 0 0;
+.cu { display:block; padding:13px 15px; margin:16px 0 0;
       background:var(--glass-plate); border:1px solid var(--warn); border-radius:12px;
       backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
       box-shadow:var(--glass-shadow), var(--glass-highlight); font-size:13.5px; color:var(--ink-2); }
@@ -778,6 +783,8 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .hkey .next { color:var(--ink); font-weight:600; }
 
 .months { display:grid; grid-template-columns:repeat(auto-fill, minmax(152px,1fr)); gap:10px; }
+/* two columns at 360px means 17px day buttons. One month per row is ~44px. */
+@media (max-width:560px) { .months { grid-template-columns:1fr; } }
 .mo { padding:12px 11px 12px; background:var(--plate); border:1px solid var(--rule); border-radius:12px; }
 .mo h3 { font-size:14px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2); margin-bottom:9px; }
 .mgrid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
@@ -790,7 +797,7 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .mgrid .sun { color:var(--ink-3); }
 .mgrid button { cursor:pointer; position:relative; transition:background .18s var(--ease); }
 .mgrid button:hover { background:var(--plate-3); }
-.mgrid button.gaz { background:var(--l-pps); color:#fff; font-weight:700; }
+.mgrid button.gaz { background:var(--l-pps); color:#000; font-weight:800; }
 .mgrid button.gaz:hover { background:var(--l-pps); filter:brightness(1.12); }
 .mgrid button.res::after {
   content:""; position:absolute; left:50%; bottom:1px; width:4px; height:4px; margin-left:-2px;
@@ -832,7 +839,8 @@ dialog.sheet { max-width:520px; }
 dialog.sheet .d-in { max-height:92vh; overflow-y:auto; }
 @media (max-width:560px) {
   dialog.sheet { margin:auto auto 0; width:100%; max-width:none; border-radius:24px 24px 0 0; }
-  dialog.sheet .d-in { max-height:92vh; padding:14px 18px calc(20px + env(safe-area-inset-bottom)); }
+  dialog.sheet .d-in { max-height:92vh;
+    padding:14px 18px calc(20px + max(env(safe-area-inset-bottom), var(--sa-bottom), var(--sa-ime))); }
 }
 .grab { width:40px; height:4px; border-radius:2px; background:var(--rule); margin:0 auto 16px; }
 
@@ -932,7 +940,8 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 /* ============ travelcard (first run) ============ */
 .gate { position:fixed; inset:0; z-index:100; background:var(--bg); overflow:auto;
         display:grid; place-items:center; align-content:center;
-        padding:calc(28px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom)); }
+        padding:calc(28px + max(env(safe-area-inset-top), var(--sa-top))) 20px
+                calc(40px + max(env(safe-area-inset-bottom), var(--sa-bottom), var(--sa-ime))); }
 .gate-in { width:100%; max-width:392px; }
 .gate h1 { font-size:31px; line-height:1.06; margin-bottom:7px; }
 .gate .sub { font-size:14.5px; color:var(--ink-2); margin-bottom:20px; }
@@ -957,9 +966,10 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
   .gate h1 { font-size:35px; }
   .gate .sub { margin-bottom:4px; }
   .gate-view { display:flex; flex-direction:column; flex:1; }
-  /* only the sign-in form drops to the thumb; the roster list must stay under its search */
-  #vLogin .field:first-of-type { margin-top:auto; }
-  #vForgot .field:first-of-type { margin-top:auto; }
+  /* only the sign-in form drops to the thumb; the roster list must stay under its search.
+     Pushing off .sub, not .field:first-of-type — .sub is a div too, so :first-of-type
+     matched nothing and the form sat at the top with 280px of dead space beneath it. */
+  #vLogin .sub, #vForgot .sub { margin-bottom:auto; }
   .field input { font-size:16px; padding:14px 14px; }
   .go { padding:16px; font-size:17px; }
   .picker { max-height:none; }
@@ -1145,25 +1155,64 @@ dialog .btn { margin-top:8px; }
 @media (max-width:560px) { .user-pill .uname { display:none; } .user-pill { padding:3px; } }
 
 .user-drop {
-  position:absolute; top:calc(100% + 8px); right:0; z-index:50; min-width:190px;
-  background:var(--plate); border:1px solid var(--rule); border-radius:12px;
+  position:absolute; top:calc(100% + 8px); right:0; z-index:50; min-width:216px;
+  background:var(--plate); border:1px solid var(--rule); border-radius:14px;
   box-shadow:var(--lift-edge); overflow:hidden;
   opacity:0; transform:translateY(6px) scale(.97); pointer-events:none;
-  transition:opacity .22s var(--ease), transform .22s var(--ease);
+  visibility:hidden;   /* pointer-events alone still let the keyboard reach Sign out */
+  transition:opacity .22s var(--ease), transform .22s var(--ease), visibility 0s linear .22s;
+  transform-origin:top right;
 }
-.user-drop.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
-.user-drop { transform-origin:top right; }
-.user-drop button {
+.user-drop.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto;
+                  visibility:visible; transition-delay:0s, 0s, 0s; }
+.drop-batch { padding:12px 14px 10px; }
+.drop-batch-lbl {
+  display:block; font-size:10px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--ink-3); margin-bottom:8px;
+}
+.drop-batch .seg {
+  display:flex; width:100%; gap:2px; padding:2.5px;
+  background:var(--plate-2); border:1px solid var(--rule-soft);
+  border-radius:999px; box-sizing:border-box;
+}
+.drop-batch .seg button {
+  flex:1; width:auto; min-width:0; display:flex; align-items:center; justify-content:center;
+  text-align:center; border:0; background:transparent; color:var(--ink-2);
+  cursor:pointer; padding:6px 0 !important; border-radius:999px; font-size:12px; font-weight:700;
+  letter-spacing:.02em; min-height:32px !important;
+  transition:color .18s var(--ease), background .18s var(--ease);
+}
+.drop-batch .seg button:hover:not([aria-pressed="true"]) { color:var(--ink); background:var(--plate-3); }
+.drop-batch .seg button[aria-pressed="true"] {
+  background:var(--ink); color:var(--bg);
+}
+.user-drop > button {
   display:flex; align-items:center; gap:10px; width:100%; text-align:left;
   border:0; background:transparent; padding:12px 15px; cursor:pointer;
   font-size:13.5px; font-weight:600; color:var(--ink);
   transition:background .15s var(--ease);
 }
-.user-drop button:hover { background:var(--plate-2); }
-.user-drop button svg { width:17px; height:17px; flex:none; color:var(--ink-3); }
+.user-drop > button:hover { background:var(--plate-2); }
+.user-drop > button svg { width:17px; height:17px; flex:none; color:var(--ink-3); }
 .user-drop .sep { height:1px; background:var(--rule-soft); }
 .user-drop .drop-bad { color:var(--bad); }
 .user-drop .drop-bad svg { color:var(--bad); }
+
+.pbatch-row {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  background:var(--plate); border:1px solid var(--rule-soft); border-radius:14px;
+  padding:12px 14px; margin:12px 0;
+}
+.pbatch-lbl span { display:block; font-size:13px; font-weight:700; color:var(--ink); }
+.pbatch-lbl small { display:block; font-size:11px; color:var(--ink-3); margin-top:2px; }
+.pbatch-row .seg { display:flex; gap:2px; padding:2.5px; background:var(--plate-2); border:1px solid var(--rule-soft); border-radius:999px; }
+.pbatch-row .seg button {
+  padding:5px 12px !important; font-size:12px; font-weight:700; border-radius:999px;
+  border:0; background:transparent; color:var(--ink-2); cursor:pointer; min-height:30px !important;
+  transition:color .18s var(--ease), background .18s var(--ease);
+}
+.pbatch-row .seg button:hover:not([aria-pressed="true"]) { color:var(--ink); background:var(--plate-3); }
+.pbatch-row .seg button[aria-pressed="true"] { background:var(--ink); color:var(--bg); }
 
 /* the bar is the first thing a phone shows: keep it to a line and no more */
 /* six labels across a 360px phone: at 10px with tracking they touch, and
@@ -1174,21 +1223,30 @@ dialog .btn { margin-top:8px; }
   .nav a svg { width:24px; height:24px; }
 }
 
-@media (max-width:560px) {
-  .top { padding:calc(12px + env(safe-area-inset-top)) 14px 12px; gap:10px; }
+@media (max-width:680px) {
   .mark .sub { display:none; }
-  .mark .txt { font-size:19px; letter-spacing:.07em; }
-  .mark .bullet { width:11px; height:11px; }
-  .seg button { padding:8px 13px; font-size:13px; letter-spacing:.02em; }
-  .iconbtn { width:38px; height:38px; }
-  .iconbtn svg { width:19px; height:19px; }
-  .user-pill { padding:4px; }
-  .user-pill .avatar { width:32px; height:32px; font-size:13px; }
+}
+
+@media (max-width:560px) {
+  .top { padding:calc(10px + max(env(safe-area-inset-top), var(--sa-top))) 12px 10px; gap:8px; }
+  .mark { gap:6px; }
+  .mark .txt { font-size:15px; letter-spacing:.05em; }
+  .mark .bullet { width:9px; height:9px; }
+  .top-acts { gap:6px; }
+  .seg { padding:2px; }
+  .seg button { padding:3px 7px; font-size:11px; letter-spacing:.02em; min-width:28px; }
+  .iconbtn { width:32px; height:32px; min-width:32px; min-height:32px; }
+  .iconbtn svg { width:16px; height:16px; }
+  .user-pill { padding:2px; min-width:32px; min-height:32px; }
+  .user-pill .avatar { width:28px; height:28px; font-size:12px; }
+  .user-pill .uname { display:none; }
 }
 
 /* ============ lock ============ */
 .lock { position:fixed; inset:0; z-index:120; background:var(--bg);
-        display:grid; place-items:center; padding:30px 24px; text-align:center; }
+        display:grid; place-items:center; text-align:center;
+        padding:calc(30px + max(env(safe-area-inset-top), var(--sa-top))) 24px
+                calc(30px + max(env(safe-area-inset-bottom), var(--sa-bottom))); }
 .lock-in { max-width:320px; display:flex; flex-direction:column; align-items:center; gap:2px; }
 .lock svg { color:var(--l-pps); margin-bottom:18px; }
 .lockart { width:44px; height:44px; color:var(--l-pps); display:block; margin:2px 0 14px; }
@@ -1430,11 +1488,57 @@ dialog .btn { margin-top:8px; }
     filter: none !important;
   }
 }
+/* ============================================================
+   Fit and reach. Everything below was measured at a real 360px
+   viewport, which is what a cheap Android phone actually gives you.
+
+   Two problems, one block:
+
+   1. Every pill control in the file was between 27px and 39px tall.
+      iOS wants 44, Android wants 48dp, and this app's whole job is
+      tapping small things quickly while a lecture starts. The nav
+      was the only control already right, at 60px.
+   2. At 360px the header ran out of room and "BUNKR" was painted
+      under the batch switcher — .mark had min-width:0 so it shrank
+      below its own content, while .seg was flex:none and would not.
+   ============================================================ */
+.atabs button, .seg button, .target-chips button,
+#taskFilters button, .chips button {
+  min-height:44px; display:inline-flex; align-items:center; justify-content:center;
+}
+.iconbtn, .user-pill { min-width:44px; min-height:44px; }
+.bulk-btn { min-height:44px; }
+input[type="date"] { padding:12px 14px; }
+
+/* a text link needs a 44px hit area without a 44px footprint */
+.link { padding:13px 0; margin-top:-13px; margin-bottom:-13px; }
+
+@media (max-width:400px) {
+  .top .mark { flex:none; }        /* stop the wordmark shrinking under the switcher */
+  .seg button { padding-left:8px; padding-right:8px; }
+}
+
+/* Every scrollbar in the file is display:none. That is a fair aesthetic
+   call, but the Sat chip was being sliced mid-word with nothing to say
+   there was more. A fade is the cheapest honest affordance. */
+.chips {
+  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);
+          mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);
+}
+
+/* Reduced motion should mean less motion, not no feedback: the global
+   rule above kills animation, this keeps colour and opacity legible. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration:.12s !important; }
+}
 </style>
 </head>
 <body>
 
-<div id="bunkr-splash" role="dialog" aria-modal="true" aria-label="Loading Bunkr">
+<!-- Its own script tag on purpose: the real dismisser lives at the bottom of the
+     app script, so any throw above that line would strand everyone on black. -->
+<script>setTimeout(function(){var s=document.getElementById("bunkr-splash");if(s&&s.parentNode)s.parentNode.removeChild(s);},6000);</script>
+<div id="bunkr-splash" role="presentation" aria-hidden="true">
   <div class="splash-stage">
     <!-- Emblem pops up -->
     <div class="splash-emblem-box">
@@ -1483,35 +1587,41 @@ dialog .btn { margin-top:8px; }
 <div class="top">
   <div class="mark">
     <svg class="b-icon" viewBox="695 770 252 245" width="22" height="22" fill="currentColor" aria-hidden="true" style="flex:none;margin-right:3px"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
-  <path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/></svg>
+    <path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/></svg>
     <span class="txt">Bunkr</span>
     <span class="sub">Sec F · IT-I</span>
   </div>
-  <span class="spacer"></span>
-  <div class="seg" role="group" aria-label="Practical batch">
-    <button type="button" data-batch="F1" aria-pressed="false">F1</button>
-    <button type="button" data-batch="F2" aria-pressed="false">F2</button>
-    <button type="button" data-batch="both" aria-pressed="true">Both</button>
-  </div>
-  <button class="iconbtn" id="themeBtn" type="button" aria-label="Switch theme" title="Switch theme">
-    <svg id="themeIconSun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></svg>
-    <svg id="themeIconMoon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-  </button>
-  <div class="user-pill" id="userPill" hidden>
-  <span class="avatar" id="userAvatar"></span>
-  <span class="uname" id="userName"></span>
-  <div class="user-drop" id="userDrop">
-    <button type="button" id="dropProfile">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.4" r="3.6"/><path d="M4.2 20.4c.8-3.8 3.6-5.8 7.8-5.8s7 2 7.8 5.8"/></svg>
-      Your profile
+  <div class="top-acts">
+    <button class="iconbtn" id="themeBtn" type="button" aria-label="Switch theme" title="Switch theme">
+      <svg id="themeIconSun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></svg>
+      <svg id="themeIconMoon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
-    <div class="sep"></div>
-    <button type="button" id="dropLogout" class="drop-bad">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 12H3.6M7.4 8.2 3.6 12l3.8 3.8"/><path d="M11.2 7V5.2a1.8 1.8 0 0 1 1.8-1.8h5.8a1.8 1.8 0 0 1 1.8 1.8v13.6a1.8 1.8 0 0 1-1.8 1.8H13a1.8 1.8 0 0 1-1.8-1.8V17"/></svg>
-      Sign out
-    </button>
+    <div class="user-pill" id="userPill" role="button" tabindex="0"
+         aria-haspopup="menu" aria-expanded="false" aria-label="Your account" hidden>
+      <span class="avatar" id="userAvatar"></span>
+      <span class="uname" id="userName"></span>
+      <div class="user-drop" id="userDrop">
+        <div class="drop-batch">
+          <span class="drop-batch-lbl">Practical Batch</span>
+          <div class="seg" role="group" aria-label="Practical batch">
+            <button type="button" data-batch="F1" aria-pressed="false">F1</button>
+            <button type="button" data-batch="F2" aria-pressed="false">F2</button>
+            <button type="button" data-batch="both" aria-pressed="true">Both</button>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <button type="button" id="dropProfile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.4" r="3.6"/><path d="M4.2 20.4c.8-3.8 3.6-5.8 7.8-5.8s7 2 7.8 5.8"/></svg>
+          Your profile
+        </button>
+        <div class="sep"></div>
+        <button type="button" id="dropLogout" class="drop-bad">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 12H3.6M7.4 8.2 3.6 12l3.8 3.8"/><path d="M11.2 7V5.2a1.8 1.8 0 0 1 1.8-1.8h5.8a1.8 1.8 0 0 1 1.8 1.8v13.6a1.8 1.8 0 0 1-1.8 1.8H13a1.8 1.8 0 0 1-1.8-1.8V17"/></svg>
+          Sign out
+        </button>
+      </div>
+    </div>
   </div>
-</div>
 </div>
 
 <main class="page">
@@ -1579,7 +1689,7 @@ dialog .btn { margin-top:8px; }
     <div class="apane" data-at="board" hidden>
       <div class="h2row">
         <h2>Service board</h2>
-        <span class="syncnote" id="syncNote"></span>
+        <span class="syncnote" id="syncNote" role="status" aria-live="polite"></span>
         <button class="link" id="attClear" type="button">Clear records</button>
       </div>
       <div class="target-wrap" id="targetWrap">
@@ -1629,11 +1739,11 @@ dialog .btn { margin-top:8px; }
       <div class="task-form" id="taskForm" hidden>
         <div class="task-form-row">
           <div>
-            <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Subject</label>
+            <label for="taskSubject" style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Subject</label>
             <select id="taskSubject"></select>
           </div>
           <div>
-            <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Type</label>
+            <label for="taskType" style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Type</label>
             <select id="taskType">
               <option value="Lab File">Lab File</option>
               <option value="Assignment">Assignment</option>
@@ -1644,11 +1754,11 @@ dialog .btn { margin-top:8px; }
           </div>
         </div>
         <div>
-          <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Title / Experiment</label>
+          <label for="taskTitle" style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Title / Experiment</label>
           <input type="text" id="taskTitle" placeholder="e.g. Experiment 4 - Linked List or Unit 2 Assignment" maxlength="80">
         </div>
         <div>
-          <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Due Date</label>
+          <label for="taskDueDate" style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Due Date</label>
           <input type="date" id="taskDueDate">
         </div>
         <div class="task-form-acts">
@@ -1670,17 +1780,17 @@ dialog .btn { margin-top:8px; }
       <h2>Section ranks</h2>
       <button class="link" id="cardEdit" type="button">Your card</button>
     </div>
-    <div class="lbstate" id="lbState"><i></i><span>Connecting…</span></div>
+    <div class="lbstate" id="lbState" role="status" aria-live="polite"><i></i><span>Connecting…</span></div>
     <div id="lbBox"></div>
   </section>
 
   <section id="directory" hidden>
     <div class="h2row">
       <h2>Sec F IT-I</h2>
-      <span class="pcount" id="dirCount" style="margin:0">Loading…</span>
+      <span class="pcount" id="dirCount" role="status" aria-live="polite" style="margin:0">Loading…</span>
     </div>
     <div class="field" style="margin-top:0">
-      <input id="dirSearch" type="search" autocapitalize="off" spellcheck="false"
+      <input id="dirSearch" aria-label="Search the section" type="search" autocapitalize="off" spellcheck="false"
              placeholder="Search the section" enterkeyhint="search">
     </div>
     <div class="seg dirfilter" id="dirFilter" role="group" aria-label="Filter">
@@ -1731,7 +1841,7 @@ dialog .btn { margin-top:8px; }
       <div class="field">
         <label for="liPass">Password</label>
         <input id="liPass" type="password" autocomplete="current-password" placeholder="••••••••" enterkeyhint="go">
-        <div class="hint" id="liHint"></div>
+        <div class="hint" id="liHint" role="status" aria-live="polite"></div>
       </div>
       <button class="go" id="liGo" type="button">Sign in</button>
       <div class="authlinks">
@@ -1745,9 +1855,9 @@ dialog .btn { margin-top:8px; }
       <h1>Find your name</h1>
       <div class="sub">The official IT (F) list. Take yours once — after that it is gone from the list for everyone else.</div>
       <div class="field">
-        <input id="pkSearch" type="search" autocapitalize="off" spellcheck="false" placeholder="Search the list" enterkeyhint="search">
+        <input id="pkSearch" aria-label="Search the roster" type="search" autocapitalize="off" spellcheck="false" placeholder="Search the list" enterkeyhint="search">
       </div>
-      <div class="pcount" id="pkCount">Loading the roster…</div>
+      <div class="pcount" id="pkCount" role="status" aria-live="polite">Loading the roster…</div>
       <div class="picker" id="pkList"></div>
       <div class="authlinks">
         <button class="link" type="button" data-goto="login">Already have an account? Sign in</button>
@@ -1780,7 +1890,7 @@ dialog .btn { margin-top:8px; }
       <div class="field">
         <label for="clPass">Password</label>
         <input id="clPass" type="password" autocomplete="new-password" placeholder="at least 8 characters">
-        <div class="hint" id="clHint"></div>
+        <div class="hint" id="clHint" role="status" aria-live="polite"></div>
       </div>
       <button class="go" id="clGo" type="button" disabled>Claim this name</button>
       <div class="authlinks">
@@ -1795,7 +1905,7 @@ dialog .btn { margin-top:8px; }
       <div class="field">
         <label for="rsPass">New password</label>
         <input id="rsPass" type="password" autocomplete="new-password" placeholder="at least 8 characters" enterkeyhint="go">
-        <div class="hint" id="rsHint"></div>
+        <div class="hint" id="rsHint" role="status" aria-live="polite"></div>
       </div>
       <button class="go" id="rsGo" type="button">Save and sign in</button>
       <div class="authlinks">
@@ -1810,7 +1920,7 @@ dialog .btn { margin-top:8px; }
       <div class="field">
         <label for="fgEmail">Email</label>
         <input id="fgEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com" enterkeyhint="go">
-        <div class="hint" id="fgHint"></div>
+        <div class="hint" id="fgHint" role="status" aria-live="polite"></div>
       </div>
       <button class="go" id="fgGo" type="button">Send reset link</button>
       <div class="authlinks">
@@ -1827,7 +1937,7 @@ dialog .btn { margin-top:8px; }
         <div id="cfDeviceName" style="font-size:16px;font-weight:600;margin-top:4px;color:var(--ink)">Another device</div>
         <div id="cfDeviceTime" style="font-size:12px;color:var(--ink-2);margin-top:3px">Recently active</div>
       </div>
-      <div class="hint" id="cfHint" style="margin-bottom:12px"></div>
+      <div class="hint" id="cfHint" role="status" aria-live="polite" style="margin-bottom:12px"></div>
       <button class="go" id="cfKick" type="button">Log out other device & sign in</button>
       <div class="authlinks">
         <button class="link" id="cfCancel" type="button">Cancel and sign in as someone else</button>
@@ -2578,6 +2688,7 @@ function renderMonths() {
       const b = el("button", ((gaz ? "gaz " : "") + (res && (showRestricted || lik) ? "res " : "") + (iso === todayISO ? "today" : "")).trim(), String(d));
       b.type = "button";
       b.title = hits.map(h => h.n).join(" · ");
+      b.setAttribute("aria-label", d + " " + MONTHS[m] + " — " + b.title);
       b.addEventListener("click", () => openHoliday(iso));
       g.appendChild(b);
     }
@@ -3244,7 +3355,7 @@ function renderBoard() {
   if (!totalH) {
     const e = el("div", "empty");
     e.appendChild(el("b", null, "Nothing marked yet"));
-    e.appendChild(document.createTextNode("Pick a date above and tap Present or Absent on a class. Your percentage per subject shows up here."));
+    e.appendChild(document.createTextNode("Mark a class on the Mark tab and your percentage per subject shows up here."));
     board.appendChild(e);
     return;
   }
@@ -3665,6 +3776,7 @@ function renderSubmissions() {
     const del = el("button", "task-del", "✕");
     del.type = "button";
     del.title = "Delete submission";
+    del.setAttribute("aria-label", "Delete " + task.title);
     del.addEventListener("click", () => {
       if (confirm("Delete \"" + task.title + "\"?")) {
         submissions = submissions.filter(x => x.id !== task.id);
@@ -3803,6 +3915,7 @@ function renderEODNotice() {
   const close = el("button", "task-del", "✕");
   close.type = "button";
   close.title = "Dismiss";
+  close.setAttribute("aria-label", "Dismiss this notice");
   close.addEventListener("click", () => {
     try { sessionStorage.setItem("bunkr-eod-dismissed-" + iso, "1"); } catch (e) {}
     card.remove();
@@ -4331,13 +4444,14 @@ function explain(err) {
   if (c === "23505" && m.includes("already claimed a name"))
     return ["This account already has a name", "Sign in — you don't need to claim again."];
   if (c === "23505") return ["Someone just took that", "Go back and pick another name or username."];
-  if (c === "PGRST205") return ["The roster is missing", "Run supabase/01-students-setup.sql in Supabase."];
-  if (c === "PGRST204" && m.includes("attendance_cleared_at"))
-    return ["Your account cannot record a clear", "Run STEP 5 of supabase/02-attendance-setup.sql in Supabase."];
-  if (c === "42501" && m.includes("row-level security"))
-    return ["The account rejected that record", "Run STEP 2 of supabase/02-attendance-setup.sql — the policies are missing."];
-  if (c === "42501" || m.includes("permission denied"))
-    return ["Your account cannot reach the attendance table", "Run STEP 2 of supabase/02-attendance-setup.sql in Supabase — the grant is missing."];
+  /* A missing table or a missing policy is our fault, not the student's, and the fix
+     is a SQL script they have no access to. Keep the diagnosis in the console where
+     it is useful, and give them the one thing they can actually act on. */
+  if (c === "PGRST205" || c === "PGRST204" || c === "42501" || m.includes("permission denied")) {
+    console.warn("setup fault:", c, err.message);
+    return ["Bunkr can't reach your records",
+            "This one is on us, not you — tell the CR. Keep marking: everything is saved on this phone."];
+  }
   if (err.status === 401 || c === "PGRST301") return ["Your session expired", "Sign in again."];
   if (c === "over_email_send_rate_limit") return ["Too many emails just now", "Wait an hour and try again."];
   if (err.status === 429 || c === "over_request_rate_limit")
@@ -4554,8 +4668,10 @@ function gateShow(view) {
   Object.entries(VIEWS).forEach(([k, id]) => { document.getElementById(id).hidden = k !== view; });
   if (view === "pick") loadRoster();
   if (view === "claim") paintCard();
+  /* On a phone the keyboard covers the CTA and hides the copy the student has not
+     read yet. On a desktop the focus is a convenience, so keep it there. */
   const first = document.querySelector("#" + VIEWS[view] + " input");
-  if (first) setTimeout(() => first.focus(), 60);
+  if (first && !NATIVE) setTimeout(() => first.focus(), 60);
 }
 function gateClose() {
   document.getElementById("gate").hidden = true;
@@ -4969,6 +5085,14 @@ const NATIVE = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.is
    against whichever theme is on. The safe-area padding in the CSS is what stops
    the top bar from sitting under the clock. */
 const darkNow = () => isDarkNow();
+
+/* uiMode is in the activity's configChanges, so Android does not recreate us on a
+   system theme flip: without this the clock and battery stay white on a white bar. */
+try {
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    updateThemeUI(); paintStatusBar();
+  });
+} catch (e) {}
 
 function paintStatusBar() {
   if (!NATIVE) return;
@@ -5582,7 +5706,9 @@ if (NATIVE && Capacitor.Plugins.App) {
   App.addListener("backButton", () => {
     const dlg = document.getElementById("dlg");
     if (dlg.open) return dlg.close();
-    if (!document.getElementById("gate").hidden) return;      // sign in or get out
+    if (userDrop.classList.contains("open")) return userDrop.classList.remove("open");
+    /* back at the sign-in screen used to do nothing at all, which reads as a hang */
+    if (!document.getElementById("gate").hidden) return App.exitApp();
     const open = PAGES.find(id => !document.getElementById(id).hidden);
     if (open && open !== "today") return show("today");
     App.exitApp();
@@ -5825,6 +5951,31 @@ function openProfile() {
   card.appendChild(stripes);
   box.appendChild(card);
 
+  /* practical batch switcher in profile */
+  const bRow = el("div", "pbatch-row");
+  const bLbl = el("div", "pbatch-lbl");
+  bLbl.appendChild(el("span", null, "Practical Batch"));
+  bLbl.appendChild(el("small", null, "Switches lab schedule & tracking"));
+  bRow.appendChild(bLbl);
+  const seg = el("div", "seg");
+  seg.setAttribute("role", "group");
+  seg.setAttribute("aria-label", "Practical batch");
+  [["F1", "F1"], ["F2", "F2"], ["both", "Both"]].forEach(([val, lbl]) => {
+    const btn = el("button", null, lbl);
+    btn.type = "button";
+    btn.dataset.batch = val;
+    btn.setAttribute("aria-pressed", val === batch);
+    btn.addEventListener("click", () => {
+      setBatch(val);
+      const unEl = who.querySelector(".un");
+      if (unEl) unEl.textContent = "@" + profile.username + " · #" + profile.sno
+        + " · Batch " + batch + (isCR() ? " · CR" : "");
+    });
+    seg.appendChild(btn);
+  });
+  bRow.appendChild(seg);
+  box.appendChild(bRow);
+
   /* where you actually stand, so the profile is worth opening */
   const t = tally();
   let p = 0, h = 0;
@@ -6002,6 +6153,14 @@ function updateUserPill() {
   document.getElementById("userAvatar").textContent = initials(profile.name);
   document.getElementById("userName").textContent = profile.name.split(/\s+/)[0];
 }
+/* role=button carries no behaviour of its own: Enter and Space have to be wired
+   by hand, or the only route to Sign out is a finger. The dropdown lives inside
+   the pill, so this cannot be a real <button> without nesting one. */
+userPill.addEventListener("keydown", e => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  if (userDrop.contains(e.target)) return;         /* the menu items handle themselves */
+  e.preventDefault(); userPill.click();
+});
 userPill.addEventListener("click", e => {
   if (e.target.closest(".user-drop")) return;        // let button handlers fire
   userDrop.classList.toggle("open");
@@ -6016,6 +6175,11 @@ document.getElementById("dropProfile").addEventListener("click", () => {
 document.getElementById("dropLogout").addEventListener("click", () => {
   userDrop.classList.remove("open");
   if (confirm("Sign out on this device?")) signOut();
+});
+document.querySelectorAll(".drop-batch .seg button").forEach(b => {
+  b.addEventListener("click", () => {
+    setTimeout(() => { userDrop.classList.remove("open"); }, 220);
+  });
 });
 
 /* Point every per-student key at this account. The one migration: marks made before
