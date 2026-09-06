@@ -751,6 +751,8 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .cu-reset-row { display:flex; justify-content:center; padding:10px 0 2px; }
 .cu-reset-btn { font-size:12px; color:var(--ink-3); opacity:.6; }
 .cu-reset-btn:hover { opacity:1; color:var(--bad); }
+.cu-reopen { font-size:12px; color:var(--ink-3); opacity:.6; margin-bottom:10px; }
+.cu-reopen:hover { opacity:1; color:var(--ink); }
 
 
 /* --- 1-Tap Bulk Marking --- */
@@ -4300,7 +4302,15 @@ function renderCatchup() {
     return;
   }
   const days = untouchedDays();
-  if (!days.length) return;
+  if (!days.length) {
+    /* Nothing outstanding, but the sheet is still the only door to "redo from
+       scratch" — leave it open or a bad bulk mark is unfixable. */
+    const q = el("button", "link cu-reopen", "Redo catch-up");
+    q.type = "button";
+    q.addEventListener("click", openCatchup);
+    box.appendChild(q);
+    return;
+  }
   const b = el("div", "cu");
   b.appendChild(el("b", null, days.length + (days.length === 1 ? " class day" : " class days")));
   b.appendChild(document.createTextNode(
@@ -6301,11 +6311,14 @@ function obCatchup() {
   let asked = null;
   try { asked = localStorage.getItem(nsKey("adgips-caught")); } catch (e) {}
   if (asked) return Promise.resolve("skip");
-  try { localStorage.setItem(nsKey("adgips-caught"), "1"); } catch (e) {}
   show("attendance"); showATab("mark");
   return new Promise(resolve => {
     const d = document.getElementById("dlg");
-    const quit = () => { d.removeEventListener("close", quit); resolve("done"); };
+    const quit = () => {
+      d.removeEventListener("close", quit);
+      try { localStorage.setItem(nsKey("adgips-caught"), "1"); } catch (e) {}
+      resolve("done");
+    };
     d.addEventListener("close", quit);
     openCatchup();
   });
