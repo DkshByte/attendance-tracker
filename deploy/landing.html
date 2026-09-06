@@ -7,152 +7,138 @@
 <title>Bunkr — Know Your Bunk Budget</title>
 <meta name="description" content="Real-time timetable, 75% bunk budget engine, and section leaderboard. Offline-first. Zero install. Built for students.">
 
+<!-- Inter -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+
 <!-- Font Awesome 6.5.2 -->
-<link
-  rel="stylesheet"
+<link rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
   integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-/>
+  crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
-<!-- BubbledotICG-FinePos (retro dot-matrix, primary display) -->
-<link
-  href="https://db.onlinewebfonts.com/c/8cb707a9b8a73f8a7403336b861c3074?family=BubbledotICG-FinePos"
-  rel="stylesheet"
-/>
+<!-- BubbledotICG-FinePos -->
+<link href="https://db.onlinewebfonts.com/c/8cb707a9b8a73f8a7403336b861c3074?family=BubbledotICG-FinePos" rel="stylesheet"/>
 
 <link rel="stylesheet" href="landing-styles.css">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
 
-<!-- ── Background Video ─────────────────────────────────────── -->
+<!-- Background video -->
 <div class="bg">
   <video class="bg-video" autoplay muted loop playsinline>
-    <source
-      src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4"
-      type="video/mp4"
-    />
+    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4" type="video/mp4"/>
   </video>
+  <!-- Overlay for legibility -->
+  <div class="bg-overlay"></div>
 </div>
 
-<!-- ── Mobile Overlay ───────────────────────────────────────── -->
+<!-- Mobile overlay menu -->
 <div id="mobile-overlay" class="mobile-overlay" hidden>
   <nav class="mobile-menu" role="dialog" aria-label="Navigation menu">
     <ul class="mobile-nav-links">
       <li><a href="landing.html" class="active">Home</a></li>
       <li><a href="app.html">Timetable</a></li>
-      <li><a href="app.html#roster">Roster</a></li>
-      <li><a href="app.html#bunk">Bunk Planner</a></li>
+      <li><a href="app.html">Roster</a></li>
+      <li><a href="app.html">Bunk Planner</a></li>
     </ul>
-    <a href="app.html" class="mobile-sign-in">Open App</a>
+    <div class="mobile-menu-actions">
+      <a href="app.html" class="mobile-open-btn">Open App</a>
+      <a href="https://github.com/DkshByte/attendance-tracker/releases/download/v1.0.0/Bunkr-v1.0.0.apk" class="mobile-dl-btn" download>
+        <i class="fa-brands fa-android"></i> Download APK
+      </a>
+    </div>
   </nav>
 </div>
 
-<!-- ── Page ─────────────────────────────────────────────────── -->
+<!-- Page -->
 <div class="page">
 
-  <!-- 1) HEADER -->
-  <header class="header" role="banner">
-
-    <!-- Logo -->
+  <!-- HEADER -->
+  <header class="header">
     <a href="landing.html" class="logo-btn" aria-label="Bunkr home">
       <img src="bunkr-icon.svg" alt="" width="52" height="52">
     </a>
 
-    <!-- Desktop nav -->
-    <ul class="nav-pill" role="navigation" aria-label="Main navigation">
-      <li><a href="landing.html" class="active">Home</a></li>
-      <li><a href="app.html">Timetable</a></li>
-      <li><a href="app.html#roster">Roster</a></li>
-      <li><a href="app.html#bunk">Bunk Planner</a></li>
-    </ul>
+    <nav class="nav-pill" aria-label="Main navigation">
+      <a href="landing.html" class="active">Home</a>
+      <a href="app.html">Timetable</a>
+      <a href="app.html">Roster</a>
+      <a href="app.html">Bunk Planner</a>
+    </nav>
 
-    <!-- Desktop open app -->
-    <a href="app.html" class="sign-in-btn">Open App</a>
+    <a href="app.html" class="open-btn">Open App</a>
 
-    <!-- Mobile burger -->
-    <button
-      id="burger"
-      class="burger-btn"
-      aria-label="Open menu"
-      aria-expanded="false"
-      aria-controls="mobile-overlay"
-    >
+    <button id="burger" class="burger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-overlay">
       <span class="bar"></span>
       <span class="bar"></span>
       <span class="bar"></span>
     </button>
   </header>
 
-  <!-- 2) HERO -->
-  <main class="hero" role="main">
+  <!-- HERO -->
+  <main class="hero">
 
-    <!-- Trust row -->
-    <div class="trust-row" aria-label="Built for students">
-      <div class="avatar" aria-hidden="true">
-        <div class="avatar-inner">
-          <i class="fa-solid fa-graduation-cap"></i>
-        </div>
-      </div>
-      <div class="avatar" aria-hidden="true">
-        <div class="avatar-inner">
-          <i class="fa-brands fa-android"></i>
-        </div>
-      </div>
-      <div class="avatar" aria-hidden="true">
-        <div class="avatar-inner">
-          <i class="fa-solid fa-wifi"></i>
-        </div>
-      </div>
-      <div class="trust-pill">Built for College Students</div>
+    <!-- Badge -->
+    <div class="badge anim" style="--d:0.05s">
+      <span class="badge-dot"></span>
+      Built for college students
     </div>
 
     <!-- Headline -->
-    <h1 class="headline" aria-label="Track Bunks. Beat 75%.">
-      <span>Track Bunks.</span>
-      <span>Beat 75%.</span>
+    <h1 class="headline">
+      <span class="hl-line" style="--d:0.12s">Track Bunks.</span>
+      <span class="hl-line" style="--d:0.28s">Beat 75%.</span>
     </h1>
 
     <!-- Subhead -->
-    <p class="subhead">
-      Real-time class radar, precise bunk budget engine, and section
-      leaderboard — offline-first, zero-install, works on any device.
+    <p class="subhead anim" style="--d:0.36s">
+      Real-time class radar, precise bunk budget engine,<br class="br-desktop">
+      and section leaderboard — offline-first, any device.
     </p>
 
-    <!-- CTA -->
-    <a href="app.html" class="cta-btn">Open App</a>
+    <!-- CTAs -->
+    <div class="cta-row anim" style="--d:0.48s">
+      <a href="app.html" class="btn btn-primary">
+        Open App
+        <i class="fa-solid fa-arrow-right btn-arrow"></i>
+      </a>
+      <a href="https://github.com/DkshByte/attendance-tracker/releases/download/v1.0.0/Bunkr-v1.0.0.apk"
+         class="btn btn-ghost" download aria-label="Download Android APK">
+        <i class="fa-brands fa-android"></i>
+        Download APK
+      </a>
+    </div>
 
   </main>
 
-  <!-- 3) STATS FOOTER -->
-  <footer class="stats" role="contentinfo" aria-label="App statistics">
-
-    <div class="stat-item">
-      <span class="stat-icon" aria-hidden="true">&lt;</span>
-      <span class="stat-value" id="sv0">1s</span>
-      <span class="stat-label">Cold Start</span>
+  <!-- STATS -->
+  <footer class="stats-bar">
+    <div class="stat anim" style="--d:0.55s">
+      <i class="fa-solid fa-bolt stat-ico"></i>
+      <span class="stat-val" id="sv0">1s</span>
+      <span class="stat-lbl">Cold Start</span>
     </div>
-
-    <div class="stat-item">
-      <span class="stat-icon" aria-hidden="true">%</span>
-      <span class="stat-value" id="sv1">75%</span>
-      <span class="stat-label">Bunk Threshold</span>
+    <div class="stat-divider"></div>
+    <div class="stat anim" style="--d:0.62s">
+      <i class="fa-solid fa-percent stat-ico"></i>
+      <span class="stat-val" id="sv1">75%</span>
+      <span class="stat-lbl">Bunk Threshold</span>
     </div>
-
-    <div class="stat-item">
-      <span class="stat-icon" aria-hidden="true">*</span>
-      <span class="stat-value" id="sv2">24/7</span>
-      <span class="stat-label">Offline Access</span>
+    <div class="stat-divider"></div>
+    <div class="stat anim" style="--d:0.69s">
+      <i class="fa-solid fa-wifi stat-ico"></i>
+      <span class="stat-val" id="sv2">24/7</span>
+      <span class="stat-lbl">Offline Access</span>
     </div>
-
-    <div class="stat-item">
-      <span class="stat-icon" aria-hidden="true">#</span>
-      <span class="stat-value" id="sv3">100%</span>
-      <span class="stat-label">Works Offline</span>
+    <div class="stat-divider"></div>
+    <div class="stat anim" style="--d:0.76s">
+      <i class="fa-solid fa-mobile-screen stat-ico"></i>
+      <span class="stat-val" id="sv3">100%</span>
+      <span class="stat-lbl">Works Offline</span>
     </div>
-
   </footer>
 
 </div>
