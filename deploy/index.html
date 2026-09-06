@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#070C1C" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#EEF1F7" media="(prefers-color-scheme: light)">
-<title>Sec F IT-I — Red Line</title>
+<title>Bunkr · Sec F IT-I</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700&family=Barlow+Condensed:wght@500;600;700&display=swap">
 <style>
@@ -982,8 +982,8 @@ dialog .btn { margin-top:8px; }
 <div class="top">
   <div class="mark">
     <span class="bullet"></span>
-    <span class="txt">Sec F</span>
-    <span class="sub">IT-I · Room 2311</span>
+    <span class="txt">Bunkr</span>
+    <span class="sub">Sec F · IT-I</span>
   </div>
   <span class="spacer"></span>
   <div class="seg" role="group" aria-label="Practical batch">
@@ -1132,7 +1132,7 @@ dialog .btn { margin-top:8px; }
   <div class="gate-in">
 
     <div class="hero">
-      <div class="hero-mark"><i></i><b>Sec F</b><em>IT-I · 2026–27</em></div>
+      <div class="hero-mark"><i></i><b>Bunkr</b><em>Sec F · IT-I · 2026–27</em></div>
       <div class="hero-lines" id="heroLines"></div>
     </div>
 
@@ -1175,7 +1175,7 @@ dialog .btn { margin-top:8px; }
       <h1>Your travelcard</h1>
       <div class="sub">This card is yours for the year. Nobody else can take this name.</div>
       <div class="tcard">
-        <div class="brand"><i></i><span>Sec F</span><em>IT-I · 2026–27</em></div>
+        <div class="brand"><i></i><span>Bunkr</span><em>Sec F · IT-I · 2026–27</em></div>
         <div>
           <div class="nm" id="cardName">Your name</div>
           <div class="un" id="cardUser">@username</div>
@@ -1236,7 +1236,7 @@ dialog .btn { margin-top:8px; }
     <!-- ---------- conflict: another device is active ---------- -->
     <div id="vConflict" class="gate-view" hidden>
       <h1>Device in use</h1>
-      <div class="sub">Your account is currently active on another device. Sec F IT-I only permits one active device at a time.</div>
+      <div class="sub">Your account is currently active on another device. Bunkr only permits one active device at a time.</div>
       <div style="margin:16px 0;padding:16px;background:var(--plate);border-radius:14px;border:1px solid var(--rule)">
         <div style="font-size:11.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;font-weight:600">Currently active on</div>
         <div id="cfDeviceName" style="font-size:16px;font-weight:600;margin-top:4px;color:var(--ink)">Another device</div>
@@ -2737,7 +2737,7 @@ function nextDateFor(dayIdx) {
   return d;
 }
 function buildICS() {
-  const out = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Sec F IT-I//Timetable//EN", "CALSCALE:GREGORIAN"];
+  const out = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Bunkr//Timetable//EN", "CALSCALE:GREGORIAN"];
   const BYDAY = ["MO","TU","WE","TH","FR","SA"];
   const stamp = compact(new Date()) + "T000000";
   DAYS.forEach((day, di) => {
@@ -3917,8 +3917,8 @@ async function askUnlock() {
   if (!B) return true;
   try {
     await B.internalAuthenticate({
-      reason: "Unlock Sec F IT-I",
-      androidTitle: "Unlock Sec F IT-I",
+      reason: "Unlock Bunkr",
+      androidTitle: "Unlock Bunkr",
       androidSubtitle: "Your attendance is locked on this device",
       allowDeviceCredential: true,          /* a PIN must still get you in */
       androidConfirmationRequired: false,   /* a matched finger is the confirmation */
@@ -4299,8 +4299,8 @@ function openProfile() {
   const card = el("div", "tcard pcard");
   const brand = el("div", "brand");
   brand.appendChild(el("i"));
-  brand.appendChild(el("span", null, "Sec F"));
-  brand.appendChild(el("em", null, "IT-I · 2026–27"));
+  brand.appendChild(el("span", null, "Bunkr"));
+  brand.appendChild(el("em", null, "Sec F · IT-I"));
   card.appendChild(brand);
   const who = el("div");
   who.appendChild(el("div", "nm", profile.name));
