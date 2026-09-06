@@ -25,6 +25,7 @@
   --ok:#35D07F; --warn:#FFB92E; --bad:#FF4D40;
   --lift:0 1px 1px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.9);
   --lift-lg:0 2px 4px rgba(0,0,0,.4), 0 20px 44px -22px rgba(0,0,0,1);
+  --lift-edge:0 4px 10px -6px rgba(0,0,0,.85);   /* for surfaces that already have an edge */
   --ease:cubic-bezier(.16,1,.3,1);
   --line:var(--rail); --badge-ink:#08101F;
 }
@@ -39,6 +40,7 @@
     --ok:#0E8C4E; --warn:#9C6500; --bad:#D62B1F; --badge-ink:#FFFFFF;
     --lift:0 1px 1px rgba(10,16,36,.05), 0 10px 26px -18px rgba(10,16,36,.4);
     --lift-lg:0 2px 4px rgba(10,16,36,.06), 0 20px 44px -22px rgba(10,16,36,.45);
+    --lift-edge:0 4px 10px -6px rgba(10,16,36,.28);
   }
 }
 :root[data-theme="light"] {
@@ -51,6 +53,7 @@
   --ok:#0E8C4E; --warn:#9C6500; --bad:#D62B1F; --badge-ink:#FFFFFF;
   --lift:0 1px 1px rgba(10,16,36,.05), 0 10px 26px -18px rgba(10,16,36,.4);
   --lift-lg:0 2px 4px rgba(10,16,36,.06), 0 20px 44px -22px rgba(10,16,36,.45);
+  --lift-edge:0 4px 10px -6px rgba(10,16,36,.28);
   --badge-ink:#FFFFFF;
 }
 
@@ -70,23 +73,35 @@ button, input { font:inherit; color:inherit; }
 
 /* --- browser surfaces --- */
 ::selection { background:var(--l-pps); color:#fff; }
-::-webkit-scrollbar { width:10px; height:10px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:var(--rail); border-radius:6px; border:3px solid var(--bg); }
-::-webkit-scrollbar-thumb:hover { background:var(--ink-3); }
-* { scrollbar-color:var(--rail) transparent; scrollbar-width:thin; }
+/* Nothing draws a scrollbar, anywhere. Every list here scrolls under the
+   thumb; a rendered track is the giveaway that this is a page in a browser. */
+::-webkit-scrollbar { width:0; height:0; display:none; }
+* { scrollbar-width:none; -ms-overflow-style:none; }
 :focus-visible { outline:2px solid var(--focus); outline-offset:3px; border-radius:3px; }
 input { caret-color:var(--l-pps); }
 
+/* No grey scrollbar track down the side, no blue flash on tap, no long-press
+   selection of a button's label — the three things that make a wrapped page
+   read as a web page. The keyboard focus ring above stays: :focus-visible does
+   not fire on touch, so nothing is lost by removing the tap highlight. */
+* { -webkit-tap-highlight-color:transparent; }
+html { overscroll-behavior:none; }
+body { overscroll-behavior-y:none; }
+button, .nav a, .card, .drow, .pname, .clink, .marks button, .seg button, .user-pill, .link {
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+}
+input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text; }
+
 /* ============ shell ============ */
 .shell { max-width:1320px; margin:0 auto; }
-.page { padding:0 18px 128px; max-width:960px; margin:0 auto; }
+.page { padding:0 18px 136px; max-width:960px; margin:0 auto; }
 
 /* --- top strip --- */
 .top {
   position:sticky; top:0; z-index:30;
   display:flex; align-items:center; gap:12px;
-  padding:11px 18px; background:color-mix(in srgb, var(--bg) 86%, transparent);
+  padding:calc(11px + env(safe-area-inset-top)) 18px 11px;
+  background:color-mix(in srgb, var(--bg) 86%, transparent);
   backdrop-filter:blur(14px) saturate(1.4); border-bottom:1px solid var(--rule-soft);
 }
 .mark { display:flex; align-items:center; gap:9px; min-width:0; }
@@ -125,16 +140,18 @@ input { caret-color:var(--l-pps); }
   padding-bottom:env(safe-area-inset-bottom);
 }
 .nav a {
-  display:flex; flex-direction:column; align-items:center; gap:3px;
-  padding:9px 1px 8px; text-decoration:none; color:var(--ink-3);
-  font-size:9px; font-weight:700; letter-spacing:.01em; text-transform:uppercase;
-  position:relative; transition:color .2s var(--ease);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+  min-height:58px; padding:10px 1px 9px; text-decoration:none; color:var(--ink-3);
+  font-size:10px; font-weight:700; letter-spacing:.02em; text-transform:uppercase;
+  position:relative; transition:color .2s var(--ease), transform .16s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }
-.nav a svg { width:21px; height:21px; }
+.nav a:active { transform:scale(.93); }
+.nav a svg { width:26px; height:26px; stroke-width:1.6; }
+.nav a[aria-current="page"] svg { stroke-width:2; }
 .nav a::after {
   content:""; position:absolute; top:0; left:50%; transform:translateX(-50%) scaleX(0);
-  width:22px; height:3px; border-radius:0 0 3px 3px; background:var(--l-pps);
+  width:28px; height:3px; border-radius:0 0 3px 3px; background:var(--l-pps);
   transition:transform .32s var(--ease);
 }
 .nav a[aria-current="page"] { color:var(--ink); }
@@ -539,6 +556,51 @@ input[type="date"]:hover { border-color:var(--rail); }
 .clink[data-k="email"]:hover > svg:first-child,
 .clink[data-k="mobile"]:hover > svg:first-child { color:var(--l-phy); }
 
+/* --- profile sheet --- */
+dialog.sheet { max-width:520px; }
+dialog.sheet .d-in { max-height:92vh; overflow-y:auto; }
+@media (max-width:560px) {
+  dialog.sheet { margin:auto auto 0; width:100%; max-width:none; border-radius:24px 24px 0 0; }
+  dialog.sheet .d-in { max-height:92vh; padding:14px 18px calc(20px + env(safe-area-inset-bottom)); }
+}
+.grab { width:40px; height:4px; border-radius:2px; background:var(--rule); margin:0 auto 16px; }
+
+.pcard { margin-bottom:16px; }
+.pstats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 4px; }
+.pstats div { padding:11px 12px; background:var(--plate-2); border:1px solid var(--rule); border-radius:12px; }
+.pstats b { display:block; font-family:"Barlow Condensed",sans-serif; font-weight:700;
+            font-size:25px; line-height:1.05; letter-spacing:-.01em; }
+.pstats span { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); }
+.pstats .ok b { color:var(--ok); } .pstats .bad b { color:var(--bad); }
+
+.chead { display:flex; align-items:baseline; gap:10px; margin:22px 0 4px; }
+.chead h3 { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:17px;
+            letter-spacing:.07em; text-transform:uppercase; margin:0; }
+.chead span { font-size:12px; color:var(--ink-3); }
+
+.cfield {
+  display:flex; align-items:center; gap:12px; margin-top:9px; padding:10px 13px;
+  border:1px solid var(--rule); border-radius:13px; background:var(--plate-2);
+  transition:border-color .2s var(--ease), background .2s var(--ease);
+}
+.cfield:focus-within { border-color:var(--rail); background:var(--plate-3); }
+.cfield > svg { width:20px; height:20px; flex:none; color:var(--ink-3); transition:color .2s var(--ease); }
+.cfield .m { flex:1; min-width:0; }
+.cfield label { display:block; font-size:9.5px; font-weight:700; letter-spacing:.12em;
+                text-transform:uppercase; color:var(--ink-3); margin:0 0 1px; }
+.cfield input { width:100%; border:0; background:transparent; padding:0;
+                font-size:15px; font-weight:600; color:var(--ink); }
+.cfield input:focus { outline:none; }
+.cfield .on { width:7px; height:7px; border-radius:50%; background:var(--ok);
+              flex:none; opacity:0; transition:opacity .25s var(--ease); }
+.cfield.filled .on { opacity:1; }
+.cfield.filled[data-k="linkedin"] > svg { color:#0A66C2; }
+.cfield.filled[data-k="instagram"] > svg { color:#E1306C; }
+.cfield.filled[data-k="github"] > svg { color:var(--ink); }
+.cfield.filled[data-k="email"] > svg, .cfield.filled[data-k="mobile"] > svg { color:var(--l-phy); }
+.psave { position:sticky; bottom:0; padding-top:14px; margin-top:4px;
+         background:linear-gradient(to top, var(--plate) 68%, transparent); }
+
 /* ============ dialog ============ */
 dialog {
   border:0; border-radius:16px; background:var(--plate); color:var(--ink);
@@ -592,14 +654,67 @@ textarea {
   .chips { margin:0; padding-left:0; padding-right:0; }
 }
 
-section { scroll-margin-top:96px; }
+/* The bar's real height, measured at runtime — it changes with the safe-area inset
+   and the breakpoint, and two sticky offsets were hardcoded against an older one. */
+section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 
 /* ============ travelcard (first run) ============ */
 .gate { position:fixed; inset:0; z-index:100; background:var(--bg); overflow:auto;
-        display:grid; place-items:center; padding:28px 20px 40px; }
+        display:grid; place-items:center; align-content:center;
+        padding:calc(28px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom)); }
 .gate-in { width:100%; max-width:392px; }
 .gate h1 { font-size:31px; line-height:1.06; margin-bottom:7px; }
 .gate .sub { font-size:14.5px; color:var(--ink-2); margin-bottom:20px; }
+
+/* the section's own mark: nine lines, the same nine that colour every page */
+.hero { margin-bottom:26px; }
+.hero-mark { display:flex; align-items:baseline; gap:9px; margin-bottom:13px; }
+.hero-mark i { width:12px; height:12px; border-radius:50%; background:var(--l-pps);
+               flex:none; align-self:center; }
+.hero-mark b { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:19px;
+               letter-spacing:.13em; text-transform:uppercase; }
+.hero-mark em { font-style:normal; font-size:11.5px; font-weight:600; letter-spacing:.13em;
+                text-transform:uppercase; color:var(--ink-3); }
+.hero-lines { display:flex; gap:3px; height:6px; }
+.hero-lines i { flex:1; border-radius:3px; transform-origin:left center; }
+
+/* on a phone the form belongs under the thumb, not floating in the middle */
+@media (max-width:560px) {
+  .gate { place-items:stretch; align-content:stretch; padding-left:18px; padding-right:18px; }
+  .gate-in { max-width:none; display:flex; flex-direction:column; }
+  .gate .hero { margin-top:4vh; }
+  .gate h1 { font-size:35px; }
+  .gate .sub { margin-bottom:4px; }
+  .gate-view { display:flex; flex-direction:column; flex:1; }
+  /* only the sign-in form drops to the thumb; the roster list must stay under its search */
+  #vLogin .field:first-of-type { margin-top:auto; }
+  #vForgot .field:first-of-type { margin-top:auto; }
+  .field input { font-size:16px; padding:14px 14px; }
+  .go { padding:16px; font-size:17px; }
+  .picker { max-height:none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gate:not([hidden]) .hero-lines i { animation:lineIn .5s var(--ease) backwards; }
+  .gate:not([hidden]) .hero-lines i:nth-child(1){animation-delay:.04s}
+  .gate:not([hidden]) .hero-lines i:nth-child(2){animation-delay:.08s}
+  .gate:not([hidden]) .hero-lines i:nth-child(3){animation-delay:.12s}
+  .gate:not([hidden]) .hero-lines i:nth-child(4){animation-delay:.16s}
+  .gate:not([hidden]) .hero-lines i:nth-child(5){animation-delay:.2s}
+  .gate:not([hidden]) .hero-lines i:nth-child(6){animation-delay:.24s}
+  .gate:not([hidden]) .hero-lines i:nth-child(7){animation-delay:.28s}
+  .gate:not([hidden]) .hero-lines i:nth-child(8){animation-delay:.32s}
+  .gate:not([hidden]) .hero-lines i:nth-child(9){animation-delay:.36s}
+  .gate:not([hidden]) .hero-mark { animation:rise .5s var(--ease) backwards; }
+  .gate:not([hidden]) .gate-view > * { animation:rise .55s var(--ease) backwards; }
+  .gate:not([hidden]) .gate-view > *:nth-child(1){animation-delay:.26s}
+  .gate:not([hidden]) .gate-view > *:nth-child(2){animation-delay:.32s}
+  .gate:not([hidden]) .gate-view > *:nth-child(3){animation-delay:.38s}
+  .gate:not([hidden]) .gate-view > *:nth-child(4){animation-delay:.44s}
+  .gate:not([hidden]) .gate-view > *:nth-child(5){animation-delay:.5s}
+  .gate:not([hidden]) .gate-view > *:nth-child(n+6){animation-delay:.56s}
+  @keyframes lineIn { from { transform:scaleX(0); opacity:0; } }
+}
 .tcard {
   position:relative; aspect-ratio:1.586; border-radius:15px; background:var(--plate-2);
   border:1px solid var(--rule); padding:17px 18px 20px; overflow:hidden;
@@ -648,7 +763,7 @@ section { scroll-margin-top:96px; }
 .dirfilter { display:inline-flex; margin:2px 0 14px; }
 
 /* every student is a station: filled once they are on the network */
-.dgroup { position:sticky; top:53px; z-index:5; display:flex; align-items:baseline; gap:10px;
+.dgroup { position:sticky; top:var(--top-h, 57px); z-index:5; display:flex; align-items:baseline; gap:10px;
           padding:9px 2px 7px; background:var(--bg); }
 .dgroup b { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:16px;
             letter-spacing:.06em; text-transform:uppercase; }
@@ -737,7 +852,7 @@ dialog .btn { margin-top:8px; }
   transition:border-color .2s var(--ease), box-shadow .2s var(--ease);
   -webkit-tap-highlight-color:transparent;
 }
-.user-pill:hover { border-color:var(--rail); box-shadow:var(--lift-lg); }
+.user-pill:hover { border-color:var(--rail); }
 .user-pill .avatar {
   width:28px; height:28px; border-radius:50%; display:grid; place-items:center;
   background:var(--l-pps); color:var(--badge-ink);
@@ -753,7 +868,7 @@ dialog .btn { margin-top:8px; }
 .user-drop {
   position:absolute; top:calc(100% + 8px); right:0; z-index:50; min-width:190px;
   background:var(--plate); border:1px solid var(--rule); border-radius:12px;
-  box-shadow:var(--lift-lg); overflow:hidden;
+  box-shadow:var(--lift-edge); overflow:hidden;
   opacity:0; transform:translateY(6px) scale(.97); pointer-events:none;
   transition:opacity .22s var(--ease), transform .22s var(--ease);
 }
@@ -773,17 +888,47 @@ dialog .btn { margin-top:8px; }
 
 /* the bar is the first thing a phone shows: keep it to a line and no more */
 @media (max-width:560px) {
-  .top { padding:8px 12px; gap:8px; }
+  .top { padding:calc(12px + env(safe-area-inset-top)) 14px 12px; gap:10px; }
   .mark .sub { display:none; }
-  .mark .txt { font-size:15px; }
-  .mark .bullet { width:9px; height:9px; }
-  .seg button { padding:5px 9px; font-size:12px; letter-spacing:.02em; }
-  .iconbtn { width:30px; height:30px; }
-  .user-pill .avatar { width:26px; height:26px; font-size:11px; }
+  .mark .txt { font-size:19px; letter-spacing:.07em; }
+  .mark .bullet { width:11px; height:11px; }
+  .seg button { padding:8px 13px; font-size:13px; letter-spacing:.02em; }
+  .iconbtn { width:38px; height:38px; }
+  .iconbtn svg { width:19px; height:19px; }
+  .user-pill { padding:4px; }
+  .user-pill .avatar { width:32px; height:32px; font-size:13px; }
+}
+
+/* ============ lock ============ */
+.lock { position:fixed; inset:0; z-index:120; background:var(--bg);
+        display:grid; place-items:center; padding:30px 24px; text-align:center; }
+.lock-in { max-width:320px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+.lock svg { color:var(--l-pps); margin-bottom:18px; }
+.lockart { width:44px; height:44px; color:var(--l-pps); display:block; margin:2px 0 14px; }
+.lock h1 { font-size:27px; line-height:1.1; margin-bottom:6px; }
+.lock p { font-size:14.5px; color:var(--ink-2); margin-bottom:24px; line-height:1.5; }
+.lock .go { width:100%; }
+.lock .link { margin-top:16px; }
+@media (prefers-reduced-motion: no-preference) {
+  .lock:not([hidden]) .lock-in > * { animation:rise .5s var(--ease) backwards; }
+  .lock:not([hidden]) .lock-in > *:nth-child(2){animation-delay:.06s}
+  .lock:not([hidden]) .lock-in > *:nth-child(3){animation-delay:.1s}
+  .lock:not([hidden]) .lock-in > *:nth-child(4){animation-delay:.14s}
 }
 
 /* ============ motion ============ */
 @media (prefers-reduced-motion: no-preference) {
+  /* Launch: the rail draws down and the stations arrive as it passes them, then the
+     live marker lands on the current time. It is the product's own thesis — a day is
+     a line, periods are stations — rather than a logo fade. Nothing waits on it. */
+  .railwrap.boot .travelled { animation:railDraw .82s var(--ease) .1s backwards; }
+  .railwrap.boot .stop { animation:stationIn .5s var(--ease) backwards;
+                         animation-delay:calc(var(--i, 0) * 52ms + 60ms); }
+  .railwrap.boot .marker { animation:markerLand .46s var(--ease) .62s backwards; }
+  @keyframes railDraw { from { transform:scaleY(0); } }
+  @keyframes stationIn { from { opacity:0; transform:translateY(11px); } }
+  @keyframes markerLand { from { opacity:0; transform:scale(.35); } }
+
   .enter > * { animation:rise .5s var(--ease) backwards; }
   .enter > *:nth-child(1){animation-delay:.02s} .enter > *:nth-child(2){animation-delay:.06s}
   .enter > *:nth-child(3){animation-delay:.1s}  .enter > *:nth-child(4){animation-delay:.14s}
@@ -975,10 +1120,15 @@ dialog .btn { margin-top:8px; }
 <div class="gate" id="gate" hidden>
   <div class="gate-in">
 
+    <div class="hero">
+      <div class="hero-mark"><i></i><b>Sec F</b><em>IT-I · 2026–27</em></div>
+      <div class="hero-lines" id="heroLines"></div>
+    </div>
+
     <!-- ---------- log in ---------- -->
-    <div id="vLogin">
-      <h1>Sec F IT-I</h1>
-      <div class="sub">Sign in to see your timetable and where you stand.</div>
+    <div id="vLogin" class="gate-view">
+      <h1>Sign in</h1>
+      <div class="sub">Your timetable, your 75%, and where the section stands.</div>
       <div class="field">
         <label for="liEmail">Email</label>
         <input id="liEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com">
@@ -996,7 +1146,7 @@ dialog .btn { margin-top:8px; }
     </div>
 
     <!-- ---------- claim: pick your name ---------- -->
-    <div id="vPick" hidden>
+    <div id="vPick" class="gate-view" hidden>
       <h1>Find your name</h1>
       <div class="sub">The official IT (F) list. Take yours once — after that it is gone from the list for everyone else.</div>
       <div class="field">
@@ -1010,7 +1160,7 @@ dialog .btn { margin-top:8px; }
     </div>
 
     <!-- ---------- claim: set up the account ---------- -->
-    <div id="vClaim" hidden>
+    <div id="vClaim" class="gate-view" hidden>
       <h1>Your travelcard</h1>
       <div class="sub">This card is yours for the year. Nobody else can take this name.</div>
       <div class="tcard">
@@ -1043,7 +1193,7 @@ dialog .btn { margin-top:8px; }
     </div>
 
     <!-- ---------- forgot ---------- -->
-    <div id="vForgot" hidden>
+    <div id="vForgot" class="gate-view" hidden>
       <h1>Reset your password</h1>
       <div class="sub">We'll email you a link. Use the address you signed up with.</div>
       <div class="field">
@@ -1057,6 +1207,21 @@ dialog .btn { margin-top:8px; }
       </div>
     </div>
 
+  </div>
+</div>
+
+<div class="lock" id="lockScreen" hidden>
+  <div class="lock-in">
+    <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor"
+         stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 2.6c-2.2 0-4.1 1.2-5.1 3M4.4 8.4A7.6 7.6 0 0 1 12 4.4a7.6 7.6 0 0 1 7.6 7.6c0 1.4-.2 2.7-.5 4"/>
+      <path d="M7.6 12a4.4 4.4 0 0 1 8.8 0c0 2.6-.3 5-1 7.2"/>
+      <path d="M12 12v2.6c0 2.4-.3 4.7-.9 6.9M4.6 12c0-1.2.3-2.4.8-3.4M5.2 18.6c.7-1.6 1.1-3.4 1.1-5.2"/>
+    </svg>
+    <h1 id="lockName">Locked</h1>
+    <p id="lockNote">Unlock with your fingerprint to see your attendance.</p>
+    <button class="go" id="lockGo" type="button">Unlock</button>
+    <button class="link" id="lockOut" type="button">Sign out instead</button>
   </div>
 </div>
 
@@ -1112,6 +1277,15 @@ const DAYS = [
   { d:"Friday",    short:"Fri", items:[ {i:0,k:"SMT"}, {i:1,span:2,split:{F1:"EVSP",F2:"BEELAB"}}, {i:3,k:"EM"}, {i:4,k:"EVSL"}, {i:5,span:2,k:"EGL"} ] },
   { d:"Saturday",  short:"Sat", items:[] },
 ];
+
+/* Storage is per account, not per device. Two students share a phone — a brother's
+   laptop, a friend's charger — and they must never share a percentage. Signed out,
+   the plain keys are used; signing in switches every per-student key to that
+   student's own bucket. Theme and alerts stay device-wide: they are preferences,
+   not records. */
+let uid = null;
+const nsKey = base => uid ? base + ":" + uid : base;
+const readMap = k => { try { return JSON.parse(localStorage.getItem(k) || "{}"); } catch (e) { return {}; } };
 
 let batch = "both";
 try { batch = localStorage.getItem("adgips-batch") || "both"; } catch (e) {}
@@ -1648,7 +1822,15 @@ function openDetail(item, dayIdx) {
   } else {
     box.appendChild(actions());
   }
-  document.getElementById("dlg").showModal();
+  openDlg();
+}
+
+/* Every dialog goes through here. The profile asks for a sheet; nothing else does,
+   and the class is cleared each time so it cannot leak into the next one. */
+function openDlg(sheet) {
+  const d = document.getElementById("dlg");
+  d.classList.toggle("sheet", !!sheet);
+  if (!d.open) d.showModal();
 }
 
 function actions(extra) {
@@ -1780,15 +1962,14 @@ function openHoliday(iso) {
   list.appendChild(r);
   box.appendChild(list);
   box.appendChild(actions());
-  document.getElementById("dlg").showModal();
+  openDlg();
 }
 
 /* ============================================================
    Attendance. 75% is the line; everything reports against it.
    ============================================================ */
-let att = {};
-try { att = JSON.parse(localStorage.getItem("adgips-att") || "{}"); } catch (e) {}
-const saveAtt = () => { try { localStorage.setItem("adgips-att", JSON.stringify(att)); } catch (e) {} };
+let att = readMap("adgips-att");                 /* signed out until adoptUser says otherwise */
+const saveAtt = () => { try { localStorage.setItem(nsKey("adgips-att"), JSON.stringify(att)); } catch (e) {} };
 
 function demo() {                                   // run demo() in the console to check the 75% math
   const ok = (x, y, m) => { if (x !== y) throw new Error(m + ": got " + x + ", want " + y); };
@@ -2435,7 +2616,7 @@ function openCatchup() {
     box.appendChild(actions());
   };
   draw();
-  document.getElementById("dlg").showModal();
+  openDlg();
 }
 
 /* ============================================================
@@ -2506,7 +2687,7 @@ function openICS() {
     } else copy.textContent = "Select the text and copy";
   });
   box.appendChild(actions(copy));
-  document.getElementById("dlg").showModal();
+  openDlg();
 }
 
 /* ============================================================
@@ -2580,6 +2761,7 @@ async function signUp(email, password) {
 }
 function signOut() {
   sess = null; profile = null; saveSess(); saveProfile();
+  att = {}; plan = {}; uid = null;                 /* the records stay in their own bucket */
   location.hash = ""; location.reload();
 }
 
@@ -2991,7 +3173,7 @@ async function openContact(username) {
   const box = document.getElementById("dlgIn");
   box.textContent = ""; box.dataset.line = "";
   box.appendChild(el("div", "d-name", "…"));
-  document.getElementById("dlg").showModal();
+  openDlg();
   try {
     if (!directory) directory = await fetchDirectory();
     const d = directory.find(x => x.username === username);
@@ -3101,6 +3283,16 @@ function drawRoster() {
 }
 
 const LINE_KEYS = Object.keys(LINES);
+function paintHero() {
+  const box = document.getElementById("heroLines");
+  if (!box || box.children.length) return;
+  LINE_KEYS.forEach(k => {
+    const i = el("i");
+    i.style.background = "var(--l-" + k + ")";
+    box.appendChild(i);
+  });
+}
+
 function paintCard() {
   const u = document.getElementById("clUser").value.trim().toLowerCase();
   document.getElementById("cardName").textContent = picked ? picked.name : "Your name";
@@ -3112,9 +3304,8 @@ function paintCard() {
 }
 
 /* ---------- the planner: what a skip would cost, no server involved ---------- */
-let plan = {};
-try { plan = JSON.parse(localStorage.getItem("adgips-plan") || "{}"); } catch (e) {}
-const savePlan = () => { try { localStorage.setItem("adgips-plan", JSON.stringify(plan)); } catch (e) {} };
+let plan = readMap("adgips-plan");
+const savePlan = () => { try { localStorage.setItem(nsKey("adgips-plan"), JSON.stringify(plan)); } catch (e) {} };
 let planning = false;
 
 /* one planned skip = one of the classes still to come that you will not attend.
@@ -3229,7 +3420,7 @@ document.querySelectorAll(".seg button").forEach(b => {
   b.setAttribute("aria-pressed", b.dataset.batch === batch);
   b.addEventListener("click", () => {
     batch = b.dataset.batch;
-    try { localStorage.setItem("adgips-batch", batch); } catch (e) {}
+    try { localStorage.setItem(nsKey("adgips-batch"), batch); } catch (e) {}
     document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x.dataset.batch === batch));
     renderAll();
   });
@@ -3243,6 +3434,7 @@ document.getElementById("themeBtn").addEventListener("click", () => {
   theme = dark ? "light" : "dark";
   document.documentElement.dataset.theme = theme;
   try { localStorage.setItem("adgips-theme", theme); } catch (e) {}
+  paintStatusBar();
 });
 
 document.getElementById("attDate").addEventListener("change", renderAttendance);
@@ -3290,6 +3482,20 @@ document.getElementById("dlg").addEventListener("click", e => {
    page is the same file either way, and the web version never sees it.
    ============================================================ */
 const NATIVE = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
+
+/* Draw under the status bar rather than below it, and keep its icons legible
+   against whichever theme is on. The safe-area padding in the CSS is what stops
+   the top bar from sitting under the clock. */
+const darkNow = () => getComputedStyle(document.documentElement)
+  .getPropertyValue("--bg").trim().toLowerCase().startsWith("#07");
+
+function paintStatusBar() {
+  if (!NATIVE) return;
+  const SB = Capacitor.Plugins.StatusBar;
+  if (!SB) return;
+  SB.setOverlaysWebView({ overlay: true }).catch(() => {});
+  SB.setStyle({ style: darkNow() ? "DARK" : "LIGHT" }).catch(() => {});
+}
 const ALERT_LEAD = 10;                             /* minutes of warning before a class */
 
 let alerts = true;
@@ -3344,6 +3550,158 @@ async function syncAlerts() {
   }
 }
 
+/* ---------- the fingerprint lock ----------
+   Opt in, never assumed. It guards nothing secret — a timetable and a percentage —
+   so it exists because a shared phone is normal here, not because the data is
+   sensitive. Sign out stays reachable from the lock screen: a student whose
+   fingerprint stops working must never be shut out of their own account. */
+let locked = false;
+try { locked = localStorage.getItem("adgips-lock") === "on"; } catch (e) {}
+
+/* the plugin registers under its native name, not the name its npm wrapper exports */
+const bio = () => (NATIVE && Capacitor.Plugins.BiometricAuthNative) || null;
+
+/* {ok, why} — a fingerprint is best, but a PIN or pattern locks the app just as well,
+   so "can this phone lock at all" is the question, not "is there a fingerprint" */
+async function bioCheck() {
+  const B = bio();
+  if (!B) return { ok:false, why:"This only works in the app." };
+  try {
+    const r = await B.checkBiometry();
+    if (r && r.isAvailable) return { ok:true, bio:true };
+    if (r && r.deviceIsSecure) return { ok:true, bio:false };
+    return { ok:false, why: r && r.reason
+      ? r.reason
+      : "Set a fingerprint, PIN or pattern in Android settings first." };
+  } catch (e) { return { ok:false, why:"This phone would not say." }; }
+}
+
+const bioAvailable = async () => (await bioCheck()).ok;
+
+async function askUnlock() {
+  const B = bio();
+  if (!B) return true;
+  try {
+    await B.internalAuthenticate({
+      reason: "Unlock Sec F IT-I",
+      androidTitle: "Unlock Sec F IT-I",
+      androidSubtitle: "Your attendance is locked on this device",
+      allowDeviceCredential: true,          /* a PIN must still get you in */
+      androidConfirmationRequired: false,   /* a matched finger is the confirmation */
+    });
+    return true;
+  } catch (e) { return false; }
+}
+
+function showLock(on) {
+  const el2 = document.getElementById("lockScreen");
+  el2.hidden = !on;
+  if (on) {
+    document.getElementById("lockName").textContent =
+      profile ? "Hi, " + profile.name.split(/\s+/)[0] : "Locked";
+  }
+}
+
+async function tryUnlock() {
+  const ok = await askUnlock();
+  buzz(ok ? "confirm" : "reject");
+  if (ok) showLock(false);
+  else document.getElementById("lockNote").textContent =
+    "Not recognised. Try again, or sign out and back in.";
+}
+
+function enableLock(on) {
+  locked = !!on;
+  try { localStorage.setItem("adgips-lock", locked ? "on" : "off"); } catch (e) {}
+  if (locked) buzz("confirm");
+}
+
+/* Offered once, as part of onboarding, and never nagged again. Asked here rather than
+   buried in settings because a shared phone is the normal case in this section. */
+async function offerLock() {
+  if (!NATIVE || locked || !profile) return;
+  let asked = null;
+  try { asked = localStorage.getItem("adgips-lock-asked"); } catch (e) {}
+  if (asked) return;
+  const can = await bioCheck();
+  if (!can.ok) return;                       /* nothing to offer; ask again another day */
+  try { localStorage.setItem("adgips-lock-asked", "1"); } catch (e) {}
+
+  const box = document.getElementById("dlgIn");
+  box.textContent = ""; box.dataset.line = "pps";
+  box.appendChild(el("div", "grab"));
+  const art = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  art.setAttribute("viewBox", "0 0 24 24");
+  art.setAttribute("class", "lockart");
+  art.setAttribute("fill", "none"); art.setAttribute("stroke", "currentColor");
+  art.setAttribute("stroke-width", "1.4");
+  art.setAttribute("stroke-linecap", "round"); art.setAttribute("stroke-linejoin", "round");
+  art.innerHTML = '<path d="M12 2.6c-2.2 0-4.1 1.2-5.1 3M4.4 8.4A7.6 7.6 0 0 1 12 4.4a7.6 7.6 0 0 1 7.6 7.6c0 1.4-.2 2.7-.5 4"/>'
+    + '<path d="M7.6 12a4.4 4.4 0 0 1 8.8 0c0 2.6-.3 5-1 7.2"/>'
+    + '<path d="M12 12v2.6c0 2.4-.3 4.7-.9 6.9M4.6 12c0-1.2.3-2.4.8-3.4M5.2 18.6c.7-1.6 1.1-3.4 1.1-5.2"/>';
+  box.appendChild(art);
+  box.appendChild(el("div", "d-name", can.bio ? "Lock it with your fingerprint?" : "Lock it with your screen lock?"));
+  box.appendChild(el("div", "d-full",
+    "Your attendance and your percentage stay yours if somebody else picks up this phone. "
+    + (can.bio ? "Your PIN still works if a finger does not." : "")));
+  const rows = el("div", "d-rows");
+  [["Asked", "Only when you open the app"],
+   ["If it fails", "Your PIN, or sign in again"],
+   ["Change it", "Profile, any time"]].forEach(([a, b]) => {
+    const r = el("div", "d-row");
+    r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b));
+    rows.appendChild(r);
+  });
+  box.appendChild(rows);
+  const yes = el("button", "btn pri", can.bio ? "Turn on fingerprint lock" : "Turn on lock");
+  yes.type = "button";
+  yes.addEventListener("click", () => { enableLock(true); document.getElementById("dlg").close(); });
+  const no = el("button", "btn", "Not now");
+  no.type = "button";
+  no.addEventListener("click", () => document.getElementById("dlg").close());
+  const act = el("div", "d-act");
+  act.appendChild(no); act.appendChild(yes);
+  box.appendChild(act);
+  openDlg(true);
+}
+
+/* ---------- haptics ----------
+   One delegated listener rather than a call in forty handlers, so anything added
+   later is covered for free. It listens on click, not pointerdown: a tap that turns
+   into a scroll should not buzz, and a phantom buzz while flicking a list is the
+   thing that makes haptics feel cheap.
+
+   Two weights only. A selection tick for changing which of a set is chosen — tabs,
+   batch, a P/A/C mark — which is the crisp, quiet one. A light impact for everything
+   else. Nothing heavier is used anywhere: medium and heavy are for a physical event
+   the user should feel through the case, and tapping a button is not that. */
+const TAPPABLE = "button, a, [role='button'], .card, .drow, .pname, .clink, .link, .go," +
+                 ".btn, .iconbtn, .user-pill, .mgrid button, .chips button, .hrow, .srow," +
+                 ".cfield, .arow, .stop .card, .lb-row, .tcard";
+const TICKABLE = ".seg, .nav, .marks, .dirfilter, .chips, .mgrid";
+
+let hapticsOff = false;
+try {
+  hapticsOff = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+} catch (e) {}
+
+/* kind is "tick" (default, the quietest), "tap", "confirm" or "reject" — see
+   SoftHapticsPlugin.java for why this is not @capacitor/haptics */
+function buzz(kind) {
+  if (!NATIVE || hapticsOff) return;
+  const H = Capacitor.Plugins.SoftHaptics;
+  if (!H) return;
+  H.tap({ kind: kind || "tick" }).catch(() => {});
+}
+
+document.addEventListener("click", e => {
+  const hit = e.target.closest(TAPPABLE);
+  if (!hit || hit.disabled) return;
+  /* a tick for choosing among a set, a tick for everything else too: the whole
+     point is that nothing in a timetable deserves more than the quietest effect */
+  buzz(hit.classList.contains("go") || hit.classList.contains("pri") ? "tap" : "tick");
+}, true);
+
 /* pages — clicks drive them; the hash is a bonus for back/forward and
    deep links, and is unavailable from a data: URL */
 const PAGES = ["today", "week", "ranks", "directory", "attendance", "holidays"];
@@ -3368,6 +3726,11 @@ document.querySelectorAll(".nav a").forEach(a => a.addEventListener("click", e =
 window.addEventListener("popstate", () => show(location.hash.slice(1)));
 window.addEventListener("hashchange", () => show(location.hash.slice(1)));
 
+document.getElementById("lockGo").addEventListener("click", tryUnlock);
+document.getElementById("lockOut").addEventListener("click", () => {
+  if (confirm("Sign out on this device?")) { showLock(false); signOut(); }
+});
+
 document.getElementById("alertBtn").addEventListener("click", () => {
   alerts = !alerts;
   try { localStorage.setItem("adgips-alerts", alerts ? "on" : "off"); } catch (e) {}
@@ -3388,6 +3751,7 @@ if (NATIVE && Capacitor.Plugins.App) {
     App.exitApp();
   });
   App.addListener("resume", () => { renderAll(); syncAlerts(); });
+  App.addListener("pause", () => { if (locked && profile) showLock(true); });
 }
 
 /* ---------- auth wiring ---------- */
@@ -3473,52 +3837,121 @@ fgGo.addEventListener("click", async () => {
 });
 document.getElementById("fgEmail").addEventListener("keydown", e => { if (e.key === "Enter") fgGo.click(); });
 
-document.getElementById("cardEdit").addEventListener("click", () => {
+/* ---------- your profile: the travelcard, where you stand, and what you share ---------- */
+function openProfile() {
   if (!profile) return gateShow("login");
   const box = document.getElementById("dlgIn");
   box.textContent = ""; box.dataset.line = "pps";
-  const top = el("div", "d-top");
-  top.appendChild(el("span", "badge", "Batch " + profile.batch));
-  top.appendChild(el("span", "plate-when", "Roll #" + profile.sno));
-  box.appendChild(top);
-  box.appendChild(el("div", "d-name", profile.name));
-  box.appendChild(el("div", "d-full", "@" + profile.username));
-  const rows = el("div", "d-rows");
-  [["Practical batch", profile.batch], ["On the list as", "#" + profile.sno]].forEach(([a, b]) => {
-    const r = el("div", "d-row");
-    r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b));
-    rows.appendChild(r);
+  box.appendChild(el("div", "grab"));
+
+  /* the travelcard is this app's identity object — the same one you claimed */
+  const card = el("div", "tcard pcard");
+  const brand = el("div", "brand");
+  brand.appendChild(el("i"));
+  brand.appendChild(el("span", null, "Sec F"));
+  brand.appendChild(el("em", null, "IT-I · 2026–27"));
+  card.appendChild(brand);
+  const who = el("div");
+  who.appendChild(el("div", "nm", profile.name));
+  who.appendChild(el("div", "un", "@" + profile.username + " · #" + profile.sno
+    + " · Batch " + profile.batch + (isCR() ? " · CR" : "")));
+  card.appendChild(who);
+  const stripes = el("div", "stripes");
+  LINE_KEYS.forEach(k => {
+    const i = el("i"); i.style.background = "var(--l-" + k + ")"; stripes.appendChild(i);
   });
-  box.appendChild(rows);
-  const hint = el("div", "d-note", "Fill in what you want your section to have. Blank means not shared.");
-  box.appendChild(hint);
+  card.appendChild(stripes);
+  box.appendChild(card);
+
+  /* where you actually stand, so the profile is worth opening */
+  const t = tally();
+  let p = 0, h = 0;
+  Object.values(t).forEach(v => { p += v.p; h += v.h; });
+  const b = termBudget().overall;
+  const stats = el("div", "pstats");
+  [[h ? pctOf(p, h) + "%" : "—", "Overall", h ? (clear(p, h) ? "ok" : "bad") : ""],
+   [String(Math.max(0, b.canBunk)), "Bunks left", b.canBunk > 0 ? "ok" : b.canBunk < 0 ? "bad" : ""],
+   [p + "/" + h, "Attended", ""]].forEach(([v, k, cls]) => {
+    const d = el("div", cls);
+    d.appendChild(el("b", null, v));
+    d.appendChild(el("span", null, k));
+    stats.appendChild(d);
+  });
+  box.appendChild(stats);
+
+  const head = el("div", "chead");
+  head.appendChild(el("h3", null, "Shared with the section"));
+  const note = el("span", null, "Blank stays private");
+  head.appendChild(note);
+  box.appendChild(head);
+
   const inputs = {};
   CONTACTS.forEach(([k, lbl, ph]) => {
-    const f = el("div", "field");
+    const f = el("div", "cfield");
+    f.dataset.k = k;
     const id = "ct_" + k;
+    f.appendChild(cicon(k, lbl));
+    const m = el("div", "m");
     const l = el("label", null, lbl); l.setAttribute("for", id);
-    f.appendChild(l);
-    const i = el("input"); i.id = id; i.type = "text"; i.placeholder = ph;
+    m.appendChild(l);
+    const i = el("input");
+    i.id = id; i.type = k === "mobile" ? "tel" : k === "email" ? "email" : "text";
+    i.placeholder = ph;
     i.value = profile[k] || "";
     i.autocapitalize = "off"; i.spellcheck = false;
-    inputs[k] = i; f.appendChild(i);
+    i.addEventListener("input", () => f.classList.toggle("filled", !!i.value.trim()));
+    if (i.value.trim()) f.classList.add("filled");
+    inputs[k] = i;
+    m.appendChild(i);
+    f.appendChild(m);
+    f.appendChild(el("span", "on"));
     box.appendChild(f);
   });
+
+  const wrap = el("div", "psave");
   const save = el("button", "btn pri", "Save");
   save.type = "button";
   save.addEventListener("click", async () => {
     save.disabled = true; save.textContent = "Saving…";
     const patch = {};
     CONTACTS.forEach(([k]) => { patch[k] = inputs[k].value.trim() || null; });
-    try { await saveContacts(patch); hint.textContent = "Saved."; }
-    catch (err) { hint.textContent = explain(err).join(" — "); }
-    save.disabled = false; save.textContent = "Save";
+    try {
+      await saveContacts(patch);
+      note.textContent = "Saved";
+      save.textContent = "Saved";
+      setTimeout(() => { save.textContent = "Save"; note.textContent = "Blank stays private"; }, 1800);
+    } catch (err) {
+      const [what, fix] = explain(err);
+      note.textContent = what + " — " + fix;
+      save.textContent = "Save";
+    }
+    save.disabled = false;
   });
-  box.appendChild(save);
+  wrap.appendChild(save);
+  box.appendChild(wrap);
+
+  if (NATIVE) {
+    const lk = el("button", "btn", locked ? "Fingerprint lock is on" : "Lock with fingerprint");
+    lk.type = "button";
+    lk.style.marginTop = "8px";
+    lk.addEventListener("click", async () => {
+      if (locked) {
+        enableLock(false);
+        lk.textContent = "Lock with fingerprint";
+        return;
+      }
+      const can = await bioCheck();
+      if (!can.ok) return alert(can.why);
+      enableLock(true);
+      lk.textContent = "Fingerprint lock is on";
+    });
+    box.appendChild(lk);
+  }
 
   if (isCR()) {
     const cr = el("button", "btn", "CR tools");
     cr.type = "button";
+    cr.style.marginTop = "8px";
     cr.addEventListener("click", openCR);
     box.appendChild(cr);
   }
@@ -3526,8 +3959,10 @@ document.getElementById("cardEdit").addEventListener("click", () => {
   out.type = "button";
   out.addEventListener("click", () => { if (confirm("Sign out on this device?")) signOut(); });
   box.appendChild(actions(out));
-  document.getElementById("dlg").showModal();
-});
+  openDlg(true);
+}
+
+document.getElementById("cardEdit").addEventListener("click", openProfile);
 
 /* ---------- CR tools: add someone the list missed, undo a wrong claim ---------- */
 async function openCR() {
@@ -3572,7 +4007,7 @@ async function openCR() {
   list.appendChild(el("div", "d-note", "Loading claimed names…"));
   box.appendChild(list);
   box.appendChild(actions());
-  document.getElementById("dlg").showModal();
+  openDlg();
 
   try {
     const dir = await fetchDirectory();
@@ -3614,18 +4049,42 @@ document.addEventListener("click", e => {
 });
 document.getElementById("dropProfile").addEventListener("click", () => {
   userDrop.classList.remove("open");
-  document.getElementById("cardEdit").click();
+  openProfile();
 });
 document.getElementById("dropLogout").addEventListener("click", () => {
   userDrop.classList.remove("open");
   if (confirm("Sign out on this device?")) signOut();
 });
 
+/* Point every per-student key at this account. The one migration: marks made before
+   anyone signed in belong to the first account that does — moved, not copied, so the
+   next student to sign in on this phone cannot inherit them. */
+function adoptUser(id) {
+  if (uid === id) return;
+  uid = id || null;
+  if (uid) {
+    const mine = readMap(nsKey("adgips-att"));
+    const loose = readMap("adgips-att");
+    if (!Object.keys(mine).length && Object.keys(loose).length) {
+      att = loose;
+      saveAtt();                                   /* now writes to this account's key */
+      try { localStorage.removeItem("adgips-att"); } catch (e) {}
+    } else {
+      att = mine;
+    }
+  } else {
+    att = readMap("adgips-att");
+  }
+  plan = readMap(nsKey("adgips-plan"));
+  let saved = null;
+  try { saved = localStorage.getItem(nsKey("adgips-batch")); } catch (e) {}
+  batch = saved || (uid && profile && profile.batch) || "both";
+  syncState = null;
+}
+
 /* batch defaults to your roster batch, and stays switchable */
 function afterSignIn() {
-  let saved = null;
-  try { saved = localStorage.getItem("adgips-batch"); } catch (e) {}
-  batch = saved || (profile && profile.batch) || "both";
+  adoptUser(profile && profile.sno);
   document.querySelectorAll(".seg button").forEach(x =>
     x.setAttribute("aria-pressed", x.dataset.batch === batch));
   updateUserPill();
@@ -3636,21 +4095,26 @@ function afterSignIn() {
 
   /* the account's records come down first, so a second device does not look empty
      and the catch-up below does not offer days that are already marked elsewhere */
+  offerLock();
   syncAttendance().catch(() => {}).then(() => {
     let asked = null;
-    try { asked = localStorage.getItem("adgips-caught"); } catch (e) {}
+    try { asked = localStorage.getItem(nsKey("adgips-caught")); } catch (e) {}
     if (!asked && batch !== "both" && untouchedDays().length) {
-      try { localStorage.setItem("adgips-caught", "1"); } catch (e) {}
+      try { localStorage.setItem(nsKey("adgips-caught"), "1"); } catch (e) {}
       show("attendance");
       openCatchup();
     }
   });
 }
 
+adoptUser(profile && profile.sno);               /* before a single number is drawn */
+if (NATIVE && locked && profile) { showLock(true); tryUnlock(); }
 renderMonths();
 renderHolidayList();
 renderLineKey();
 renderAlertBtn();
+paintHero();
+paintStatusBar();
 show(location.hash.slice(1));
 syncAlerts();
 

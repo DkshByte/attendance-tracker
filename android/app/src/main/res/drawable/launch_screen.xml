@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Capacitor ships a near-white splash.png. Against a midnight-enamel app that is a
+  white flash on every cold start — the most visible defect in the whole product,
+  and the first thing a classmate sees. This is the app's own ground with the Red
+  Line station disc on it, so launch and first paint are the same surface.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#07090C" />
+        </shape>
+    </item>
+
+    <item android:gravity="center">
+        <shape android:shape="oval">
+            <size android:width="26dp" android:height="26dp" />
+            <solid android:color="#E4322B" />
+        </shape>
+    </item>
+
+</layer-list>
