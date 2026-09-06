@@ -19,7 +19,7 @@
 /* Brand preview banner on test page */
 .brand-test-bar {
   position:sticky; top:0; z-index:9999;
-  background:#111524; color:#FFF; padding:10px 18px;
+  background:#000000; border-bottom:1px solid #1A1A1A; color:#FFF; padding:10px 18px;
   font:13px/1.4 system-ui,-apple-system,sans-serif;
   border-bottom:1px solid rgba(255,255,255,0.15);
   display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
@@ -44,19 +44,19 @@
    ============================================================ */
 
 :root {
-  /* Bunkr Brand Kit: Charcoal (#26272B), Warm White (#FDFCFA), Forest Teal (#0E5454), Terracotta (#B34949) */
-  --bg:#1A1B1E; --plate:#26272B; --plate-2:#2F3137; --plate-3:#383B42;
-  --rule:rgba(253,252,250,0.12); --rule-soft:rgba(253,252,250,0.07); --rail:#3A3D46;
-  --ink:#FDFCFA; --ink-2:#A8ADB8; --ink-3:#707684;
-  --focus:#0E5454;
-  --l-pps:#FF4D40; --l-bee:#E59819; --l-phy:#4E96FF; --l-smt:#10766E;
-  --l-em:#9F7AEA;  --l-csl:#ED64A6; --l-evs:#0E5454; --l-eg:#DD6B20; --l-pd:#718096;
-  --ok:#0E5454; --warn:#D97706; --bad:#B34949;
-  --lift:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -18px rgba(0,0,0,.8);
-  --lift-lg:0 2px 5px rgba(0,0,0,.4), 0 24px 44px -20px rgba(0,0,0,.9);
-  --lift-edge:0 4px 12px -6px rgba(0,0,0,.7);
+  /* Complete True Pitch Black (#000000) OLED Theme */
+  --bg:#000000; --plate:#0D0D11; --plate-2:#14141A; --plate-3:#1C1C24;
+  --rule:rgba(255,255,255,0.09); --rule-soft:rgba(255,255,255,0.05); --rail:#1F2026;
+  --ink:#FFFFFF; --ink-2:#A0A4B0; --ink-3:#656978;
+  --focus:#4E62E5;
+  --l-pps:#FF4D40; --l-bee:#FFB92E; --l-phy:#4E96FF; --l-smt:#35D07F;
+  --l-em:#B18CFF;  --l-csl:#FF6BB0; --l-evs:#29D6CD; --l-eg:#FF9147; --l-pd:#93A3C0;
+  --ok:#35D07F; --warn:#FFB92E; --bad:#FF4D40;
+  --lift:0 1px 2px rgba(0,0,0,.8), 0 12px 28px -18px rgba(0,0,0,1);
+  --lift-lg:0 2px 5px rgba(0,0,0,.9), 0 24px 44px -20px rgba(0,0,0,1);
+  --lift-edge:0 4px 12px -6px rgba(0,0,0,.95);
   --ease:cubic-bezier(.16,1,.3,1);
-  --line:var(--rail); --badge-ink:#FDFCFA;
+  --line:var(--rail); --badge-ink:#FFFFFF;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
@@ -988,7 +988,7 @@ dialog .btn { margin-top:8px; }
   <div style="display:flex;align-items:center;gap:10px;">
     <span class="tag">Local Test File</span>
     <b>Bunkr Brand Kit Preview</b>
-    <span style="color:#A6B3CE;font-size:12px;">(Exact Brand Kit: Charcoal #26272B · Warm White #FDFCFA · Forest Teal #0E5454 · Terracotta #B34949)</span>
+    <span style="color:#A6B3CE;font-size:12px;">(Exact Brand Kit: Pure Pitch Black #000000 · Warm White #FDFCFA · Forest Teal #0E5454 · Terracotta #B34949)</span>
   </div>
   <div class="items">
     <span>Icon: <svg viewBox="695 770 252 245" width="18" height="18" fill="#fff" style="vertical-align:middle;"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
