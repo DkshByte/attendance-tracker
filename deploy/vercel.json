@@ -18,6 +18,16 @@
         { "key": "Permissions-Policy", "value": "geolocation=(), camera=(), microphone=(), payment=(), usb=(), interest-cohort=()" },
         { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" }
       ]
+    },
+
+    {
+      "//": "app.html is one big self-contained file with a stable name \u2014 revalidation is not enough, phones replay it from history. Never let it be reused.",
+      "source": "/(.*\\.html)",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    },
+    {
+      "source": "/",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
     }
   ]
 }
