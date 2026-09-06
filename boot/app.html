@@ -189,7 +189,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 /* --- nav --- */
 .nav {
   position:fixed; left:0; right:0; bottom:0; z-index:40;
-  display:grid; grid-template-columns:repeat(6,1fr);
+  display:grid; grid-template-columns:repeat(7,1fr);
   background:color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter:blur(18px) saturate(1.4);
   border-top:1px solid var(--rule);
@@ -1044,6 +1044,43 @@ dialog .btn { margin-top:8px; }
   @keyframes stamp { 0%{transform:scale(.4)} 60%{transform:scale(1.18)} 100%{transform:scale(1)} }
 }
 /* ============================================================
+   The bunk section
+   ============================================================ */
+.bk-head { padding:20px 0 4px; }
+.bk-big { font-family:"Barlow Condensed",sans-serif; font-weight:700; line-height:.92;
+          font-size:76px; letter-spacing:-.02em; color:var(--ink); }
+.bk-big.ok { color:var(--l-smt); } .bk-big.warn { color:var(--l-eg); } .bk-big.bad { color:var(--l-pps); }
+.bk-cap { font-size:14.5px; color:var(--ink-2); margin-top:4px; line-height:1.5; }
+.bk-why { font-size:12.5px; color:var(--ink-3); margin-top:10px; line-height:1.55;
+          border-left:2px solid var(--rule); padding-left:11px; }
+
+.bk-rows { margin-top:20px; }
+.bk-row { display:flex; align-items:center; gap:11px; padding:12px 0; border-top:1px solid var(--rule-soft); }
+.bk-row .ln { flex:none; width:3px; align-self:stretch; border-radius:2px; min-height:34px; }
+.bk-row .w { flex:1; min-width:0; }
+.bk-row .w b { display:block; font-size:14.5px; font-weight:600; }
+.bk-row .w span { display:block; font-size:12px; color:var(--ink-3); margin-top:2px; }
+.bk-row .n { flex:none; font-family:"Barlow Condensed",sans-serif; font-weight:700;
+             font-size:27px; line-height:1; min-width:26px; text-align:right; }
+.bk-step { flex:none; display:flex; gap:5px; }
+.bk-step button { width:31px; height:31px; border-radius:9px; border:1px solid var(--rule);
+                  background:var(--plate); color:var(--ink); font:inherit; font-size:16px;
+                  line-height:1; cursor:pointer; display:grid; place-items:center; }
+.bk-step button:disabled { opacity:.32; cursor:default; }
+.bk-step button:not(:disabled):hover { border-color:var(--rail); background:var(--plate-3); }
+
+.bk-tag { display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.07em;
+          text-transform:uppercase; padding:3px 7px; border-radius:6px; margin-top:4px; }
+.bk-tag.safe { background:color-mix(in srgb, var(--l-smt) 17%, transparent); color:var(--l-smt); }
+.bk-tag.last { background:color-mix(in srgb, var(--l-eg) 17%, transparent); color:var(--l-eg); }
+.bk-tag.no,
+.bk-tag.over,
+.bk-tag.lost { background:color-mix(in srgb, var(--l-pps) 17%, transparent); color:var(--l-pps); }
+
+.bk-next { margin-top:8px; }
+.bk-next .bk-row .w b { font-size:14px; }
+
+/* ============================================================
    First run
    ============================================================ */
 .ob-dots { display:flex; gap:5px; justify-content:center; margin:0 0 15px; }
@@ -1242,6 +1279,9 @@ dialog .btn { margin-top:8px; }
   <a href="#week" data-p="week">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.2 8.2h6.3l3.4 3.4h8"/><path d="M3.2 17.4h9.7"/><circle cx="9.5" cy="8.2" r="1.9" fill="currentColor" stroke="none"/><circle cx="20.3" cy="11.6" r="1.9" fill="currentColor" stroke="none"/><circle cx="12.9" cy="17.4" r="1.9" fill="currentColor" stroke="none"/></svg>
     Week</a>
+  <a href="#bunk" data-p="bunk">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.6a7.5 7.5 0 0 1 15 0"/><path d="M12 12.6V20"/><path d="M8.6 20h6.8"/><circle cx="12" cy="12.6" r="1.9" fill="currentColor" stroke="none"/></svg>
+    Bunk</a>
   <a href="#ranks" data-p="ranks">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 20.5v-6M12 20.5V3.5M18.5 20.5v-9"/><circle cx="5.5" cy="11.6" r="1.9" fill="currentColor" stroke="none"/><circle cx="12" cy="3.5" r="1.9" fill="currentColor" stroke="none"/><circle cx="18.5" cy="8.6" r="1.9" fill="currentColor" stroke="none"/></svg>
     Ranks</a>
@@ -1326,6 +1366,10 @@ dialog .btn { margin-top:8px; }
       <button class="link" id="icsBtn" type="button">Export to calendar</button>
     </div>
     <div class="key" id="lineKey"></div>
+  </section>
+
+  <section id="bunk" hidden>
+    <div id="bunkBox"></div>
   </section>
 
   <section id="attendance" hidden>
@@ -2368,6 +2412,31 @@ function demo() {                                   // run demo() in the console
   ok(subOf("EVSLP"), "EVSL", "a mark left under the old key reads as EVS");
   ok(classesIn("2026-08-17", "2026-08-21").per.EVSL, 3, "EVS theory runs three times a week, counted as one");
   ok(nid("2026-09-07", 2, 3) - nid("2026-09-07", 1, 3), 1000000, "each kind of alert owns its own id space");
+  /* The bunk engine's whole claim: the number it prints is spendable. Skip exactly
+     `safe` in every subject, attend the rest, and no subject ends under 75% — and
+     the overall budget on its own is not a safe answer to the same question. */
+  const spend = subs => {
+    const per = subs.map(x => budgetOf(x.p, x.h, x.r));
+    const safe = per.map(x => Math.max(0, x.canBunk));
+    const ends = per.map((x, i) => pctOf(x.p + x.r - safe[i], x.total));
+    const P = subs.reduce((a, x) => a + x.p, 0), H = subs.reduce((a, x) => a + x.h, 0),
+          R = subs.reduce((a, x) => a + x.r, 0);
+    const tot = safe.reduce((a, b) => a + b, 0);
+    return { tot, ends, cap: budgetOf(P, H, R).canBunk,
+             all: pctOf(P + R - tot, H + R) };
+  };
+  const two = spend([{p:0,h:0,r:10}, {p:0,h:0,r:10}]);
+  ok(two.tot, 4, "two fresh subjects of ten allow four skips");
+  ok(two.cap, 5, "...where the average alone would have said five");
+  ok(two.ends.every(x => x >= 75), true, "spending all four leaves both subjects on the line");
+  ok(two.all >= 75, true, "...and the overall percentage with them");
+  const mix = spend([{p:20,h:30,r:15}, {p:28,h:30,r:15}, {p:25,h:30,r:15}]);
+  ok(mix.ends.every(x => x >= 75), true, "an uneven term is still safe once spent per subject");
+  ok(mix.tot <= mix.cap, true, "the per-subject answer never exceeds the average's");
+  /* a subject that cannot be saved is named, not averaged away */
+  ok(budgetOf(0, 20, 20).canBunk < 0, true, "a subject past saving reports as past saving");
+  ok(Math.max(0, budgetOf(0, 20, 20).canBunk), 0, "...and offers no skips rather than negative ones");
+
   /* first run: which prompts an account gets, and in which order */
   const seq = o => obPlan(o).join(">");
   ok(seq({ first: true, batch: "both", untouched: true, caught: false, native: true, lockAsked: false }),
@@ -2522,6 +2591,80 @@ function leaveCost(fromIso, toIso) {
     spare: o.canBunk - gone.total,
     worst: hits[0] || null,
   };
+}
+
+/* ============================================================
+   The bunk engine
+
+   75% is required in every subject, not on average across them, and
+   those are two different numbers. The gap between them is the whole
+   reason this exists: the overall budget is a total, and a total spent
+   inside one subject fails that subject while the average still reads
+   clear. Two fresh subjects of ten classes each allow four skips, not
+   the five the average on its own would sell you — and even where the
+   two totals agree, spending them all in one line is what a student
+   actually does, and it is what actually fails.
+
+   budgetOf already answers one pool exactly. Everything here is about
+   the pools not being interchangeable. Integer arithmetic throughout,
+   read against the end of term: `left` is a count that can genuinely be
+   spent one class at a time with every subject still landing on 75%.
+
+   Skipping `safe` in every subject lands each one at or above the line
+   by construction, and an average of numbers each >= 75 is >= 75, so
+   the total is not just a bound — it is reachable. That is the whole
+   claim, and demo() holds it to it. */
+function bunkPlan() {
+  const b = termBudget(), subs = [];
+  Object.keys(b.per).forEach(k => {
+    const v = b.per[k];
+    if (!SUB[k] || !v.total) return;
+    const spent = Math.min(v.r, plan[k] || 0);      /* skips already pencilled in */
+    const safe  = Math.max(0, v.canBunk);           /* what this subject can give up, alone */
+    subs.push({
+      k, v, spent, safe,
+      left: Math.max(0, safe - spent),
+      over: Math.max(0, spent - safe),              /* pencilled in past the line */
+      end:  pctOf(v.p + v.r - spent, v.total),      /* where it lands on this plan */
+      lost: v.canBunk < 0,                          /* 75% already out of reach here */
+    });
+  });
+  /* tightest first: the subject that runs out of room is the one that decides the term */
+  subs.sort((x, y) => x.left - y.left || x.end - y.end || SUB[x.k].short.localeCompare(SUB[y.k].short));
+  const sum = f => subs.reduce((n, s) => n + f(s), 0);
+  return {
+    subs, overall: b.overall,
+    safe:  sum(s => s.safe),          /* the honest ceiling, and it is reachable */
+    left:  sum(s => s.left),          /* still available under the current plan */
+    spent: sum(s => s.spent),
+    over:  sum(s => s.over),
+    lost:  subs.filter(s => s.lost),
+    cap:   b.overall.canBunk,         /* what the average alone would have allowed */
+  };
+}
+
+/* what one more skip in this subject means, right now */
+function skipCall(s) {
+  if (!s)        return { v:"none", say:"Nothing scheduled" };
+  if (s.lost)    return { v:"lost", say:"75% is out of reach here" };
+  if (s.over)    return { v:"over", say:s.over + " past the line" };
+  if (s.left > 1) return { v:"safe", say:s.left + " to spare" };
+  if (s.left === 1) return { v:"last", say:"Your last one" };
+  return { v:"no", say:"None left — attend it" };
+}
+
+/* the next few classes genuinely still to come, in order */
+function upcomingClasses(n) {
+  const out = [];
+  for (const { iso, di } of classDays(nowISO(), semEnd)) {
+    for (let ii = 0; ii < DAYS[di].items.length; ii++) {
+      const k = resolve(DAYS[di].items[ii]);
+      if (!k || att[iso + "|" + ii]) continue;
+      out.push({ iso, di, ii, k, it: DAYS[di].items[ii] });
+      if (out.length >= n) return out;
+    }
+  }
+  return out;
 }
 
 /* the untouched days that fell on a festival the institute usually takes off */
@@ -3882,6 +4025,143 @@ function renderPlan() {
   }
 }
 
+/* ---------- the bunk section: the engine, said out loud ---------- */
+function renderBunk() {
+  const box = document.getElementById("bunkBox");
+  box.textContent = "";
+  const g = bunkPlan();
+
+  if (!g.subs.length) {
+    const e = el("div", "empty");
+    e.appendChild(el("b", null, "Nothing to weigh yet"));
+    e.appendChild(document.createTextNode(
+      "No classes are marked and none are scheduled before " + longDate(semEnd) + "."));
+    box.appendChild(e);
+    return;
+  }
+  if (batch === "both") {
+    const e = el("div", "cu");
+    e.appendChild(el("b", null, "Pick F1 or F2 first"));
+    e.appendChild(document.createTextNode(
+      " — until then the split practicals cannot be counted, and a bunk budget "
+      + "built on half a timetable is worse than none."));
+    box.appendChild(e);
+    return;
+  }
+
+  /* the headline is the reachable number, never the average's looser one */
+  const head = el("div", "bk-head");
+  const state = g.lost.length ? "bad" : g.left ? "ok" : "warn";
+  head.appendChild(el("div", "bk-big " + state, String(g.left)));
+  head.appendChild(el("div", "bk-cap", g.left === 1
+    ? "class you can still miss and finish every subject on 75%"
+    : "classes you can still miss and finish every subject on 75%"));
+  box.appendChild(head);
+
+  /* the one number the old headline got wrong is worth naming, not hiding */
+  const why = el("div", "bk-why");
+  if (g.lost.length) {
+    why.textContent = g.lost.map(s => SUB[s.k].short).join(", ")
+      + (g.lost.length === 1 ? " cannot reach 75% any more" : " cannot reach 75% any more between them")
+      + ", even by attending everything left. Everything below is the rest of the term.";
+  } else if (g.cap > g.safe) {
+    why.textContent = "Averaged across every subject the term would allow " + g.cap
+      + ". It is " + g.safe + " here because 75% has to hold in each subject on its own, "
+      + "and the last " + (g.cap - g.safe) + " could only come out of a subject that has no room.";
+  } else {
+    why.textContent = "Counted per subject, not on average — a skip is only free in the "
+      + "subject that has room for it. Spend them where the line below says you can.";
+  }
+  box.appendChild(why);
+
+  if (g.spent) {
+    const d = el("div", "bk-cap");
+    d.textContent = g.over
+      ? g.spent + " planned, and " + g.over + " of them break a subject."
+      : g.spent + " already planned, " + g.left + " still free.";
+    box.appendChild(d);
+  }
+
+  /* per subject: the ledger, tightest first, with the plan editable in place */
+  box.appendChild(el("div", "h2row")).appendChild(el("h2", null, "Where the room is"));
+  const rows = el("div", "bk-rows");
+  g.subs.forEach(s => {
+    const row = el("div", "bk-row");
+    const ln = el("div", "ln");
+    ln.style.background = "var(--l-" + SUB[s.k].line + ")";
+    row.appendChild(ln);
+
+    const w = el("div", "w");
+    w.appendChild(el("b", null, SUB[s.k].name));
+    w.appendChild(el("span", null,
+      s.v.p + " of " + s.v.h + " so far · " + s.v.r + " left · ends at " + s.end + "%"));
+    /* the count column already says "3"; the tag only speaks when it knows something
+       the number does not — that this is the last one, or that there is none to take */
+    const call = skipCall(s);
+    if (call.v !== "safe") w.appendChild(el("i", "bk-tag " + call.v, call.say));
+    row.appendChild(w);
+
+    const step = el("div", "bk-step");
+    const minus = el("button", null, "−");
+    minus.type = "button";
+    minus.setAttribute("aria-label", "One fewer planned skip in " + SUB[s.k].name);
+    minus.disabled = !s.spent;
+    minus.addEventListener("click", () => {
+      plan[s.k] = Math.max(0, (plan[s.k] || 0) - 1);
+      if (!plan[s.k]) delete plan[s.k];
+      savePlan(); renderWeekRail(); renderPlan(); renderBunk();
+    });
+    const plus = el("button", null, "+");
+    plus.type = "button";
+    plus.setAttribute("aria-label", "Plan a skip in " + SUB[s.k].name);
+    plus.disabled = s.spent >= s.v.r;
+    plus.addEventListener("click", () => {
+      plan[s.k] = (plan[s.k] || 0) + 1;
+      savePlan(); renderWeekRail(); renderPlan(); renderBunk();
+    });
+    step.appendChild(minus); step.appendChild(plus);
+    row.appendChild(el("div", "n", String(s.left)));
+    row.appendChild(step);
+    rows.appendChild(row);
+  });
+  box.appendChild(rows);
+
+  if (g.spent) {
+    const clr = el("button", "link", "Clear the plan");
+    clr.type = "button";
+    clr.addEventListener("click", () => {
+      plan = {}; savePlan(); renderWeekRail(); renderPlan(); renderBunk();
+    });
+    box.appendChild(clr);
+  }
+
+  /* and the question actually being asked: this class, on this day — can I? */
+  const next = upcomingClasses(8);
+  if (!next.length) return;
+  box.appendChild(el("div", "h2row")).appendChild(el("h2", null, "Can I miss this one?"));
+  const nx = el("div", "bk-rows bk-next");
+  const by = {};
+  g.subs.forEach(s => by[s.k] = s);
+  next.forEach(c => {
+    const s = by[c.k], call = skipCall(s);
+    const row = el("div", "bk-row");
+    const ln = el("div", "ln");
+    ln.style.background = "var(--l-" + SUB[c.k].line + ")";
+    row.appendChild(ln);
+    const w = el("div", "w");
+    w.appendChild(el("b", null, SUB[c.k].short + " · " + TIMES[c.it.i]));
+    w.appendChild(el("span", null, longDate(c.iso)));
+    w.appendChild(el("i", "bk-tag " + call.v,
+      call.v === "safe" ? "Yes — " + call.say
+      : call.v === "last" ? "Yes, but it is your last in this subject"
+      : call.v === "no" ? "No — attend it"
+      : call.say));
+    row.appendChild(w);
+    nx.appendChild(row);
+  });
+  box.appendChild(nx);
+}
+
 /* ---------- ranks ---------- */
 let ranksBusy = false;
 async function renderRanks() {
@@ -3940,6 +4220,7 @@ async function renderRanks() {
    ============================================================ */
 function renderAll() {
   renderToday(); renderNetwork(); renderWeekRail(); renderAttendance();
+  if (!document.getElementById("bunk").hidden) renderBunk();
 }
 
 /* the seg buttons and the first-run batch step go through here, so neither can
@@ -4506,17 +4787,17 @@ async function runOnboarding() {
   try { lockAsked = localStorage.getItem("adgips-lock-asked"); } catch (e) {}
   try { caught = localStorage.getItem(nsKey("adgips-caught")); } catch (e) {}
 
-  const plan = obPlan({ first, batch, native: NATIVE, untouched: !!untouchedDays().length,
-                        caught: !!caught, lockAsked: !!lockAsked });
+  const steps = obPlan({ first, batch, native: NATIVE, untouched: !!untouchedDays().length,
+                         caught: !!caught, lockAsked: !!lockAsked });
   if (first) { try { localStorage.setItem(nsKey(OB_KEY), "1"); } catch (e) {} }
 
   let want = null;
-  for (let i = 0; i < plan.length; i++) {
-    const s = plan[i];
-    const r = s === "welcome" ? await obWelcome(i, plan.length)
-            : s === "batch"   ? await obBatch(i, plan.length)
+  for (let i = 0; i < steps.length; i++) {
+    const s = steps[i];
+    const r = s === "welcome" ? await obWelcome(i, steps.length)
+            : s === "batch"   ? await obBatch(i, steps.length)
             : s === "catchup" ? await obCatchup()
-            : s === "alerts"  ? await obAlerts(i, plan.length)
+            : s === "alerts"  ? await obAlerts(i, steps.length)
             :                   await offerLock();
     if (s === "alerts") want = r;
     if (r === null) break;                    /* dismissed: that is an answer, not a retry */
@@ -4574,9 +4855,10 @@ document.addEventListener("click", e => {
 
 /* pages — clicks drive them; the hash is a bonus for back/forward and
    deep links, and is unavailable from a data: URL */
-const PAGES = ["today", "week", "ranks", "directory", "attendance", "holidays"];
+const PAGES = ["today", "week", "bunk", "ranks", "directory", "attendance", "holidays"];
 function show(id) {
   if (!PAGES.includes(id)) id = "today";
+  if (id === "bunk") renderBunk();
   if (id === "ranks") renderRanks();
   if (id === "directory") renderDirectory();
   PAGES.forEach(p => {
