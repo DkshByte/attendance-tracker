@@ -157,19 +157,22 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
              font-weight:600; white-space:nowrap; }
 .top .spacer { flex:1; }
 
-.seg {
+.seg, .atabs {
   display:flex; gap:1px; padding:2px; background:var(--glass-plate); border:1px solid var(--glass-border);
   backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
   box-shadow:var(--glass-highlight);
   border-radius:999px; flex:none;
 }
-.seg button {
+.seg button, .atabs button {
   border:0; background:transparent; color:var(--ink-2); cursor:pointer;
   padding:5px 11px; border-radius:999px; font-size:12.5px; font-weight:600;
   letter-spacing:.04em; transition:color .18s var(--ease), background .18s var(--ease);
 }
-.seg button:hover { color:var(--ink); }
-.seg button[aria-pressed="true"] { background:var(--ink); color:var(--bg); }
+.seg button:hover, .atabs button:hover { color:var(--ink); }
+.seg button[aria-pressed="true"],
+.atabs button[aria-pressed="true"] { background:var(--ink); color:var(--bg); }
+.atabs { width:max-content; margin:16px 0 2px; }
+.apane[hidden] { display:none; }
 .iconbtn {
   width:34px; height:34px; flex:none; display:grid; place-items:center; cursor:pointer;
   border:1px solid var(--glass-border); border-radius:999px; background:var(--glass-plate); color:var(--ink-2);
@@ -189,7 +192,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 /* --- nav --- */
 .nav {
   position:fixed; left:0; right:0; bottom:0; z-index:40;
-  display:grid; grid-template-columns:repeat(7,1fr);
+  display:grid; grid-template-columns:repeat(6,1fr);
   background:color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter:blur(18px) saturate(1.4);
   border-top:1px solid var(--rule);
@@ -1279,9 +1282,6 @@ dialog .btn { margin-top:8px; }
   <a href="#week" data-p="week">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.2 8.2h6.3l3.4 3.4h8"/><path d="M3.2 17.4h9.7"/><circle cx="9.5" cy="8.2" r="1.9" fill="currentColor" stroke="none"/><circle cx="20.3" cy="11.6" r="1.9" fill="currentColor" stroke="none"/><circle cx="12.9" cy="17.4" r="1.9" fill="currentColor" stroke="none"/></svg>
     Week</a>
-  <a href="#bunk" data-p="bunk">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.6a7.5 7.5 0 0 1 15 0"/><path d="M12 12.6V20"/><path d="M8.6 20h6.8"/><circle cx="12" cy="12.6" r="1.9" fill="currentColor" stroke="none"/></svg>
-    Bunk</a>
   <a href="#ranks" data-p="ranks">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 20.5v-6M12 20.5V3.5M18.5 20.5v-9"/><circle cx="5.5" cy="11.6" r="1.9" fill="currentColor" stroke="none"/><circle cx="12" cy="3.5" r="1.9" fill="currentColor" stroke="none"/><circle cx="18.5" cy="8.6" r="1.9" fill="currentColor" stroke="none"/></svg>
     Ranks</a>
@@ -1368,45 +1368,59 @@ dialog .btn { margin-top:8px; }
     <div class="key" id="lineKey"></div>
   </section>
 
-  <section id="bunk" hidden>
-    <div id="bunkBox"></div>
-  </section>
-
   <section id="attendance" hidden>
     <div id="catchup"></div>
-    <div class="bar-tools">
-      <input type="date" id="attDate" aria-label="Date to mark">
-      <span class="daynote" id="attNote"></span>
-    </div>
-    <div class="railwrap" id="attRail"></div>
 
-    <div class="h2row">
-      <h2>Service board</h2>
-      <span class="syncnote" id="syncNote"></span>
-      <button class="link" id="attClear" type="button">Clear records</button>
+    <!-- three views on one set of records: what happened, where it leaves you, and
+         what the rest of the term costs. Not .seg — that class is claimed by the
+         batch switcher, whose handler selects every .seg button on the page. -->
+    <div class="atabs" role="group" aria-label="Attendance view">
+      <button type="button" data-at="mark" aria-pressed="true">Mark</button>
+      <button type="button" data-at="board" aria-pressed="false">Board</button>
+      <button type="button" data-at="bunk" aria-pressed="false">Bunk</button>
     </div>
-    <div id="summary"></div>
-    <div id="board"></div>
 
-    <div class="h2row">
-      <h2>Bunk budget</h2>
-      <span class="daynote">Term ends</span>
-      <input type="date" id="semEndInput" aria-label="Last teaching day of the term">
-      <span class="daynote" id="termNote"></span>
+    <div class="apane" data-at="mark">
+      <div class="bar-tools">
+        <input type="date" id="attDate" aria-label="Date to mark">
+        <span class="daynote" id="attNote"></span>
+      </div>
+      <div class="railwrap" id="attRail"></div>
     </div>
-    <div id="budget"></div>
 
-    <div class="h2row">
-      <h2>Leave planner</h2>
-      <span class="daynote">What a stretch of days off actually costs.</span>
+    <div class="apane" data-at="board" hidden>
+      <div class="h2row">
+        <h2>Service board</h2>
+        <span class="syncnote" id="syncNote"></span>
+        <button class="link" id="attClear" type="button">Clear records</button>
+      </div>
+      <div id="summary"></div>
+      <div id="board"></div>
     </div>
-    <div class="lv">
-      <input type="date" id="lvFrom" aria-label="Away from">
-      <span>to</span>
-      <input type="date" id="lvTo" aria-label="Away until">
-      <button class="link" id="lvClear" type="button">Clear</button>
+
+    <div class="apane" data-at="bunk" hidden>
+      <div id="bunkBox"></div>
+
+      <div class="h2row">
+        <h2>The term</h2>
+        <span class="daynote">Term ends</span>
+        <input type="date" id="semEndInput" aria-label="Last teaching day of the term">
+        <span class="daynote" id="termNote"></span>
+      </div>
+      <div id="budget"></div>
+
+      <div class="h2row">
+        <h2>Leave planner</h2>
+        <span class="daynote">What a stretch of days off actually costs.</span>
+      </div>
+      <div class="lv">
+        <input type="date" id="lvFrom" aria-label="Away from">
+        <span>to</span>
+        <input type="date" id="lvTo" aria-label="Away until">
+        <button class="link" id="lvClear" type="button">Clear</button>
+      </div>
+      <div id="lvOut"></div>
     </div>
-    <div id="lvOut"></div>
   </section>
 
   <section id="ranks" hidden>
@@ -2557,14 +2571,25 @@ function termBudget() {
   return { overall: budgetOf(p, h, left.total), per, left };
 }
 
-/* stop coming from today: the last day you could stay away and still land on 75% */
-function vanishUntil(spare) {
-  if (spare <= 0) return null;
-  let n = spare, last = null;
+/* Stop coming from today: the last day you could stay away with every subject still
+   landing on 75%. Walking one total forward overshoots the moment a single subject
+   runs out — the day is only affordable if every subject it contains can pay for its
+   own share of it, so the budget is spent per subject and the walk stops at the first
+   day that would push any one of them past its own line. */
+function vanishUntil() {
+  const room = {};
+  bunkPlan().subs.forEach(s => room[s.k] = s.left);
+  let last = null;
   for (const { iso, di } of classDays(nowISO(), semEnd)) {
-    const cost = DAYS[di].items.filter((it, ii) => resolve(it) && !att[iso + "|" + ii]).length;
-    if (cost > n) break;
-    n -= cost; last = iso;
+    const cost = {};
+    DAYS[di].items.forEach((it, ii) => {
+      const k = resolve(it);
+      if (!k || att[iso + "|" + ii]) return;
+      cost[k] = (cost[k] || 0) + 1;
+    });
+    if (Object.keys(cost).some(k => cost[k] > (room[k] || 0))) break;
+    Object.keys(cost).forEach(k => room[k] -= cost[k]);
+    last = iso;
   }
   return last;
 }
@@ -2728,6 +2753,7 @@ function renderAttendance() {
   renderBoard();
   renderCatchup();
   renderBudget();
+  renderBunk();
   renderLeave();
   renderSyncNote();
 }
@@ -2938,14 +2964,15 @@ function renderBudget() {
     return;
   }
 
-  const spare = Math.max(0, o.canBunk);
+  /* The headline now lives one panel up, and it is the per-subject number. Printing
+     the overall one here too would put two different answers to the same question on
+     one screen, inches apart, and the looser of the two cannot actually be spent.
+     `must` goes the same way: the real floor is what the per-subject budget leaves. */
+  const g = bunkPlan();
+  const spare = g.left;
   const card = el("div", "summary");
-  const big = el("div", "big " + (o.canBunk < 0 ? "bad" : o.canBunk ? "ok" : "warn"));
-  big.appendChild(el("b", null, String(spare)));
-  big.appendChild(document.createTextNode("Bunks left this term"));
-  card.appendChild(big);
   [["Classes left", String(o.r)],
-   ["Must attend", String(o.must)],
+   ["Must attend", String(Math.max(0, o.r - g.left))],
    ["Ceiling", o.best + "%"]].forEach(([k, v]) => {
     const d = el("div");
     d.appendChild(el("b", null, v));
@@ -2957,21 +2984,21 @@ function renderBudget() {
   const note = el("div", "planbar");
   note.hidden = false;
   const head = el("div", "psum");
-  if (o.canBunk < 0) {
+  if (g.lost.length) {
     head.appendChild(el("b", null, o.best + "%"));
     head.appendChild(document.createTextNode(
-      " is the highest this term can still end at, even attending all " + o.r +
-      " classes left. 75% is out of reach — every class from here still lifts the number."));
-  } else if (!o.canBunk) {
+      " is the highest the term can still average, but " + g.lost.map(x => SUB[x.k].short).join(", ") +
+      " cannot reach 75% any more. Every class from here still lifts the number."));
+  } else if (!spare) {
     head.appendChild(el("b", null, "0"));
     head.appendChild(document.createTextNode(
       " to spare. Attend all " + o.r + " classes left and you finish at exactly " + o.best +
-      "%. One more absence and the term closes below the line."));
+      "%. One more absence in any subject and that subject closes below the line."));
   } else {
     head.appendChild(el("b", null, String(spare)));
     head.appendChild(document.createTextNode(
-      (spare === 1 ? " class" : " classes") + " you can still miss. Attend everything left and you finish at " +
-      o.best + "%; miss all " + spare + " and you land on 75% with nothing to spare."));
+      (spare === 1 ? " class" : " classes") + " you can still miss, spent the way the panel above "
+      + "allows. Attend everything left and you finish at " + o.best + "%."));
   }
   note.appendChild(head);
 
@@ -2980,7 +3007,7 @@ function renderBudget() {
     (o.h - o.p) + " missed, " + o.r + " to come · 75% of " + o.total + " is " + o.need + " classes.";
   note.appendChild(facts);
 
-  const v = vanishUntil(o.canBunk);
+  const v = vanishUntil();
   if (v) {
     const d = el("div", "pdelta");
     d.textContent = "Disappear from today and you stay clear until " + longDate(v) +
@@ -4220,7 +4247,6 @@ async function renderRanks() {
    ============================================================ */
 function renderAll() {
   renderToday(); renderNetwork(); renderWeekRail(); renderAttendance();
-  if (!document.getElementById("bunk").hidden) renderBunk();
 }
 
 /* the seg buttons and the first-run batch step go through here, so neither can
@@ -4741,7 +4767,7 @@ function obCatchup() {
   try { asked = localStorage.getItem(nsKey("adgips-caught")); } catch (e) {}
   if (asked) return Promise.resolve("skip");
   try { localStorage.setItem(nsKey("adgips-caught"), "1"); } catch (e) {}
-  show("attendance");
+  show("attendance"); showATab("mark");
   return new Promise(resolve => {
     const d = document.getElementById("dlg");
     const quit = () => { d.removeEventListener("close", quit); resolve("done"); };
@@ -4829,7 +4855,7 @@ async function runOnboarding() {
 const TAPPABLE = "button, a, [role='button'], .card, .drow, .pname, .clink, .link, .go," +
                  ".btn, .iconbtn, .user-pill, .mgrid button, .chips button, .hrow, .srow," +
                  ".cfield, .arow, .stop .card, .lb-row, .tcard";
-const TICKABLE = ".seg, .nav, .marks, .dirfilter, .chips, .mgrid";
+const TICKABLE = ".seg, .atabs, .nav, .marks, .dirfilter, .chips, .mgrid";
 
 let hapticsOff = false;
 try {
@@ -4855,10 +4881,9 @@ document.addEventListener("click", e => {
 
 /* pages — clicks drive them; the hash is a bonus for back/forward and
    deep links, and is unavailable from a data: URL */
-const PAGES = ["today", "week", "bunk", "ranks", "directory", "attendance", "holidays"];
+const PAGES = ["today", "week", "ranks", "directory", "attendance", "holidays"];
 function show(id) {
   if (!PAGES.includes(id)) id = "today";
-  if (id === "bunk") renderBunk();
   if (id === "ranks") renderRanks();
   if (id === "directory") renderDirectory();
   PAGES.forEach(p => {
@@ -4882,6 +4907,18 @@ document.getElementById("lockGo").addEventListener("click", tryUnlock);
 document.getElementById("lockOut").addEventListener("click", () => {
   if (confirm("Sign out on this device?")) { showLock(false); signOut(); }
 });
+
+/* the three panes are all built on every render — they are cheap DOM and it keeps
+   the tab a pure visibility switch, with nothing to forget to refresh */
+function showATab(which) {
+  document.querySelectorAll("#attendance .apane").forEach(p => p.hidden = p.dataset.at !== which);
+  document.querySelectorAll(".atabs button").forEach(b =>
+    b.setAttribute("aria-pressed", b.dataset.at === which));
+  try { localStorage.setItem("adgips-atab", which); } catch (e) {}
+}
+document.querySelectorAll(".atabs button").forEach(b =>
+  b.addEventListener("click", () => showATab(b.dataset.at)));
+(() => { let t = "mark"; try { t = localStorage.getItem("adgips-atab") || "mark"; } catch (e) {} showATab(t); })();
 
 document.getElementById("alertBtn").addEventListener("click", () => {
   alerts = !alerts;
