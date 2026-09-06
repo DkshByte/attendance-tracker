@@ -9,8 +9,9 @@
 <meta name="theme-color" content="#EEF1F7" media="(prefers-color-scheme: light)">
 <title>Bunkr · Sec F IT-I</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Blinker:wght@200;300;400;600;700;800;900&display=swap">
 <style>
 /* ============================================================
    RED LINE — Sec F IT-I
@@ -107,12 +108,12 @@
 html { -webkit-text-size-adjust:100%; }
 body {
   margin:0; background:var(--bg); color:var(--ink);
-  font-family:Barlow, ui-sans-serif, system-ui, sans-serif;
+  font-family:'Blinker', ui-sans-serif, system-ui, -apple-system, sans-serif;
   font-size:15px; line-height:1.45; font-variant-numeric:tabular-nums;
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
   overflow-wrap:break-word;
 }
-h1,h2,h3 { font-family:"Barlow Condensed", Barlow, sans-serif; margin:0; font-weight:700; letter-spacing:.005em; }
+h1,h2,h3 { font-family:'Blinker', sans-serif; margin:0; font-weight:700; letter-spacing:.005em; }
 button, input { font:inherit; color:inherit; }
 
 /* --- browser surfaces --- */
@@ -150,7 +151,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 }
 .mark { display:flex; align-items:center; gap:9px; min-width:0; }
 .mark .bullet { width:11px; height:11px; border-radius:50%; background:var(--l-pps); flex:none; }
-.mark .txt { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:16px;
+.mark .txt { font-family:'Blinker', sans-serif; font-weight:700; font-size:16px;
              letter-spacing:.055em; text-transform:uppercase; white-space:nowrap; }
 .mark .sub { font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3);
              font-weight:600; white-space:nowrap; }
@@ -225,7 +226,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
   display:inline-flex; align-items:center; gap:6px; flex:none;
   padding:3px 9px 3px; border-radius:3px; background:var(--line, var(--rail));
   color:var(--badge-ink); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
-  font-family:"Barlow Condensed",sans-serif; line-height:1.5;
+  font-family:'Blinker', sans-serif; line-height:1.5;
 }
 .badge.ghost {
   background:transparent; color:var(--line); box-shadow:inset 0 0 0 1px var(--line);
@@ -283,7 +284,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
                 box-shadow:inset 0 0 0 3px var(--line, var(--rail)); background:var(--plate); }
 .upnext .m { min-width:0; flex:1; }
 .upnext .lbl { font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:700; }
-.upnext .val { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:19px; line-height:1.15; color:var(--line); }
+.upnext .val { font-family:'Blinker', sans-serif; font-weight:700; font-size:19px; line-height:1.15; color:var(--line); }
 .upnext .fac { font-size:12.5px; color:var(--ink-2); }
 .upnext .t { font-size:15px; color:var(--ink); font-weight:700; flex:none; }
 
@@ -326,7 +327,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 .card .hd { display:flex; align-items:baseline; gap:9px; margin-bottom:3px; flex-wrap:wrap; }
 .card .t { font-size:12.5px; font-weight:600; color:var(--ink-3); letter-spacing:.03em; flex:none; }
 .card .name {
-  font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:22px; line-height:1.1;
+  font-family:'Blinker', sans-serif; font-weight:700; font-size:22px; line-height:1.1;
   color:var(--line, var(--ink)); letter-spacing:.004em;
 }
 .card .meta { font-size:13.5px; color:var(--ink-2); }
@@ -355,7 +356,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
   width:20px; flex:none;
 }
 .branch .arm .bar { width:4px; align-self:stretch; min-height:22px; border-radius:2px; background:var(--line); flex:none; }
-.branch .arm .n { font-family:"Barlow Condensed",sans-serif; font-weight:600; font-size:17px; color:var(--line); }
+.branch .arm .n { font-family:'Blinker', sans-serif; font-weight:600; font-size:17px; color:var(--line); }
 .branch .arm .f { font-size:12.5px; color:var(--ink-2); }
 
 /* --- the live marker --- */
@@ -381,7 +382,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 /* ============ section headings ============ */
 h2 {
   font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
-  font-weight:700; font-family:Barlow, sans-serif;
+  font-weight:700; font-family:'Blinker', sans-serif;
   margin:38px 0 13px; display:flex; align-items:center; gap:12px;
 }
 h2::after { content:""; flex:1; height:1px; background:var(--rule-soft); }
@@ -411,7 +412,7 @@ h2::after { content:""; flex:1; height:1px; background:var(--rule-soft); }
 .netrow .day {
   width:126px; flex:none; padding:16px 14px 16px 0;
 }
-.netrow .day .d { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:19px; }
+.netrow .day .d { font-family:'Blinker', sans-serif; font-weight:700; font-size:19px; }
 .netrow .day .c { font-size:11.5px; color:var(--ink-3); font-weight:600; letter-spacing:.04em; }
 .netrow.today .day .d { color:var(--l-pps); }
 .netrow .trk { position:relative; flex:1; display:flex; padding-top:22px; padding-bottom:14px; }
@@ -440,7 +441,7 @@ h2::after { content:""; flex:1; height:1px; background:var(--rule-soft); }
 }
 .nc:hover { border-color:var(--glass-border-hover); background:var(--glass-plate-hover); transform:translateY(-2px); box-shadow:var(--lift), var(--glass-highlight); }
 .nc.live { border-color:var(--line); box-shadow:0 0 0 1px var(--line), var(--lift), var(--glass-highlight); }
-.nc .n { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:17px; line-height:1.12; color:var(--line, var(--ink)); }
+.nc .n { font-family:'Blinker', sans-serif; font-weight:700; font-size:17px; line-height:1.12; color:var(--line, var(--ink)); }
 .nc .f { font-size:12px; color:var(--ink-2); line-height:1.25; margin-top:1px; }
 .nc .b { font-size:10.5px; color:var(--ink-3); font-weight:600; letter-spacing:.07em; text-transform:uppercase; margin-top:3px; }
 .slot.empty .void {
@@ -469,7 +470,7 @@ h2::after { content:""; flex:1; height:1px; background:var(--rule-soft); }
 .keyrow { display:flex; gap:13px; align-items:flex-start; padding:13px 15px; background:var(--glass-plate); }
 .keyrow .bar { width:5px; align-self:stretch; min-height:34px; border-radius:3px; background:var(--line); flex:none; }
 .keyrow .m { min-width:0; flex:1; }
-.keyrow .n { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:18px; color:var(--line); line-height:1.15; }
+.keyrow .n { font-family:'Blinker', sans-serif; font-weight:700; font-size:18px; color:var(--line); line-height:1.15; }
 .keyrow .full { font-size:13.5px; color:var(--ink); }
 .keyrow .f { font-size:12.5px; color:var(--ink-2); }
 .keyrow .c { font-size:11.5px; color:var(--ink-3); font-weight:500; letter-spacing:.03em; margin-top:2px; }
@@ -499,7 +500,7 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 }
 .arow .m { flex:1; min-width:150px; }
 .arow .t { font-size:12px; color:var(--ink-3); font-weight:600; letter-spacing:.03em; }
-.arow .n { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:19px; color:var(--line); line-height:1.15; }
+.arow .n { font-family:'Blinker', sans-serif; font-weight:700; font-size:19px; color:var(--line); line-height:1.15; }
 .arow .f { font-size:12.5px; color:var(--ink-2); }
 
 .marks { display:flex; gap:1px; padding:2px; background:var(--plate-2); border:1px solid var(--rule); border-radius:999px; flex:none; }
@@ -532,7 +533,7 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
   box-shadow:var(--glass-shadow), var(--glass-highlight);
 }
 .summary div { font-size:12px; color:var(--ink-3); font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
-.summary b { display:block; font-family:"Barlow Condensed",sans-serif; font-weight:700;
+.summary b { display:block; font-family:'Blinker', sans-serif; font-weight:700;
              font-size:30px; color:var(--ink); letter-spacing:-.01em; line-height:1.05; margin-bottom:1px; }
 .summary .big b { font-size:40px; }
 @media (min-width:560px) { .summary { display:flex; gap:30px; flex-wrap:wrap; } }
@@ -542,12 +543,12 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .srow { display:grid; grid-template-columns:5px 1fr auto; gap:13px; align-items:center; padding:14px 15px; background:var(--glass-plate); }
 .srow .bar { width:5px; align-self:stretch; min-height:38px; border-radius:3px; background:var(--line); }
 .srow .m { min-width:0; }
-.srow .n { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:18px; color:var(--line); line-height:1.15; }
+.srow .n { font-family:'Blinker', sans-serif; font-weight:700; font-size:18px; color:var(--line); line-height:1.15; }
 .srow .st { font-size:12.5px; font-weight:600; letter-spacing:.03em; }
 .srow .st.ok { color:var(--ok); } .srow .st.warn { color:var(--warn); } .srow .st.bad { color:var(--bad); }
 .srow .adv { font-size:12.5px; color:var(--ink-2); }
 .srow .r { text-align:right; }
-.srow .pct { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:27px; line-height:1; letter-spacing:-.01em; }
+.srow .pct { font-family:'Blinker', sans-serif; font-weight:700; font-size:27px; line-height:1; letter-spacing:-.01em; }
 .srow.ok .pct { color:var(--ok); } .srow.warn .pct { color:var(--warn); } .srow.bad .pct { color:var(--bad); }
 .srow .held { font-size:11.5px; color:var(--ink-3); font-weight:600; margin-top:2px; }
 .srow .track { position:relative; height:4px; border-radius:2px; background:var(--rule); margin-top:7px; overflow:visible; }
@@ -564,7 +565,7 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
   padding:26px 20px; text-align:center; border:1px dashed var(--rule); border-radius:12px;
   color:var(--ink-2); font-size:14px;
 }
-.empty b { display:block; font-family:"Barlow Condensed",sans-serif; font-size:20px; color:var(--ink); margin-bottom:4px; font-weight:700; }
+.empty b { display:block; font-family:'Blinker', sans-serif; font-size:20px; color:var(--ink); margin-bottom:4px; font-weight:700; }
 
 /* --- the 75% engine: budget, leave, catch-up --- */
 .cu { display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:13px 15px; margin:16px 0 0;
@@ -582,7 +583,7 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .cud .d { display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:10px 13px; background:var(--plate); }
 .cud .d.done { opacity:.5; }
 .cud .w { flex:1; min-width:118px; font-size:12px; color:var(--ink-3); font-weight:600; }
-.cud .w b { display:block; font-family:"Barlow Condensed",sans-serif; font-size:17px;
+.cud .w b { display:block; font-family:'Blinker', sans-serif; font-size:17px;
             color:var(--ink); font-weight:700; letter-spacing:.005em; }
 .cud .marks button { padding:5px 9px; font-size:12px; }
 .cud .w i { display:block; font-style:normal; color:var(--warn); font-weight:600; }
@@ -656,13 +657,13 @@ dialog.sheet .d-in { max-height:92vh; overflow-y:auto; }
 .pcard { margin-bottom:16px; }
 .pstats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 4px; }
 .pstats div { padding:11px 12px; background:var(--plate-2); border:1px solid var(--rule); border-radius:12px; }
-.pstats b { display:block; font-family:"Barlow Condensed",sans-serif; font-weight:700;
+.pstats b { display:block; font-family:'Blinker', sans-serif; font-weight:700;
             font-size:25px; line-height:1.05; letter-spacing:-.01em; }
 .pstats span { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); }
 .pstats .ok b { color:var(--ok); } .pstats .bad b { color:var(--bad); }
 
 .chead { display:flex; align-items:baseline; gap:10px; margin:22px 0 4px; }
-.chead h3 { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:17px;
+.chead h3 { font-family:'Blinker', sans-serif; font-weight:700; font-size:17px;
             letter-spacing:.07em; text-transform:uppercase; margin:0; }
 .chead span { font-size:12px; color:var(--ink-3); }
 
@@ -700,7 +701,7 @@ dialog[open] { animation:dlg .34s var(--ease); }
 @keyframes dlg { from { opacity:0; transform:translateY(14px) scale(.98); } }
 .d-in { padding:20px 22px 20px; position:relative; max-height:86vh; overflow-y:auto; overscroll-behavior:contain; }
 .d-top { display:flex; align-items:center; gap:9px; margin-bottom:10px; flex-wrap:wrap; }
-.d-name { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:29px; line-height:1.05;
+.d-name { font-family:'Blinker', sans-serif; font-weight:700; font-size:29px; line-height:1.05;
           color:var(--line, var(--ink)); letter-spacing:-.005em; margin-bottom:2px; text-wrap:balance; }
 .d-full { font-size:14.5px; color:var(--ink-2); }
 .d-rows { margin-top:16px; }
@@ -759,7 +760,7 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 .hero-mark { display:flex; align-items:baseline; gap:9px; margin-bottom:13px; }
 .hero-mark i { width:12px; height:12px; border-radius:50%; background:var(--l-pps);
                flex:none; align-self:center; }
-.hero-mark b { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:19px;
+.hero-mark b { font-family:'Blinker', sans-serif; font-weight:700; font-size:19px;
                letter-spacing:.13em; text-transform:uppercase; }
 .hero-mark em { font-style:normal; font-size:11.5px; font-weight:600; letter-spacing:.13em;
                 text-transform:uppercase; color:var(--ink-3); }
@@ -814,10 +815,10 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 }
 .tcard .brand { display:flex; align-items:center; gap:8px; }
 .tcard .brand i { width:10px; height:10px; border-radius:50%; background:var(--l-pps); flex:none; }
-.tcard .brand span { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:14px;
+.tcard .brand span { font-family:'Blinker', sans-serif; font-weight:700; font-size:14px;
                      letter-spacing:.1em; text-transform:uppercase; }
 .tcard .brand em { font-style:normal; font-size:11.5px; color:var(--ink-3); font-weight:600; letter-spacing:.07em; }
-.tcard .nm { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:28px;
+.tcard .nm { font-family:'Blinker', sans-serif; font-weight:700; font-size:28px;
              line-height:1.04; letter-spacing:-.005em; text-wrap:balance; }
 .tcard .nm.ph { color:var(--ink-3); }
 .tcard .un { font-size:13px; color:var(--ink-2); letter-spacing:.07em; margin-top:2px; }
@@ -834,7 +835,7 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 .field .hint { font-size:12.5px; color:var(--ink-3); margin-top:6px; }
 .field .hint.err { color:var(--bad); font-weight:600; }
 .go { width:100%; margin-top:20px; padding:13px; border-radius:10px; border:0; cursor:pointer;
-      background:var(--ink); color:var(--bg); font-family:"Barlow Condensed",sans-serif;
+      background:var(--ink); color:var(--bg); font-family:'Blinker', sans-serif;
       font-weight:700; font-size:16px; letter-spacing:.07em; text-transform:uppercase;
       transition:opacity .2s var(--ease); }
 .go[disabled] { opacity:.35; cursor:not-allowed; }
@@ -858,7 +859,7 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 /* every student is a station: filled once they are on the network */
 .dgroup { position:sticky; top:var(--top-h, 57px); z-index:5; display:flex; align-items:baseline; gap:10px;
           padding:9px 2px 7px; background:var(--bg); }
-.dgroup b { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:16px;
+.dgroup b { font-family:'Blinker', sans-serif; font-weight:700; font-size:16px;
             letter-spacing:.06em; text-transform:uppercase; }
 .dgroup span { font-size:11.5px; font-weight:600; letter-spacing:.08em;
                text-transform:uppercase; color:var(--ink-3); }
@@ -872,7 +873,7 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 button.drow { cursor:pointer; transition:background .15s var(--ease); }
 button.drow:hover { background:var(--glass-plate-hover); }
 .dot2 { width:34px; height:34px; flex:none; border-radius:50%; display:grid; place-items:center;
-        font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:13.5px;
+        font-family:'Blinker', sans-serif; font-weight:700; font-size:13.5px;
         letter-spacing:.02em; background:var(--line); color:var(--badge-ink); }
 .drow.ghost .dot2 { background:transparent; box-shadow:inset 0 0 0 2px var(--rule); color:var(--ink-3); }
 .dwho { flex:1; min-width:0; }
@@ -894,7 +895,7 @@ button.drow:hover { background:var(--glass-plate-hover); }
            backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
            box-shadow:var(--glass-shadow), var(--glass-highlight); }
 .psum { font-size:14px; color:var(--ink-2); }
-.psum b { font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:30px;
+.psum b { font-family:'Blinker', sans-serif; font-weight:700; font-size:30px;
           color:var(--ink); letter-spacing:-.01em; margin-right:6px; }
 .pdelta { font-size:13px; color:var(--ink-2); margin-top:5px; }
 .pdelta.bad { color:var(--bad); font-weight:600; }
@@ -919,7 +920,7 @@ dialog .btn { margin-top:8px; }
 .lbrow { display:grid; grid-template-columns:34px 1fr auto; gap:14px; align-items:center;
          padding:12px 15px; background:var(--plate); border:0; width:100%; text-align:left; }
 .lbrow .rk { display:grid; place-items:center; width:30px; height:30px; border-radius:50%;
-             font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:15px;
+             font-family:'Blinker', sans-serif; font-weight:700; font-size:15px;
              color:var(--ink-2); box-shadow:inset 0 0 0 2px var(--rule); }
 .lbrow.podium .rk { background:var(--ink); color:var(--bg); box-shadow:none; }
 .lbrow.me { background:var(--plate-2); }
@@ -952,7 +953,7 @@ dialog .btn { margin-top:8px; }
 .user-pill .avatar {
   width:28px; height:28px; border-radius:50%; display:grid; place-items:center;
   background:var(--l-pps); color:var(--badge-ink);
-  font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:12px;
+  font-family:'Blinker', sans-serif; font-weight:700; font-size:12px;
   letter-spacing:.02em; flex:none;
 }
 .user-pill .uname {
@@ -1042,6 +1043,30 @@ dialog .btn { margin-top:8px; }
   .marks button[aria-pressed="true"] .glyph { animation:stamp .42s var(--ease); }
   @keyframes stamp { 0%{transform:scale(.4)} 60%{transform:scale(1.18)} 100%{transform:scale(1)} }
 }
+/* ============================================================
+   First run
+   ============================================================ */
+.ob-dots { display:flex; gap:5px; justify-content:center; margin:0 0 15px; }
+.ob-dots i { width:5px; height:5px; border-radius:50%; background:var(--rule);
+             transition:width .22s var(--ease), background .22s var(--ease); }
+.ob-dots i.on { width:17px; border-radius:3px; background:var(--ink); }
+
+.ob-hi { display:flex; align-items:flex-start; gap:11px; padding:11px 0; border-top:1px solid var(--rule-soft); }
+.ob-hi:first-child { border-top:0; padding-top:2px; }
+.ob-hi .k { flex:none; width:30px; height:30px; border-radius:9px; background:var(--plate);
+            border:1px solid var(--rule); display:grid; place-items:center; color:var(--ink); }
+.ob-hi .k svg { width:17px; height:17px; }
+.ob-hi b { display:block; font-size:14px; font-weight:600; }
+.ob-hi span { display:block; font-size:12.5px; color:var(--ink-3); line-height:1.45; margin-top:1px; }
+
+.ob-pick { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; }
+.ob-pick button { padding:15px 10px; border-radius:14px; border:1px solid var(--rule);
+                  background:var(--plate); color:var(--ink); font:inherit; cursor:pointer;
+                  transition:border-color .15s, background .15s; }
+.ob-pick button:hover { border-color:var(--rail); background:var(--plate-3); }
+.ob-pick button b { display:block; font-family:"Barlow Condensed",sans-serif;
+                    font-size:27px; font-weight:700; line-height:1; }
+.ob-pick button span { display:block; font-size:11.5px; color:var(--ink-3); margin-top:5px; }
 /* ============================================================
    Bunkr Splash Animation
    ============================================================ */
@@ -2343,6 +2368,18 @@ function demo() {                                   // run demo() in the console
   ok(subOf("EVSLP"), "EVSL", "a mark left under the old key reads as EVS");
   ok(classesIn("2026-08-17", "2026-08-21").per.EVSL, 3, "EVS theory runs three times a week, counted as one");
   ok(nid("2026-09-07", 2, 3) - nid("2026-09-07", 1, 3), 1000000, "each kind of alert owns its own id space");
+  /* first run: which prompts an account gets, and in which order */
+  const seq = o => obPlan(o).join(">");
+  ok(seq({ first: true, batch: "both", untouched: true, caught: false, native: true, lockAsked: false }),
+     "welcome>batch>catchup>alerts>lock", "a new account is oriented and asked its batch before anything is counted");
+  ok(seq({ first: true, batch: "F1", untouched: true, caught: false, native: true, lockAsked: false }),
+     "welcome>catchup>alerts>lock", "a batch the roster already knows is not asked for twice");
+  ok(seq({ first: true, batch: "F1", untouched: false, caught: false, native: false, lockAsked: false }),
+     "welcome", "the web has no notification or fingerprint to offer, and nothing to catch up on");
+  ok(seq({ first: false, batch: "F1", untouched: true, caught: false, native: true, lockAsked: true }),
+     "catchup", "a returning account gets only what it has not answered");
+  ok(seq({ first: false, batch: "both", untouched: true, caught: false, native: true, lockAsked: true }),
+     "", "and no catch-up while the batch is unset — the marks would be counted against the wrong lab");
   ok(classDays("2026-08-15", "2026-08-21").length, 5, "Saturday, Sunday and Independence Day hold no class");
   ok(classDays("2026-09-04", "2026-09-04").length, 0, "a gazetted holiday is not a class day");
   ok(classesIn("2026-08-17", "2026-08-17").total, 5, "Monday runs five classes");
@@ -3905,14 +3942,18 @@ function renderAll() {
   renderToday(); renderNetwork(); renderWeekRail(); renderAttendance();
 }
 
+/* the seg buttons and the first-run batch step go through here, so neither can
+   drift from the other on what changing a batch has to touch */
+function setBatch(bt) {
+  batch = bt;
+  try { localStorage.setItem(nsKey("adgips-batch"), batch); } catch (e) {}
+  document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x.dataset.batch === batch));
+  renderAll();
+}
+
 document.querySelectorAll(".seg button").forEach(b => {
   b.setAttribute("aria-pressed", b.dataset.batch === batch);
-  b.addEventListener("click", () => {
-    batch = b.dataset.batch;
-    try { localStorage.setItem(nsKey("adgips-batch"), batch); } catch (e) {}
-    document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x.dataset.batch === batch));
-    renderAll();
-  });
+  b.addEventListener("click", () => setBatch(b.dataset.batch));
 });
 
 function isDarkNow() {
@@ -4232,50 +4273,266 @@ function enableLock(on) {
 /* Offered once, as part of onboarding, and never nagged again. Asked here rather than
    buried in settings because a shared phone is the normal case in this section. */
 async function offerLock() {
-  if (!NATIVE || locked || !profile) return;
+  if (!NATIVE || locked || !profile) return "skip";
   let asked = null;
   try { asked = localStorage.getItem("adgips-lock-asked"); } catch (e) {}
-  if (asked) return;
+  if (asked) return "skip";
   const can = await bioCheck();
-  if (!can.ok) return;                       /* nothing to offer; ask again another day */
+  if (!can.ok) return "skip";                /* nothing to offer; ask again another day */
   try { localStorage.setItem("adgips-lock-asked", "1"); } catch (e) {}
 
-  const box = document.getElementById("dlgIn");
-  box.textContent = ""; box.dataset.line = "pps";
-  box.appendChild(el("div", "grab"));
-  const art = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  art.setAttribute("viewBox", "0 0 24 24");
-  art.setAttribute("class", "lockart");
-  art.setAttribute("fill", "none"); art.setAttribute("stroke", "currentColor");
-  art.setAttribute("stroke-width", "1.4");
-  art.setAttribute("stroke-linecap", "round"); art.setAttribute("stroke-linejoin", "round");
-  art.innerHTML = '<path d="M12 2.6c-2.2 0-4.1 1.2-5.1 3M4.4 8.4A7.6 7.6 0 0 1 12 4.4a7.6 7.6 0 0 1 7.6 7.6c0 1.4-.2 2.7-.5 4"/>'
-    + '<path d="M7.6 12a4.4 4.4 0 0 1 8.8 0c0 2.6-.3 5-1 7.2"/>'
-    + '<path d="M12 12v2.6c0 2.4-.3 4.7-.9 6.9M4.6 12c0-1.2.3-2.4.8-3.4M5.2 18.6c.7-1.6 1.1-3.4 1.1-5.2"/>';
-  box.appendChild(art);
-  box.appendChild(el("div", "d-name", can.bio ? "Lock it with your fingerprint?" : "Lock it with your screen lock?"));
-  box.appendChild(el("div", "d-full",
-    "Your attendance and your percentage stay yours if somebody else picks up this phone. "
-    + (can.bio ? "Your PIN still works if a finger does not." : "")));
-  const rows = el("div", "d-rows");
-  [["Asked", "Only when you open the app"],
-   ["If it fails", "Your PIN, or sign in again"],
-   ["Change it", "Profile, any time"]].forEach(([a, b]) => {
-    const r = el("div", "d-row");
-    r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b));
-    rows.appendChild(r);
+  return obStep((box, next) => {
+    box.dataset.line = "pps";
+    box.appendChild(el("div", "grab"));
+    const art = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    art.setAttribute("viewBox", "0 0 24 24");
+    art.setAttribute("class", "lockart");
+    art.setAttribute("fill", "none"); art.setAttribute("stroke", "currentColor");
+    art.setAttribute("stroke-width", "1.4");
+    art.setAttribute("stroke-linecap", "round"); art.setAttribute("stroke-linejoin", "round");
+    art.innerHTML = '<path d="M12 2.6c-2.2 0-4.1 1.2-5.1 3M4.4 8.4A7.6 7.6 0 0 1 12 4.4a7.6 7.6 0 0 1 7.6 7.6c0 1.4-.2 2.7-.5 4"/>'
+      + '<path d="M7.6 12a4.4 4.4 0 0 1 8.8 0c0 2.6-.3 5-1 7.2"/>'
+      + '<path d="M12 12v2.6c0 2.4-.3 4.7-.9 6.9M4.6 12c0-1.2.3-2.4.8-3.4M5.2 18.6c.7-1.6 1.1-3.4 1.1-5.2"/>';
+    box.appendChild(art);
+    box.appendChild(el("div", "d-name", can.bio ? "Lock it with your fingerprint?" : "Lock it with your screen lock?"));
+    box.appendChild(el("div", "d-full",
+      "Your attendance and your percentage stay yours if somebody else picks up this phone. "
+      + (can.bio ? "Your PIN still works if a finger does not." : "")));
+    const rows = el("div", "d-rows");
+    [["Asked", "Only when you open the app"],
+     ["If it fails", "Your PIN, or sign in again"],
+     ["Change it", "Profile, any time"]].forEach(([a, b]) => {
+      const r = el("div", "d-row");
+      r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b));
+      rows.appendChild(r);
+    });
+    box.appendChild(rows);
+    const act = el("div", "d-act");
+    act.appendChild(obBtn("btn", "Not now", () => next("off")));
+    act.appendChild(obBtn("btn pri", can.bio ? "Turn on fingerprint lock" : "Turn on lock",
+      () => { enableLock(true); next("on"); }));
+    box.appendChild(act);
   });
-  box.appendChild(rows);
-  const yes = el("button", "btn pri", can.bio ? "Turn on fingerprint lock" : "Turn on lock");
-  yes.type = "button";
-  yes.addEventListener("click", () => { enableLock(true); document.getElementById("dlg").close(); });
-  const no = el("button", "btn", "Not now");
-  no.type = "button";
-  no.addEventListener("click", () => document.getElementById("dlg").close());
-  const act = el("div", "d-act");
-  act.appendChild(no); act.appendChild(yes);
-  box.appendChild(act);
-  openDlg(true);
+}
+
+/* ============================================================
+   First run
+
+   Three prompts used to land on a new student at once, all of them writing
+   into the same #dlg: the lock offer, the catch-up sheet, and — ahead of
+   both — the notification permission, fired from syncAlerts() at boot.
+   Whichever resolved last wiped the others off the screen, and the OS
+   permission box arrived before there was anything worth being notified
+   about, which is the reliable way to have it refused for good.
+
+   They are one queue now, ordered so each step has earned the next: what
+   the app is for, then the batch that makes the numbers true, then the
+   marks that fill those numbers in, and only then the two permissions —
+   asked once the student has seen the thing they are for.
+   ============================================================ */
+const OB_KEY = "adgips-onboarded";
+const obDone = () => { try { return !!localStorage.getItem(nsKey(OB_KEY)); } catch (e) { return true; } };
+
+/* An account already carrying marks, or already asked by the old flow, has met these
+   prompts once. A mid-term update should not drop it back on a welcome screen. */
+function obBackfill() {
+  try {
+    if (localStorage.getItem(nsKey(OB_KEY))) return;
+    if (localStorage.getItem("adgips-lock-asked") || localStorage.getItem(nsKey("adgips-caught"))
+        || Object.keys(att).length) localStorage.setItem(nsKey(OB_KEY), "1");
+  } catch (e) {}
+}
+
+/* Which steps an account actually needs, as a plain decision over plain facts so
+   demo() can check the ordering with no dialog anywhere near it. The catch-up is
+   planned on the assumption the batch step gets an answer; obCatchup re-reads the
+   real state and drops out if it did not. */
+function obPlan(o) {
+  const s = [];
+  if (o.first) { s.push("welcome"); if (o.batch === "both") s.push("batch"); }
+  if (o.untouched && !o.caught && (o.first || o.batch !== "both")) s.push("catchup");
+  if (o.first && o.native) s.push("alerts");
+  if (o.native && !o.lockAsked) s.push("lock");
+  return s;
+}
+
+/* One step. The sheet is rebuilt in place rather than closed and reopened, so the
+   sequence reads as one card changing its mind. next(v) hands a value back; the
+   backdrop and the hardware back key resolve null, which ends the queue — a
+   dismissal is an answer, and chasing it with the next card is how onboarding
+   turns into something people learn to tap through without reading. */
+function obStep(build) {
+  return new Promise(resolve => {
+    const d = document.getElementById("dlg"), box = document.getElementById("dlgIn");
+    box.textContent = ""; box.dataset.line = "";
+    let done = false;
+    const finish = v => { if (done) return; done = true; d.removeEventListener("close", quit); resolve(v); };
+    const quit = () => finish(null);
+    d.addEventListener("close", quit);
+    build(box, finish);
+    openDlg(true);
+  });
+}
+
+const obBtn = (cls, txt, fn) => {
+  const b = el("button", cls, txt); b.type = "button"; b.addEventListener("click", fn); return b;
+};
+
+const obDots = (i, n) => {
+  const d = el("div", "ob-dots");
+  for (let k = 0; k < n; k++) d.appendChild(el("i", k === i ? "on" : null));
+  return d;
+};
+
+/* icon, heading, one line under it — the shape every first-run point is written in */
+function obPoint(path, head, note) {
+  const r = el("div", "ob-hi"), k = el("div", "k"), w = el("div");
+  k.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '
+    + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
+  w.appendChild(el("b", null, head));
+  w.appendChild(el("span", null, note));
+  r.appendChild(k); r.appendChild(w);
+  return r;
+}
+
+/* what the app is for, in the student's own name — three lines, then out of the way */
+function obWelcome(i, n) {
+  const who = ((profile && profile.name) || "").trim().split(/\s+/)[0] || "";
+  return obStep((box, next) => {
+    box.appendChild(el("div", "grab"));
+    box.appendChild(obDots(i, n));
+    box.appendChild(el("div", "d-name", who ? "You're in, " + who : "You're in"));
+    box.appendChild(el("div", "d-full",
+      "Bunkr keeps one number honest for you: how far you are from the 75% you have to "
+      + "finish the term on, and how many classes you can still afford to miss."));
+    const list = el("div", "d-rows");
+    list.appendChild(obPoint(
+      '<path d="M12 3v6M12 15v6"/><circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/>',
+      "Mark the day as it goes",
+      "Today knows which class you are sitting in. One tap present, one tap absent."));
+    list.appendChild(obPoint(
+      '<path d="M5.5 20.5v-6M12 20.5V3.5M18.5 20.5v-9"/>',
+      "Spend the budget on purpose",
+      "Bunks left says what a skip costs before you take it, not after."));
+    list.appendChild(obPoint(
+      '<circle cx="9" cy="8.4" r="3.1"/><path d="M3.6 19.2c.6-3 2.8-4.6 5.4-4.6s4.8 1.6 5.4 4.6"/><path d="M16.4 6.2a2.6 2.6 0 0 1 0 5.2"/>',
+      "See where the section stands",
+      "Ranks and the directory, so 75% is not a line you are walking alone."));
+    box.appendChild(list);
+    const act = el("div", "d-act");
+    act.appendChild(obBtn("btn pri", "Set it up — one minute", () => next("go")));
+    box.appendChild(act);
+  });
+}
+
+/* The roster usually knows this, and when it does the step never runs. When it does
+   not, nothing else in the app is true until it is answered, so it is asked first. */
+function obBatch(i, n) {
+  return obStep((box, next) => {
+    box.appendChild(el("div", "grab"));
+    box.appendChild(obDots(i, n));
+    box.appendChild(el("div", "d-name", "Which practical batch?"));
+    box.appendChild(el("div", "d-full",
+      "Half the section sits a different lab on the same afternoon. Until Bunkr knows which "
+      + "half is yours it has to count both, and every percentage it shows you reads short."));
+    const pick = el("div", "ob-pick");
+    [["F1", "First half of the roll"], ["F2", "Second half"]].forEach(([bt, note]) => {
+      const b = el("button");
+      b.type = "button";
+      b.appendChild(el("b", null, bt));
+      b.appendChild(el("span", null, note));
+      b.addEventListener("click", () => { setBatch(bt); next(bt); });
+      pick.appendChild(b);
+    });
+    box.appendChild(pick);
+    const act = el("div", "d-act");
+    act.appendChild(obBtn("btn", "I'll check and pick later", () => next("later")));
+    box.appendChild(act);
+  });
+}
+
+/* The first real number of the term, which is the whole point of the queue: the
+   percentage is wrong until the days already gone are marked. The sheet closes
+   itself, so this waits on the dialog rather than on a step. */
+function obCatchup() {
+  if (batch === "both" || !untouchedDays().length) return Promise.resolve("skip");
+  let asked = null;
+  try { asked = localStorage.getItem(nsKey("adgips-caught")); } catch (e) {}
+  if (asked) return Promise.resolve("skip");
+  try { localStorage.setItem(nsKey("adgips-caught"), "1"); } catch (e) {}
+  show("attendance");
+  return new Promise(resolve => {
+    const d = document.getElementById("dlg");
+    const quit = () => { d.removeEventListener("close", quit); resolve("done"); };
+    d.addEventListener("close", quit);
+    openCatchup();
+  });
+}
+
+/* Asked here and nowhere earlier. The OS box is spent the first time it is shown,
+   so it is worth spending on a student who has just watched their own percentage
+   appear and knows what the reminder is for. */
+function obAlerts(i, n) {
+  if (!NATIVE || !(window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.LocalNotifications))
+    return Promise.resolve("skip");
+  return obStep((box, next) => {
+    box.appendChild(el("div", "grab"));
+    box.appendChild(obDots(i, n));
+    box.appendChild(el("div", "d-name", "Want the nudge?"));
+    box.appendChild(el("div", "d-full",
+      "The percentage is only as good as the marks behind it. Bunkr can put the class on "
+      + "your lock screen and take the mark straight off the notification."));
+    const rows = el("div", "d-rows");
+    [["The night before", "What to pack for tomorrow's lab"],
+     ["Ten minutes out", "Before the class, not after it"],
+     ["In the class", "Present or Absent without opening the app"]].forEach(([a, b]) => {
+      const r = el("div", "d-row");
+      r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b));
+      rows.appendChild(r);
+    });
+    box.appendChild(rows);
+    const act = el("div", "d-act");
+    act.appendChild(obBtn("btn", "No reminders", () => next("off")));
+    act.appendChild(obBtn("btn pri", "Turn reminders on", () => next("on")));
+    box.appendChild(act);
+  });
+}
+
+async function runOnboarding() {
+  if (!profile) return;
+  obBackfill();
+  const first = !obDone();
+  let lockAsked = null, caught = null;
+  try { lockAsked = localStorage.getItem("adgips-lock-asked"); } catch (e) {}
+  try { caught = localStorage.getItem(nsKey("adgips-caught")); } catch (e) {}
+
+  const plan = obPlan({ first, batch, native: NATIVE, untouched: !!untouchedDays().length,
+                        caught: !!caught, lockAsked: !!lockAsked });
+  if (first) { try { localStorage.setItem(nsKey(OB_KEY), "1"); } catch (e) {} }
+
+  let want = null;
+  for (let i = 0; i < plan.length; i++) {
+    const s = plan[i];
+    const r = s === "welcome" ? await obWelcome(i, plan.length)
+            : s === "batch"   ? await obBatch(i, plan.length)
+            : s === "catchup" ? await obCatchup()
+            : s === "alerts"  ? await obAlerts(i, plan.length)
+            :                   await offerLock();
+    if (s === "alerts") want = r;
+    if (r === null) break;                    /* dismissed: that is an answer, not a retry */
+  }
+
+  try { document.getElementById("dlg").close(); } catch (e) {}
+  if (first && NATIVE) {
+    /* the boot call was held back so the OS box would not be the first thing on
+       screen; it fires here with a reason behind it, or it does not fire at all
+       and the header button is left saying so */
+    alerts = want === "on";
+    try { localStorage.setItem("adgips-alerts", alerts ? "on" : "off"); } catch (e) {}
+    renderAlertBtn();
+    if (alerts) syncAlerts();
+  }
+  if (first) renderAll();
 }
 
 /* ---------- haptics ----------
@@ -4833,16 +5090,7 @@ function afterSignIn() {
 
   /* the account's records come down first, so a second device does not look empty
      and the catch-up below does not offer days that are already marked elsewhere */
-  offerLock();
-  syncAttendance().catch(() => {}).then(() => {
-    let asked = null;
-    try { asked = localStorage.getItem(nsKey("adgips-caught")); } catch (e) {}
-    if (!asked && batch !== "both" && untouchedDays().length) {
-      try { localStorage.setItem(nsKey("adgips-caught"), "1"); } catch (e) {}
-      show("attendance");
-      openCatchup();
-    }
-  });
+  syncAttendance().catch(() => {}).then(runOnboarding);
 }
 
 adoptUser(profile && profile.sno);               /* before a single number is drawn */
@@ -4856,7 +5104,10 @@ paintHero();
 paintStatusBar();
 recovery = recoveryFromHash();                   /* before show() reads the hash */
 show(location.hash.slice(1));
-syncAlerts();
+obBackfill();
+/* a new account is asked in its own first-run step, with a reason attached; firing
+   the OS permission box here would spend it on a black screen */
+if (profile && obDone()) syncAlerts();
 
 /* signed in, signed out, or half way through claiming a name */
 (async () => {
