@@ -1,7 +1,20 @@
 -- ============================================================
--- Sec F IT-I — Production Database Reset
--- Run this in Supabase → SQL Editor to get a clean launch state.
+-- Bunkr — Production Database Reset
+--
+-- !!! THIS DESTROYS DATA. It truncates public.attendance, which is a
+-- !!! whole term of marks entered by hand, one class at a time, by
+-- !!! sixty people. There is no undo and no backup on the free tier.
+-- !!!
+-- !!! It exists for ONE moment: the clean state just before launch.
+-- !!! To run it, delete the `raise exception` block immediately below.
+-- !!! Leaving the block in place is what stops a stray paste into the
+-- !!! SQL editor from wiping the section in October.
 -- ============================================================
+
+do $$ begin
+  raise exception
+    'production-reset.sql is armed. Delete this do-block in the SQL editor to confirm you mean to erase every student''s attendance.';
+end $$;
 
 -- ---------- 1. Clear test attendance marks & cancellations ----------
 truncate table public.attendance;

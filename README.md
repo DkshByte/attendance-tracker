@@ -192,7 +192,7 @@ npm run build
 Bunkr is built upon an intentional design system tailored for low-light classrooms and outdoors:
 - **Primary Dark Background:** Pitch Black `#000000` (zero battery draw on OLED/AMOLED screens).
 - **Glassmorphism Layers:** `backdrop-filter: blur(16px)` with subtle `rgba(255, 255, 255, 0.08)` borders.
-- **Typography:** Barlow Condensed & Barlow — tabular numbers for high-density, legible timetable grids.
+- **Typography:** Blinker — squarish, modern geometric typeface matching the Bunkr brand logo, with tabular numbers for high-density, legible timetable grids.
 - **Brand Preview:** Explore the design tokens and logos live by viewing [`docs/preview-brand.html`](./docs/preview-brand.html).
 
 ---

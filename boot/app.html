@@ -591,6 +591,127 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .cud .marks button { padding:5px 9px; font-size:12px; }
 .cud .w i { display:block; font-style:normal; color:var(--warn); font-weight:600; }
 
+/* --- 1-Tap Bulk Marking --- */
+.bulk-btn {
+  display:inline-flex; align-items:center; gap:6px; cursor:pointer;
+  border:1px solid var(--glass-border); border-radius:999px;
+  background:var(--glass-plate); color:var(--ink); font-size:12px; font-weight:600;
+  padding:5px 12px; backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-highlight);
+  transition:border-color .18s var(--ease), color .18s var(--ease), transform .18s var(--ease), background .18s var(--ease);
+}
+.bulk-btn:hover {
+  border-color:var(--ok); color:var(--ok); transform:translateY(-1px);
+  background:var(--glass-plate-hover);
+}
+.bulk-btn.all-marked {
+  border-color:var(--ok); color:var(--ok);
+  background:color-mix(in srgb, var(--ok) 14%, transparent);
+}
+
+/* --- Custom Target Goal --- */
+.target-wrap {
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:12px 0 14px;
+  padding:9px 14px; background:var(--glass-plate); border:1px solid var(--glass-border);
+  border-radius:12px; backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-shadow), var(--glass-highlight);
+}
+.target-wrap span { font-size:11.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); }
+.target-chips { display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
+.target-chips button {
+  border:1px solid var(--glass-border); background:transparent; color:var(--ink-2);
+  padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600; cursor:pointer;
+  transition:all .18s var(--ease);
+}
+.target-chips button:hover { color:var(--ink); border-color:var(--rail); }
+.target-chips button[aria-pressed="true"] {
+  background:var(--ink); color:var(--bg); border-color:var(--ink);
+}
+
+/* --- Submissions & Lab Files --- */
+.tasks-header {
+  display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+  margin:18px 0 12px;
+}
+.tasks-title { font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); }
+.tasks-controls { display:flex; gap:8px; align-items:center; }
+.task-form {
+  padding:16px; margin-bottom:16px; background:var(--glass-plate);
+  border:1px solid var(--glass-border); border-radius:14px;
+  backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-shadow), var(--glass-highlight);
+  display:grid; gap:12px;
+}
+.task-form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media (max-width:540px) { .task-form-row { grid-template-columns:1fr; } }
+.task-form select, .task-form input {
+  width:100%; padding:9px 12px; border-radius:9px; background:var(--plate-2);
+  border:1px solid var(--glass-border); color:var(--ink); font-size:13.5px; font-weight:500;
+  transition:border-color .2s var(--ease);
+}
+.task-form select:focus, .task-form input:focus { outline:none; border-color:var(--focus); }
+.task-form-acts { display:flex; gap:8px; justify-content:flex-end; margin-top:4px; }
+.task-list { display:grid; gap:8px; margin-bottom:24px; }
+.task-card {
+  display:flex; align-items:center; gap:12px; padding:12px 14px;
+  background:var(--glass-plate); border:1px solid var(--glass-border); border-radius:12px;
+  backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-shadow), var(--glass-highlight);
+  transition:border-color .2s var(--ease), transform .2s var(--ease), opacity .2s var(--ease);
+}
+.task-card:hover { border-color:var(--glass-border-hover); transform:translateY(-1px); }
+.task-card.is-done { opacity:.55; }
+.task-card.is-done .task-name { text-decoration:line-through; }
+.task-chk {
+  width:22px; height:22px; border-radius:6px; border:2px solid var(--rail);
+  background:transparent; cursor:pointer; display:grid; place-items:center;
+  color:transparent; font-size:12px; font-weight:700; transition:all .18s var(--ease); flex:none;
+}
+.task-card.is-done .task-chk { background:var(--ok); border-color:var(--ok); color:#000; }
+.task-main { flex:1; min-width:0; }
+.task-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:2px; }
+.task-badge {
+  font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  padding:2px 7px; border-radius:4px; background:var(--line, var(--rail)); color:var(--badge-ink);
+}
+.task-type { font-size:11.5px; color:var(--ink-3); font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
+.task-name { font-size:15px; font-weight:600; color:var(--ink); line-height:1.2; word-break:break-word; }
+.task-due {
+  font-size:12px; font-weight:600; color:var(--ink-2); display:inline-flex; align-items:center; gap:4px; margin-top:3px;
+}
+.task-due.bad { color:var(--bad); }
+.task-due.warn { color:var(--warn); }
+.task-del {
+  border:0; background:transparent; color:var(--ink-3); cursor:pointer; padding:6px;
+  border-radius:6px; font-size:13px; transition:color .18s var(--ease), background .18s var(--ease); flex:none;
+}
+.task-del:hover { color:var(--bad); background:var(--plate-2); }
+.task-due-banner {
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:11px 15px; margin:12px 0 6px;
+  background:linear-gradient(135deg, rgba(255, 185, 46, 0.16) 0%, rgba(255, 185, 46, 0.04) 100%), rgba(22, 24, 30, 0.8);
+  border:1px solid rgba(255, 185, 46, 0.35);
+  border-radius:12px; font-size:13px; font-weight:600; color:var(--ink);
+  cursor:pointer; transition:transform .18s var(--ease);
+  backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-shadow);
+}
+.task-due-banner:hover { transform:translateY(-1px); border-color:var(--warn); }
+
+/* --- End-of-Day 4:00 PM Prompt Card --- */
+.eod-card {
+  display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  padding:13px 16px; margin:14px 0 6px;
+  background:linear-gradient(135deg, rgba(255, 77, 64, 0.14) 0%, rgba(255, 185, 46, 0.09) 100%), rgba(20, 22, 28, 0.85);
+  border:1px solid rgba(255, 255, 255, 0.15); border-radius:14px;
+  backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:var(--glass-shadow), var(--glass-highlight);
+  animation:rise .4s var(--ease);
+}
+.eod-txt b { display:block; font-size:14px; font-weight:700; color:var(--ink); }
+.eod-txt span { font-size:12.5px; color:var(--ink-2); }
+.eod-acts { display:flex; align-items:center; gap:8px; flex:none; }
+
 /* ============ holidays ============ */
 .hkey { display:flex; gap:20px; flex-wrap:wrap; align-items:center; margin:2px 0 18px; font-size:13px; color:var(--ink-2); }
 .hkey span { display:flex; align-items:center; gap:8px; }
@@ -1339,8 +1460,11 @@ dialog .btn { margin-top:8px; }
 
   <section id="today">
     <div id="plateBox"></div>
-    <div class="h2row" style="margin-top:30px">
+    <div id="eodNoticeBox"></div>
+    <div id="taskDueBox"></div>
+    <div class="h2row" style="margin-top:24px">
       <h2 id="todayHead">Today's line</h2>
+      <button class="bulk-btn" id="markAllTodayBtn" type="button" title="Mark all today's classes present">⚡ Mark all present</button>
       <button class="link" id="alertBtn" type="button" aria-pressed="true" hidden>Class alerts</button>
     </div>
     <div class="railwrap" id="todayRail"></div>
@@ -1382,11 +1506,13 @@ dialog .btn { margin-top:8px; }
       <button type="button" data-at="mark" aria-pressed="true">Mark</button>
       <button type="button" data-at="board" aria-pressed="false">Board</button>
       <button type="button" data-at="bunk" aria-pressed="false">Bunk</button>
+      <button type="button" data-at="tasks" aria-pressed="false">Submissions</button>
     </div>
 
     <div class="apane" data-at="mark">
       <div class="bar-tools">
         <input type="date" id="attDate" aria-label="Date to mark">
+        <button class="bulk-btn" id="markAllAttBtn" type="button" title="Mark all classes on this date present">⚡ Mark all present</button>
         <span class="daynote" id="attNote"></span>
       </div>
       <div class="railwrap" id="attRail"></div>
@@ -1397,6 +1523,15 @@ dialog .btn { margin-top:8px; }
         <h2>Service board</h2>
         <span class="syncnote" id="syncNote"></span>
         <button class="link" id="attClear" type="button">Clear records</button>
+      </div>
+      <div class="target-wrap" id="targetWrap">
+        <span>Goal</span>
+        <div class="target-chips" id="targetChips" role="group" aria-label="Target attendance percentage">
+          <button type="button" data-pct="70">70%</button>
+          <button type="button" data-pct="75" aria-pressed="true">75%</button>
+          <button type="button" data-pct="80">80%</button>
+          <button type="button" data-pct="85">85%</button>
+        </div>
       </div>
       <div id="summary"></div>
       <div id="board"></div>
@@ -1424,6 +1559,51 @@ dialog .btn { margin-top:8px; }
         <button class="link" id="lvClear" type="button">Clear</button>
       </div>
       <div id="lvOut"></div>
+    </div>
+
+    <div class="apane" data-at="tasks" hidden>
+      <div class="tasks-header">
+        <div class="tasks-title" id="tasksSummary">Submissions & Files</div>
+        <div class="tasks-controls">
+          <button class="bulk-btn" id="toggleTaskFormBtn" type="button">+ New submission</button>
+        </div>
+      </div>
+      <div class="task-form" id="taskForm" hidden>
+        <div class="task-form-row">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Subject</label>
+            <select id="taskSubject"></select>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Type</label>
+            <select id="taskType">
+              <option value="Lab File">Lab File</option>
+              <option value="Assignment">Assignment</option>
+              <option value="Project">Project</option>
+              <option value="Viva / Quiz">Viva / Quiz</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Title / Experiment</label>
+          <input type="text" id="taskTitle" placeholder="e.g. Experiment 4 - Linked List or Unit 2 Assignment" maxlength="80">
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--ink-3);margin-bottom:4px;text-transform:uppercase">Due Date</label>
+          <input type="date" id="taskDueDate">
+        </div>
+        <div class="task-form-acts">
+          <button type="button" class="btn" id="taskCancelBtn">Cancel</button>
+          <button type="button" class="btn pri" id="taskSaveBtn">Add</button>
+        </div>
+      </div>
+      <div class="target-chips" id="taskFilters" style="margin-bottom:12px">
+        <button type="button" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" data-filter="pending" aria-pressed="false">Pending</button>
+        <button type="button" data-filter="completed" aria-pressed="false">Completed</button>
+      </div>
+      <div class="task-list" id="taskList"></div>
     </div>
   </section>
 
@@ -1933,6 +2113,9 @@ function renderToday() {
     rail.classList.add("boot");
     setTimeout(() => rail.classList.remove("boot"), 1600);
   }
+  updateBulkBtns();
+  renderDueBanner();
+  renderEODNotice();
 }
 
 function renderPlate() {
@@ -2390,7 +2573,9 @@ let att = readAtt("adgips-att");                 /* signed out until adoptUser s
 const saveAtt = () => { try { localStorage.setItem(nsKey("adgips-att"), JSON.stringify(att)); } catch (e) {} };
 
 function demo() {                                   // run demo() in the console to check the 75% math
-  const ok = (x, y, m) => { if (x !== y) throw new Error(m + ": got " + x + ", want " + y); };
+  const wasTarget = targetPct;
+  targetPct = 75;
+  const ok = (x, y, m) => { if (x !== y) { targetPct = wasTarget; throw new Error(m + ": got " + x + ", want " + y); } };
   const segs = segmentsFor(0);                      // Monday: free 8:15, then five classes
   ok(segs[0].kind, "free", "a free first period stays on the rail");
   ok(segs.some(s => s.kind === "lunch"), true, "lunch sits on the rail");
@@ -2486,6 +2671,7 @@ function demo() {                                   // run demo() in the console
   ok(mergeMark({ m:"P" }, 5), "take", "an undated local mark loses to a dated cloud one");
   ok(mergeMark({ m:"P", t:9 }, 5), "keep", "the newer of two writes wins");
   ok(mergeMark({ m:"P", t:5 }, 5), "take", "a tie goes to the server, so devices converge");
+  targetPct = wasTarget;
   return "checks ok";
 }
 
@@ -2512,11 +2698,32 @@ const saveSemEnd = () => { try { localStorage.setItem("adgips-semend", semEnd); 
 
 const nowISO = () => isoOf(new Date());
 
+let targetPct = 75;
+try { targetPct = parseInt(localStorage.getItem("bunkr-target-pct") || "75", 10); } catch (e) {}
+if (isNaN(targetPct) || targetPct < 50 || targetPct > 99) targetPct = 75;
+
+function setTargetPct(pct) {
+  const n = parseInt(pct, 10);
+  if (isNaN(n) || n < 50 || n > 99) return;
+  targetPct = n;
+  try { localStorage.setItem("bunkr-target-pct", String(targetPct)); } catch (e) {}
+  document.querySelectorAll("#targetChips button").forEach(b => {
+    b.setAttribute("aria-pressed", String(parseInt(b.dataset.pct, 10) === targetPct));
+  });
+  renderBoard();
+  renderBudget();
+  renderBunk();
+  renderLeave();
+  renderCatchup();
+  renderToday();
+}
+
 /* Percentages are floored, never rounded: 74.6% must never show as 75%, and the pass
    test is done in integers so it never disagrees with the number on screen. */
 const pctOf = (p, h) => h ? Math.floor(p * 100 / h) : null;
-const clear = (p, h) => p * 4 >= h * 3;
+const clear = (p, h) => (p * 100) >= (h * targetPct);
 const dayBefore = iso => { const d = fromISO(iso); d.setDate(d.getDate() - 1); return isoOf(d); };
+const dayAfter = iso => { const d = fromISO(iso); d.setDate(d.getDate() + 1); return isoOf(d); };
 const longDate = iso => fromISO(iso).toLocaleDateString("en-IN", { weekday:"short", day:"numeric", month:"long" });
 
 /* every teaching day in a window: no Sundays, no Saturdays, no gazetted closures */
@@ -2551,12 +2758,12 @@ function classesIn(fromIso, toIso, skipMarked) {
 /* p attended, h held, r still to come → what the term can still become */
 function budgetOf(p, h, r) {
   const total = h + r;
-  const need = Math.ceil(total * 3 / 4);        /* presents the term must end with */
-  const must = Math.max(0, need - p);           /* of the r left, attend at least this many */
+  const need = Math.ceil(total * targetPct / 100);        /* presents the term must end with */
+  const must = Math.max(0, need - p);                     /* of the r left, attend at least this many */
   return {
     p, h, r, total, need, must,
     pct:     pctOf(p, h),
-    canBunk: r - must,                          /* below zero: 75% is out of reach */
+    canBunk: r - must,                          /* below zero: target % is out of reach */
     best:    pctOf(p + r, total),
   };
 }
@@ -2677,7 +2884,7 @@ function bunkPlan() {
    chip on the ledger row, `full` is the sentence on the next-classes list. */
 function skipCall(s) {
   if (!s)          return { v:"none", say:"Nothing scheduled",    full:"Nothing scheduled" };
-  if (s.lost)      return { v:"lost", say:"Can't reach 75% now",  full:"Too late — this subject can't reach 75% any more" };
+  if (s.lost)      return { v:"lost", say:"Can't reach " + targetPct + "% now",  full:"Too late — this subject can't reach " + targetPct + "% any more" };
   if (s.over)      return { v:"over", say:s.over + " too many planned",
                             full:"You've planned " + s.over + " too many in this subject" };
   if (s.left > 1)  return { v:"safe", say:s.left + " left",
@@ -2719,6 +2926,79 @@ function markDay(iso, di, mk) {
     const id = iso + "|" + ii;
     if (mk === null) delete att[id]; else att[id] = { m:mk, s:k, t:Date.now() };
   });
+}
+
+/* 1-Tap bulk marking for a day with smart toggle (undo) */
+function markAllDay(iso, mk = "P") {
+  const d = fromISO(iso);
+  const di = d.getDay() - 1;
+  if (di < 0 || di > 5 || !DAYS[di] || !DAYS[di].items.length || gazettedOn(iso)) return;
+
+  const valid = DAYS[di].items.map((it, ii) => ({ it, ii, k: resolve(it) })).filter(x => x.k);
+  if (!valid.length) return;
+
+  const allP = valid.every(({ ii }) => att[iso + "|" + ii] && att[iso + "|" + ii].m === mk);
+
+  valid.forEach(({ ii, k }) => {
+    const id = iso + "|" + ii;
+    if (allP) delete att[id];
+    else att[id] = { m: mk, s: k, t: Date.now() };
+  });
+
+  saveAtt();
+  renderToday();
+  renderAttendance();
+  updateBulkBtns();
+
+  if (profile) {
+    syncAttendance().catch(() => {});
+    pushScore().catch(() => {});
+  }
+}
+
+function updateBulkBtns() {
+  const todayIso = nowISO();
+  const dToday = fromISO(todayIso);
+  const diToday = dToday.getDay() - 1;
+  const btnToday = document.getElementById("markAllTodayBtn");
+  if (btnToday) {
+    if (diToday < 0 || diToday > 5 || gazettedOn(todayIso) || !DAYS[diToday] || !DAYS[diToday].items.length) {
+      btnToday.style.display = "none";
+    } else {
+      btnToday.style.display = "";
+      const valid = DAYS[diToday].items.map((it, ii) => ({ it, ii, k: resolve(it) })).filter(x => x.k);
+      const allP = valid.length > 0 && valid.every(x => att[todayIso + "|" + x.ii] && att[todayIso + "|" + x.ii].m === "P");
+      if (allP) {
+        btnToday.classList.add("all-marked");
+        btnToday.innerHTML = "✓ All present <small style='opacity:.75'>(undo)</small>";
+      } else {
+        btnToday.classList.remove("all-marked");
+        btnToday.textContent = "⚡ Mark all present";
+      }
+    }
+  }
+
+  const btnAtt = document.getElementById("markAllAttBtn");
+  const attInput = document.getElementById("attDate");
+  if (btnAtt) {
+    const iso = (attInput && attInput.value) ? attInput.value : todayIso;
+    const d = fromISO(iso);
+    const di = d.getDay() - 1;
+    if (di < 0 || di > 5 || gazettedOn(iso) || !DAYS[di] || !DAYS[di].items.length) {
+      btnAtt.style.display = "none";
+    } else {
+      btnAtt.style.display = "";
+      const valid = DAYS[di].items.map((it, ii) => ({ it, ii, k: resolve(it) })).filter(x => x.k);
+      const allP = valid.length > 0 && valid.every(x => att[iso + "|" + x.ii] && att[iso + "|" + x.ii].m === "P");
+      if (allP) {
+        btnAtt.classList.add("all-marked");
+        btnAtt.innerHTML = "✓ All present <small style='opacity:.75'>(undo)</small>";
+      } else {
+        btnAtt.classList.remove("all-marked");
+        btnAtt.textContent = "⚡ Mark all present";
+      }
+    }
+  }
 }
 
 function renderAttendance() {
@@ -2764,6 +3044,8 @@ function renderAttendance() {
   renderBudget();
   renderBunk();
   renderLeave();
+  renderSubmissions();
+  updateBulkBtns();
   renderSyncNote();
 }
 
@@ -2875,7 +3157,7 @@ function showPreview(node, key, id, mk) {
 function advice(b) {
   /* nothing left to attend has to be said first, or it reads "attend all 0 left" */
   if (!b.r) return b.pct === null ? "Nothing held and nothing left"
-          : b.pct >= 75 ? "Term over for this one — finished at " + b.pct + "%"
+          : b.pct >= targetPct ? "Term over for this one — finished at " + b.pct + "%"
                         : "No classes left to fix it — finished at " + b.pct + "%";
   if (b.canBunk < 0) return "Attend all " + b.r + " left and you still finish at " + b.best + "%";
   if (!b.canBunk) return "Attend every one of the " + b.r + " left";
@@ -2933,7 +3215,10 @@ function renderBoard() {
     m.appendChild(el("div", "adv", advice(b)));
     const track = el("div", "track");
     const fill = el("i"); fill.style.width = Math.min(100, pct) + "%";
-    track.appendChild(fill); track.appendChild(el("u"));
+    track.appendChild(fill);
+    const uEl = el("u");
+    uEl.style.left = targetPct + "%";
+    track.appendChild(uEl);
     m.appendChild(track);
     row.appendChild(m);
 
@@ -2997,7 +3282,7 @@ function renderBudget() {
     head.appendChild(el("b", null, o.best + "%"));
     head.appendChild(document.createTextNode(
       " is the highest the term can still average, but " + g.lost.map(x => SUB[x.k].short).join(", ") +
-      " cannot reach 75% any more. Every class from here still lifts the number."));
+      " cannot reach " + targetPct + "% any more. Every class from here still lifts the number."));
   } else if (!spare) {
     head.appendChild(el("b", null, "0"));
     head.appendChild(document.createTextNode(
@@ -3013,7 +3298,7 @@ function renderBudget() {
 
   const facts = el("div", "pdelta");
   facts.textContent = o.total + " classes across the term · " + o.p + " attended, " +
-    (o.h - o.p) + " missed, " + o.r + " to come · 75% of " + o.total + " is " + o.need + " classes.";
+    (o.h - o.p) + " missed, " + o.r + " to come · " + targetPct + "% of " + o.total + " is " + o.need + " classes.";
   note.appendChild(facts);
 
   const v = vanishUntil();
@@ -3063,9 +3348,9 @@ function renderLeave() {
     (r.days === 1 ? " class day" : " class days") + ", " + longDate(r.from) + " to " + longDate(r.to) + "."));
   bar.appendChild(head);
 
-  const verdict = el("div", "pdelta" + (r.end !== null && r.end < 75 ? " bad" : ""));
+  const verdict = el("div", "pdelta" + (r.end !== null && r.end < targetPct ? " bad" : ""));
   verdict.textContent = r.end === null ? "Nothing marked yet, so there is no percentage to project."
-    : r.end < 75
+    : r.end < targetPct
       ? "Too expensive. You would finish at " + r.end + "% — " + Math.abs(r.spare) +
         " more classes than the budget covers. Trim the trip by that much."
       : "Affordable. You would finish at " + r.end + "%, with " + r.spare +
@@ -3073,7 +3358,7 @@ function renderLeave() {
   bar.appendChild(verdict);
 
   if (r.worst) {
-    const w = el("div", "pdelta" + (r.worst.pct < 75 ? " bad" : ""));
+    const w = el("div", "pdelta" + (r.worst.pct < targetPct ? " bad" : ""));
     w.textContent = "Tightest line: " + SUB[r.worst.k].short + " lands at " + r.worst.pct +
       "% after missing " + r.worst.n + " of it.";
     bar.appendChild(w);
@@ -3197,6 +3482,269 @@ function openCatchup() {
   };
   draw();
   openDlg();
+}
+
+/* ============================================================
+   Submissions & Lab File Tracker
+   ============================================================ */
+let submissions = [];
+try {
+  const saved = localStorage.getItem("bunkr-submissions");
+  if (saved) submissions = JSON.parse(saved);
+} catch (e) { submissions = []; }
+
+let taskFilter = "all";
+
+function saveSubmissions() {
+  try { localStorage.setItem("bunkr-submissions", JSON.stringify(submissions)); } catch (e) {}
+  renderSubmissions();
+  renderDueBanner();
+}
+
+function initTaskForm() {
+  const sel = document.getElementById("taskSubject");
+  if (!sel || sel.children.length) return;
+  Object.keys(SUB).forEach(k => {
+    const opt = document.createElement("option");
+    opt.value = k;
+    opt.textContent = SUB[k].short + " — " + SUB[k].name;
+    sel.appendChild(opt);
+  });
+}
+
+function renderSubmissions() {
+  initTaskForm();
+  const list = document.getElementById("taskList");
+  const summary = document.getElementById("tasksSummary");
+  if (!list) return;
+  list.textContent = "";
+
+  const pending = submissions.filter(s => !s.done);
+  if (summary) {
+    summary.textContent = "Submissions (" + pending.length + " pending)";
+  }
+
+  let items = submissions.slice();
+  if (taskFilter === "pending") items = items.filter(s => !s.done);
+  else if (taskFilter === "completed") items = items.filter(s => s.done);
+
+  if (!items.length) {
+    const empty = el("div", "empty");
+    empty.style.padding = "28px 16px";
+    empty.appendChild(el("b", null, taskFilter === "completed" ? "No completed submissions" : (taskFilter === "pending" ? "All caught up!" : "No submissions logged yet")));
+    empty.appendChild(document.createTextNode(taskFilter === "all" ? "Add assignments, lab experiments, or file deadlines to keep track of them." : ""));
+    list.appendChild(empty);
+    return;
+  }
+
+  const today = nowISO();
+  const tomorrow = dayAfter(today);
+
+  // Sort: pending first (by dueDate asc, then createdAt), completed last (by createdAt desc)
+  items.sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    if (!a.done) {
+      if (a.dueDate && b.dueDate) return a.dueDate.localeCompare(b.dueDate);
+      if (a.dueDate) return -1;
+      if (b.dueDate) return 1;
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    }
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
+
+  items.forEach(task => {
+    const card = el("div", "task-card" + (task.done ? " is-done" : ""));
+
+    const chk = el("button", "task-chk", task.done ? "✓" : "");
+    chk.type = "button";
+    chk.setAttribute("aria-label", task.done ? "Mark as pending" : "Mark as completed");
+    chk.addEventListener("click", () => {
+      task.done = !task.done;
+      saveSubmissions();
+    });
+    card.appendChild(chk);
+
+    const main = el("div", "task-main");
+    const meta = el("div", "task-meta");
+
+    const subInfo = SUB[task.subject] || { short: task.subject, line: "dsa" };
+    const badge = el("span", "task-badge", subInfo.short);
+    badge.style.setProperty("--line", "var(--l-" + subInfo.line + ")");
+    meta.appendChild(badge);
+
+    if (task.type) {
+      meta.appendChild(el("span", "task-type", task.type));
+    }
+    main.appendChild(meta);
+
+    main.appendChild(el("div", "task-name", task.title));
+
+    if (task.dueDate) {
+      const d = fromISO(task.dueDate);
+      const shortStr = d.toLocaleDateString("en-IN", { month:"short", day:"numeric" });
+      let dueEl;
+      if (!task.done && task.dueDate < today) {
+        dueEl = el("div", "task-due bad", "⚠ Overdue (" + shortStr + ")");
+      } else if (!task.done && task.dueDate === today) {
+        dueEl = el("div", "task-due warn", "⚡ Due today");
+      } else if (!task.done && task.dueDate === tomorrow) {
+        dueEl = el("div", "task-due warn", "📅 Due tomorrow");
+      } else {
+        dueEl = el("div", "task-due", "📅 Due " + shortStr);
+      }
+      main.appendChild(dueEl);
+    }
+    card.appendChild(main);
+
+    const del = el("button", "task-del", "✕");
+    del.type = "button";
+    del.title = "Delete submission";
+    del.addEventListener("click", () => {
+      if (confirm("Delete \"" + task.title + "\"?")) {
+        submissions = submissions.filter(x => x.id !== task.id);
+        saveSubmissions();
+      }
+    });
+    card.appendChild(del);
+
+    list.appendChild(card);
+  });
+}
+
+function renderDueBanner() {
+  const box = document.getElementById("taskDueBox");
+  if (!box) return;
+  box.textContent = "";
+  const today = nowISO();
+  const urgent = submissions.filter(s => !s.done && s.dueDate && s.dueDate <= today);
+  if (!urgent.length) return;
+  const overdue = urgent.filter(s => s.dueDate < today).length;
+  const dueToday = urgent.filter(s => s.dueDate === today).length;
+
+  const banner = el("div", "task-due-banner");
+  let msg = "";
+  if (overdue && dueToday) {
+    msg = overdue + " overdue submission" + (overdue > 1 ? "s" : "") + " & " + dueToday + " due today";
+  } else if (overdue) {
+    msg = overdue + " overdue submission" + (overdue > 1 ? "s" : "") + "!";
+  } else {
+    msg = dueToday + " submission" + (dueToday > 1 ? "s" : "") + " due today";
+  }
+  banner.innerHTML = "<span>📌 <b>" + msg + "</b></span><span style='opacity:.75;font-size:12px'>View →</span>";
+  banner.addEventListener("click", () => {
+    show("attendance");
+    showATab("tasks");
+  });
+  box.appendChild(banner);
+}
+
+function wireSubmissions() {
+  const form = document.getElementById("taskForm");
+  const toggleBtn = document.getElementById("toggleTaskFormBtn");
+  const cancelBtn = document.getElementById("taskCancelBtn");
+  const saveBtn = document.getElementById("taskSaveBtn");
+  const titleInput = document.getElementById("taskTitle");
+  const subInput = document.getElementById("taskSubject");
+  const typeInput = document.getElementById("taskType");
+  const dueInput = document.getElementById("taskDueDate");
+
+  if (toggleBtn && form) {
+    toggleBtn.addEventListener("click", () => {
+      form.hidden = !form.hidden;
+      if (!form.hidden && titleInput) titleInput.focus();
+    });
+  }
+
+  if (cancelBtn && form) {
+    cancelBtn.addEventListener("click", () => {
+      form.hidden = true;
+      if (titleInput) titleInput.value = "";
+      if (dueInput) dueInput.value = "";
+    });
+  }
+
+  if (saveBtn && form && titleInput) {
+    saveBtn.addEventListener("click", () => {
+      const title = titleInput.value.trim();
+      if (!title) {
+        titleInput.focus();
+        return;
+      }
+      submissions.push({
+        id: "sub_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        subject: (subInput && subInput.value) ? subInput.value : Object.keys(SUB)[0],
+        type: (typeInput && typeInput.value) ? typeInput.value : "Assignment",
+        title: title,
+        dueDate: (dueInput && dueInput.value) ? dueInput.value : "",
+        done: false,
+        createdAt: Date.now()
+      });
+      titleInput.value = "";
+      if (dueInput) dueInput.value = "";
+      form.hidden = true;
+      saveSubmissions();
+    });
+  }
+
+  document.querySelectorAll("#taskFilters button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      taskFilter = btn.dataset.filter;
+      document.querySelectorAll("#taskFilters button").forEach(b => {
+        b.setAttribute("aria-pressed", String(b.dataset.filter === taskFilter));
+      });
+      renderSubmissions();
+    });
+  });
+}
+
+/* ============================================================
+   End-of-Day 4:00 PM Reminder & Smart Notice
+   ============================================================ */
+function renderEODNotice() {
+  const box = document.getElementById("eodNoticeBox");
+  if (!box) return;
+  box.textContent = "";
+  const iso = nowISO();
+  const d = fromISO(iso);
+  const di = d.getDay() - 1;
+  if (di < 0 || di > 5 || !DAYS[di] || !DAYS[di].items.length || gazettedOn(iso)) return;
+
+  // After 3:30 PM (930 minutes from midnight)
+  if (nowMin() < 930) return;
+
+  try {
+    if (sessionStorage.getItem("bunkr-eod-dismissed-" + iso) === "1") return;
+  } catch (e) {}
+
+  const unmarked = DAYS[di].items.some((it, ii) => resolve(it) && !att[iso + "|" + ii]);
+  if (!unmarked) return;
+
+  const card = el("div", "eod-card");
+  const txt = el("div", "eod-txt");
+  txt.appendChild(el("b", null, "Wrap up today's attendance"));
+  txt.appendChild(el("span", null, "You have unmarked classes today. Mark them before you forget."));
+  card.appendChild(txt);
+
+  const acts = el("div", "eod-acts");
+  const btn = el("button", "bulk-btn", "⚡ Mark all present");
+  btn.type = "button";
+  btn.addEventListener("click", () => {
+    markAllDay(iso, "P");
+    renderEODNotice();
+  });
+  acts.appendChild(btn);
+
+  const close = el("button", "task-del", "✕");
+  close.type = "button";
+  close.title = "Dismiss";
+  close.addEventListener("click", () => {
+    try { sessionStorage.setItem("bunkr-eod-dismissed-" + iso, "1"); } catch (e) {}
+    card.remove();
+  });
+  acts.appendChild(close);
+
+  card.appendChild(acts);
+  box.appendChild(card);
 }
 
 /* ============================================================
@@ -4048,9 +4596,9 @@ function renderPlan() {
     : " at the end of term if you attend everything left — tap classes to plan skips"));
   bar.appendChild(head);
   if (extra) {
-    const d = el("div", "pdelta" + (then < 75 ? " bad" : ""));
-    d.textContent = (then < 75
-      ? "That closes the term below 75% — " + Math.abs(spare) + " too many."
+    const d = el("div", "pdelta" + (then < targetPct ? " bad" : ""));
+    d.textContent = (then < targetPct
+      ? "That closes the term below " + targetPct + "% — " + Math.abs(spare) + " too many."
       : "Still clear, with " + spare + (spare === 1 ? " class" : " classes") + " spare after it.")
       + (worst ? " Weakest line: " + SUB[worst[0]].short + " at " + worst[1] + "%." : "");
     bar.appendChild(d);
@@ -4097,12 +4645,12 @@ function renderBunk() {
   /* the one number the old headline got wrong is worth naming, not hiding */
   const why = el("div", "bk-why");
   if (g.lost.length) {
-    why.textContent = "You can no longer reach 75% in "
+    why.textContent = "You can no longer reach " + targetPct + "% in "
       + g.lost.map(s => SUB[s.k].short).join(", ")
       + ", even if you attend every class left. Keep going anyway — every class you attend "
       + "still pulls the number up.";
   } else {
-    why.textContent = "You need 75% in every subject, not 75% overall. So a spare class in one "
+    why.textContent = "You need " + targetPct + "% in every subject, not " + targetPct + "% overall. So a spare class in one "
       + "subject can't cover a missed one in another — check the list below before you skip.";
   }
   box.appendChild(why);
@@ -4464,6 +5012,13 @@ async function syncAlerts() {
           title: "Were you in " + SUB[key].short + "?",
           body: when + " · " + SUB[key].fac,
         });
+      });
+
+      /* 4:00 PM End-of-day attendance wrap-up reminder */
+      soon(clockAt(iso, 16 * 60), {
+        id: nid(iso, 5, 0), group: "secf-eod", autoCancel: true,
+        title: "Wrap up today's attendance",
+        body: "Check and log today's classes on Bunkr before you forget.",
       });
 
       /* a lab you turned up to without the kit is a lab you sat out, so this is asked
@@ -4924,10 +5479,28 @@ function showATab(which) {
   document.querySelectorAll(".atabs button").forEach(b =>
     b.setAttribute("aria-pressed", b.dataset.at === which));
   try { localStorage.setItem("adgips-atab", which); } catch (e) {}
+  if (which === "tasks") renderSubmissions();
 }
 document.querySelectorAll(".atabs button").forEach(b =>
   b.addEventListener("click", () => showATab(b.dataset.at)));
 (() => { let t = "mark"; try { t = localStorage.getItem("adgips-atab") || "mark"; } catch (e) {} showATab(t); })();
+
+/* Bulk marking & feature wiring */
+const markTodayBtn = document.getElementById("markAllTodayBtn");
+if (markTodayBtn) markTodayBtn.addEventListener("click", () => markAllDay(nowISO(), "P"));
+
+const markAttBtn = document.getElementById("markAllAttBtn");
+if (markAttBtn) markAttBtn.addEventListener("click", () => {
+  const input = document.getElementById("attDate");
+  markAllDay(input ? input.value : nowISO(), "P");
+});
+
+document.querySelectorAll("#targetChips button").forEach(b => {
+  b.setAttribute("aria-pressed", String(parseInt(b.dataset.pct, 10) === targetPct));
+  b.addEventListener("click", () => setTargetPct(b.dataset.pct));
+});
+
+wireSubmissions();
 
 document.getElementById("alertBtn").addEventListener("click", () => {
   alerts = !alerts;

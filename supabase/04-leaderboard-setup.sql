@@ -58,25 +58,15 @@ create policy "delete own row" on public.leaderboard
 grant select, insert, update, delete on public.leaderboard to authenticated;
 
 
--- ---------- STEP 3 · the only thing the section can read ----------
--- Name, username and position. No percentages leave the database.
--- Expect: "Success. No rows returned."
-
-drop view if exists public.leaderboard_ranks;
-
-create view public.leaderboard_ranks as
-  select
-    name,
-    username,
-    rank() over (
-      order by (present::numeric / nullif(held, 0)) desc nulls last,
-               held desc,
-               updated_at asc
-    ) as rank
-  from public.leaderboard
-  where held > 0;
-
-grant select on public.leaderboard_ranks to anon, authenticated;
+-- ---------- STEP 3 · (removed) ----------
+-- This file used to redefine public.leaderboard_ranks over the table above.
+-- 01 already defines that view over public.students, and 01's is the one the
+-- app uses: it selects `batch`, which the version here did not have. Because
+-- this file's number is higher it ran last and broke the leaderboard with a
+-- 400 for every student. The view now lives in 01 only.
+--
+-- public.leaderboard is consequently unused. Nothing reads or writes it; the
+-- totals live on public.students. Drop it once you have checked it is empty.
 
 
 -- ---------- STEP 4 · prove it worked ----------

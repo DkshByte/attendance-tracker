@@ -80,7 +80,14 @@ create policy "update own row" on public.students
 -- No insert or delete policy: the roster is fixed. Students only
 -- ever claim an existing row, and only through the function below.
 
-grant select, update on public.students to authenticated;
+-- RLS says which ROW; a column grant says which COLUMNS. Without the second,
+-- "update own row" lets a student PATCH role='cr' onto themselves and then
+-- use cr_release() on the whole section. Only what the app writes is listed.
+grant select on public.students to authenticated;
+grant update (
+  present, held, updated_at, attendance_cleared_at,
+  github, linkedin, instagram, mobile, email
+) on public.students to authenticated;
 
 
 -- ---------- STEP 4 · the pick-your-name list ----------

@@ -27,11 +27,16 @@ alter table public.students
 
 drop view if exists public.directory;
 
+-- A view runs as its OWNER, so it does not see the students RLS policies.
+-- "authenticated" is not the same as "in this section": sign-up is open, so
+-- without the exists() below anyone on the internet could make an account and
+-- read all 60 phone numbers. You see the section once you are in it.
 create view public.directory as
-  select sno, name, batch, username, role,
-         github, linkedin, instagram, mobile, email
-  from public.students
-  where claimed_by is not null;
+  select s.sno, s.name, s.batch, s.username, s.role,
+         s.github, s.linkedin, s.instagram, s.mobile, s.email
+  from public.students s
+  where s.claimed_by is not null
+    and exists (select 1 from public.students me where me.claimed_by = auth.uid());
 
 revoke all on public.directory from anon;
 grant select on public.directory to authenticated;

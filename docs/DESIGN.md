@@ -33,55 +33,55 @@ colors:
   line-pps-light: "#D62B1F"
 typography:
   display:
-    fontFamily: "Barlow Condensed, Barlow, sans-serif"
+    fontFamily: "Blinker, sans-serif"
     fontSize: "clamp(30px, 8.4vw, 44px)"
     fontWeight: 700
     lineHeight: 1.02
     letterSpacing: "-0.012em"
   headline:
-    fontFamily: "Barlow Condensed, Barlow, sans-serif"
+    fontFamily: "Blinker, sans-serif"
     fontSize: "29px"
     fontWeight: 700
     lineHeight: 1.05
     letterSpacing: "-0.005em"
   figure:
-    fontFamily: "Barlow Condensed, Barlow, sans-serif"
+    fontFamily: "Blinker, sans-serif"
     fontSize: "30px"
     fontWeight: 700
     lineHeight: 1.05
     letterSpacing: "-0.01em"
     fontFeature: "tabular-nums"
   title:
-    fontFamily: "Barlow Condensed, Barlow, sans-serif"
+    fontFamily: "Blinker, sans-serif"
     fontSize: "22px"
     fontWeight: 700
     lineHeight: 1.1
     letterSpacing: "0.004em"
   body:
-    fontFamily: "Barlow, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Blinker, ui-sans-serif, system-ui, sans-serif"
     fontSize: "15px"
     fontWeight: 400
     lineHeight: 1.45
     fontFeature: "tabular-nums"
   meta:
-    fontFamily: "Barlow, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Blinker, ui-sans-serif, system-ui, sans-serif"
     fontSize: "12.5px"
     fontWeight: 500
     lineHeight: 1.25
   label:
-    fontFamily: "Barlow, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Blinker, ui-sans-serif, system-ui, sans-serif"
     fontSize: "13px"
     fontWeight: 700
     lineHeight: 1.45
     letterSpacing: "0.16em"
   signage:
-    fontFamily: "Barlow Condensed, Barlow, sans-serif"
+    fontFamily: "Blinker, sans-serif"
     fontSize: "11px"
     fontWeight: 700
     lineHeight: 1.5
     letterSpacing: "0.1em"
   nav:
-    fontFamily: "Barlow, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Blinker, ui-sans-serif, system-ui, sans-serif"
     fontSize: "10px"
     fontWeight: 700
     lineHeight: 1.2
@@ -220,7 +220,7 @@ Density is phone-first and one-handed: a 390px portrait viewport carries a statu
 **Key Characteristics:**
 - Rails, station discs, and 45°/90° geometry as the primary structural device
 - Achromatic reading field; nine metro line inks only at rails, discs, titles, and edges
-- Barlow Condensed signage capitals over Barlow body, tabular figures everywhere
+- Blinker geometric typography matching the Bunkr brand and logo, tabular figures everywhere
 - Close-toned plate stack (three steps) with shadows only under true floaters
 - Live, time-driven state: the marker and travelled rail move as the day passes
 - Full dark/light parity through re-tinted tokens, not opacity tricks
@@ -259,25 +259,24 @@ These are the same hues as three line inks by design — the service tier reuses
 
 ## Typography
 
-**Display Font:** Barlow Condensed (500/600/700), with Barlow and sans-serif fallbacks
-**Body Font:** Barlow (400/500/600/700), with ui-sans-serif and system-ui fallbacks
+**Primary Font:** Blinker (300/400/600/700/800/900), matching the Bunkr logo wordmark, with ui-sans-serif and system-ui fallbacks
 **Mono:** ui-monospace / SFMono-Regular / Menlo, used only in the .ics export textarea and inline setup code
 
 **Character:** Condensed grotesque signage over a plain grotesque body — the exact pairing a transit system uses for station names against timetable print. Everything numeric is tabular by default (`font-variant-numeric: tabular-nums` on `body`), so percentages, clocks, and counts never shift width as they tick.
 
 ### Hierarchy
-- **Display** (Barlow Condensed 700, clamp 30–44px, line-height 1.02, tracking -0.012em, balanced wrap): the status plate's single live statement. One per screen.
-- **Headline** (Barlow Condensed 700, 29px, tracking -0.005em): the dialog subject name; 23px in the identity-row variant.
-- **Figure** (Barlow Condensed 700, 25–40px, tracking -0.01em): the big numbers — summary stats (30px, 40px for the lead stat), subject percentages (27px), profile stats (25px), the plan-bar total (30px). Always paired with a small uppercase caption beneath or beside it.
-- **Title** (Barlow Condensed 700, 17–22px): subject names on cards and rows — 22px on the today rail, 19px in attendance rows and the up-next block, 18px on the service board, 17px on the week diagram.
-- **Body** (Barlow 400/500, 15px, line-height 1.45): default reading size; 14.5px for dialog subtitles.
-- **Meta** (Barlow 500/600, 12–13.5px): faculty, room, times, hints. `--ink-2` for content, `--ink-3` for structure.
-- **Label** (Barlow 700, 13px, tracking 0.16em, uppercase): section headings, which run as a caps line followed by a hairline leader that fills the remaining width.
-- **Micro-label** (Barlow 700, 9.5–11.5px, tracking 0.09–0.12em, uppercase, `--ink-3`): field labels, stat captions, and data captions above a value.
-- **Signage** (Barlow Condensed 700, 11–19px, tracking 0.055–0.13em, uppercase): the section mark, badges, the primary CTA, sheet headings, group headers — anything that behaves like a sign rather than a sentence.
+- **Display** (Blinker 700, clamp 30–44px, line-height 1.02, tracking -0.012em, balanced wrap): the status plate's single live statement. One per screen.
+- **Headline** (Blinker 700, 29px, tracking -0.005em): the dialog subject name; 23px in the identity-row variant.
+- **Figure** (Blinker 700, 25–40px, tracking -0.01em): the big numbers — summary stats (30px, 40px for the lead stat), subject percentages (27px), profile stats (25px), the plan-bar total (30px). Always paired with a small uppercase caption beneath or beside it.
+- **Title** (Blinker 700, 17–22px): subject names on cards and rows — 22px on the today rail, 19px in attendance rows and the up-next block, 18px on the service board, 17px on the week diagram.
+- **Body** (Blinker 400/500, 15px, line-height 1.45): default reading size; 14.5px for dialog subtitles.
+- **Meta** (Blinker 500/600, 12–13.5px): faculty, room, times, hints. `--ink-2` for content, `--ink-3` for structure.
+- **Label** (Blinker 700, 13px, tracking 0.16em, uppercase): section headings, which run as a caps line followed by a hairline leader that fills the remaining width.
+- **Micro-label** (Blinker 700, 9.5–11.5px, tracking 0.09–0.12em, uppercase, `--ink-3`): field labels, stat captions, and data captions above a value.
+- **Signage** (Blinker 700, 11–19px, tracking 0.055–0.13em, uppercase): the section mark, badges, the primary CTA, sheet headings, group headers — anything that behaves like a sign rather than a sentence.
 
 ### Named Rules
-**The Signage Rule.** Barlow Condensed is for signs and numbers: station names, badges, big figures, primary actions. Prose is never condensed. If it is a sentence, it is Barlow.
+**The Signage Rule.** Blinker is for signs and numbers: station names, badges, big figures, primary actions. Prose is never condensed. If it is a sentence, it is Blinker.
 
 **The Tabular Rule.** Every figure in the app is tabular-lined. Nothing that updates on a clock tick may reflow.
 
@@ -344,7 +343,7 @@ The signature interaction. The travelled portion of the rail is redrawn in `--in
 ### Buttons
 - **Shape:** squared-soft (9px), full-width CTA at 10px, pills (999px) for anything segmented.
 - **Primary** (`.btn.pri`): inverted — `--ink` fill, `--bg` text, matching border; hover dims with `filter: brightness(.92)`.
-- **CTA** (`.go`): full width, 13px padding, Barlow Condensed 700 uppercase at 16px / 0.07em; disabled drops to 0.35 opacity.
+- **CTA** (`.go`): full width, 13px padding, Blinker 700 uppercase at 16px / 0.07em; disabled drops to 0.35 opacity.
 - **Secondary** (`.btn`): plate-2 fill, `--rule` border; hover moves to plate-3 with a `--rail` border.
 - **Text** (`.link`): no chrome, `--ink-2`, underlined in `--rail` with a 4px offset; hover brings the underline to currentColor.
 - **Icon** (`.iconbtn`): 34px circle (38px under 560px), plate fill, `--rule` border, `--ink-2` glyph.
@@ -402,7 +401,7 @@ The same file ships as an Android app, and the native layer only contributes wha
 - **Do** bind subject colour with a `data-line` attribute and read it through `var(--line)`; never hardcode a line hex on a component.
 - **Do** keep line ink to rails, discs, bars, badges, gauge fills, and subject titles; the reading field stays achromatic.
 - **Do** draw station discs as `--bg` fills with an inset ring (`box-shadow: inset 0 0 0 3px var(--line)`).
-- **Do** use Barlow Condensed for signage and figures, and Barlow for anything that is a sentence.
+- **Do** use Blinker for signage and figures, and Blinker for anything that is a sentence.
 - **Do** track out every uppercase run (0.09–0.16em) and keep all figures tabular.
 - **Do** separate lists with 1px grid gaps over `--rule-soft` inside a 12px clipped container.
 - **Do** step down the plate stack (plate → plate-2 → plate-3) for nested surfaces instead of adding a shadow.
