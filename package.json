@@ -1,7 +1,7 @@
 {
   "name": "bunkr",
   "version": "1.0.0",
-  "description": "Glassmorphic attendance tracker, 75% bunk budget calculator, and live timetable for ADGIPS Sec F IT-1 (GGSIPU)",
+  "description": "Universal glassmorphic attendance tracker, 75% bunk budget calculator, and real-time smart timetable for college & university students",
   "main": "timetable.html",
   "scripts": {
     "prep": "cp timetable.html deploy/index.html && cp timetable.html boot/app.html",
@@ -15,10 +15,10 @@
     "timetable",
     "college-app",
     "bunk-calculator",
-    "ggsipu",
     "capacitor",
     "supabase",
-    "glassmorphism"
+    "glassmorphism",
+    "universal"
   ],
   "author": "Daksh Sharma <dakshsharma3758@gmail.com>",
   "license": "MIT",

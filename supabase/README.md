@@ -1,6 +1,6 @@
 # Supabase Database Schemas & Migrations
 
-This directory contains the SQL setup scripts for **Bunkr** (ADGIPS Sec F IT-1 Attendance Tracker).
+This directory contains the SQL setup scripts for **Bunkr** (Universal College Attendance Tracker & Smart Timetable).
 
 ---
 

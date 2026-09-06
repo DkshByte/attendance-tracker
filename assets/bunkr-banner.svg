@@ -11,26 +11,22 @@
       <stop offset="100%" stop-color="#38BDF8" />
     </linearGradient>
     <radialGradient id="glowGrad" cx="50%" cy="40%" r="60%">
-      <stop offset="0%" stop-color="#4E62E5" stop-opacity="0.18" />
+      <stop offset="0%" stop-color="#4E62E5" stop-opacity="0.2" />
       <stop offset="100%" stop-color="#000000" stop-opacity="0" />
     </radialGradient>
-    <filter id="subtleGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="16" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
   </defs>
 
   <!-- Canvas Background -->
-  <rect width="1200" height="380" rx="24" fill="url(#bgGrad)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5" />
+  <rect width="1200" height="380" rx="24" fill="url(#bgGrad)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" />
   
-  <!-- Subtle Ambient Center Glow -->
-  <rect x="200" y="20" width="800" height="340" fill="url(#glowGrad)" pointer-events="none" />
+  <!-- Ambient Center Glow -->
+  <rect x="150" y="20" width="900" height="340" fill="url(#glowGrad)" pointer-events="none" />
 
   <!-- Accent Top Border Beam -->
-  <rect x="24" y="1.5" width="1152" height="2" fill="url(#accentGrad)" opacity="0.8" rx="1" />
+  <rect x="24" y="1.5" width="1152" height="2.5" fill="url(#accentGrad)" opacity="0.85" rx="1.2" />
 
   <!-- Centered Logo Group: scaled and shifted -->
-  <g transform="translate(195, 45) scale(0.78)" fill="#FFFFFF">
+  <g transform="translate(195, 48) scale(0.78)" fill="#FFFFFF">
     <!-- Icon Mark -->
     <path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
     <path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/>
@@ -48,21 +44,21 @@
 
   <!-- Tagline Text -->
   <text x="600" y="270" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="600" fill="#94A3B8" letter-spacing="0.08em">
-    SMART ATTENDANCE TRACKER  •  75% BUNK BUDGET  •  LIVE TIMETABLE
+    SMART ATTENDANCE TRACKER  •  75% BUNK BUDGET  •  REAL-TIME TIMETABLE
   </text>
 
   <!-- Pill Tags Row -->
   <g transform="translate(600, 316)">
-    <!-- Pill 1: ADGIPS IT-1 -->
-    <rect x="-240" y="0" width="130" height="28" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" />
-    <text x="-175" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#F8FAFC">ADGIPS IT-1</text>
+    <!-- Pill 1: Universal -->
+    <rect x="-260" y="0" width="160" height="28" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" />
+    <text x="-180" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#F8FAFC">UNIVERSAL &amp; ADAPTABLE</text>
 
-    <!-- Pill 2: GGSIPU 2026-27 -->
-    <rect x="-90" y="0" width="180" height="28" rx="14" fill="rgba(78,98,229,0.15)" stroke="rgba(78,98,229,0.4)" />
-    <text x="0" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#818CF8">GGSIPU 2026–2027</text>
+    <!-- Pill 2: Offline-First -->
+    <rect x="-80" y="0" width="160" height="28" rx="14" fill="rgba(78,98,229,0.15)" stroke="rgba(78,98,229,0.4)" />
+    <text x="0" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#818CF8">OFFLINE-FIRST CORE</text>
 
-    <!-- Pill 3: Room 2311 -->
-    <rect x="110" y="0" width="130" height="28" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" />
-    <text x="175" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#F8FAFC">ROOM 2311</text>
+    <!-- Pill 3: Mobile & Web -->
+    <rect x="100" y="0" width="160" height="28" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" />
+    <text x="180" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#F8FAFC">MOBILE &amp; WEB READY</text>
   </g>
 </svg>
