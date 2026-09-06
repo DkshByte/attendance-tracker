@@ -9,8 +9,34 @@
 <meta name="theme-color" content="#EEF1F7" media="(prefers-color-scheme: light)">
 <title>Bunkr · Sec F IT-I</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+/* Bunkr Brand Styles (No color theme changes) */
+.b-icon { display:inline-block; vertical-align:middle; width:20px; height:20px; flex:none; }
+.mark .b-icon { width:22px; height:22px; color:var(--ink); margin-right:2px; }
+.hero-mark .b-icon { width:32px; height:32px; color:var(--ink); }
+.brand .b-icon { width:22px; height:22px; color:var(--ink); }
+
+/* Brand preview banner on test page */
+.brand-test-bar {
+  position:sticky; top:0; z-index:9999;
+  background:#111524; color:#FFF; padding:10px 18px;
+  font:13px/1.4 system-ui,-apple-system,sans-serif;
+  border-bottom:1px solid rgba(255,255,255,0.15);
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+}
+.brand-test-bar .tag {
+  background:#4E62E5; color:#fff; font-size:11px; font-weight:700;
+  padding:3px 8px; border-radius:6px; letter-spacing:0.04em; text-transform:uppercase;
+}
+.brand-test-bar .items { display:flex; align-items:center; gap:16px; }
+.brand-test-bar button {
+  background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+  color:#fff; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer;
+}
+.brand-test-bar button:hover { background:rgba(255,255,255,0.2); }
+</style>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Barlow:wght@500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
 <style>
 /* ============================================================
    RED LINE — Sec F IT-I
@@ -18,44 +44,45 @@
    ============================================================ */
 
 :root {
-  --bg:#070C1C; --plate:#0F1830; --plate-2:#17223F; --plate-3:#1D2A4C;
-  --rule:#26314F; --rule-soft:#1A2340; --rail:#2C3859;
-  --ink:#F3F6FC; --ink-2:#A6B3CE; --ink-3:#6E7C99;
-  --focus:var(--l-phy);        /* the Blue Line, not a browser blue */
-  --l-pps:#FF4D40; --l-bee:#FFB92E; --l-phy:#4E96FF; --l-smt:#35D07F;
-  --l-em:#B18CFF;  --l-csl:#FF6BB0; --l-evs:#29D6CD; --l-eg:#FF9147; --l-pd:#93A3C0;
-  --ok:#35D07F; --warn:#FFB92E; --bad:#FF4D40;
-  --lift:0 1px 1px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.9);
-  --lift-lg:0 2px 4px rgba(0,0,0,.4), 0 20px 44px -22px rgba(0,0,0,1);
-  --lift-edge:0 4px 10px -6px rgba(0,0,0,.85);   /* for surfaces that already have an edge */
+  /* Bunkr Brand Kit: Charcoal (#26272B), Warm White (#FDFCFA), Forest Teal (#0E5454), Terracotta (#B34949) */
+  --bg:#1A1B1E; --plate:#26272B; --plate-2:#2F3137; --plate-3:#383B42;
+  --rule:rgba(253,252,250,0.12); --rule-soft:rgba(253,252,250,0.07); --rail:#3A3D46;
+  --ink:#FDFCFA; --ink-2:#A8ADB8; --ink-3:#707684;
+  --focus:#0E5454;
+  --l-pps:#FF4D40; --l-bee:#E59819; --l-phy:#4E96FF; --l-smt:#10766E;
+  --l-em:#9F7AEA;  --l-csl:#ED64A6; --l-evs:#0E5454; --l-eg:#DD6B20; --l-pd:#718096;
+  --ok:#0E5454; --warn:#D97706; --bad:#B34949;
+  --lift:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -18px rgba(0,0,0,.8);
+  --lift-lg:0 2px 5px rgba(0,0,0,.4), 0 24px 44px -20px rgba(0,0,0,.9);
+  --lift-edge:0 4px 12px -6px rgba(0,0,0,.7);
   --ease:cubic-bezier(.16,1,.3,1);
-  --line:var(--rail); --badge-ink:#08101F;
+  --line:var(--rail); --badge-ink:#FDFCFA;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --bg:#EEF1F7; --plate:#FFFFFF; --plate-2:#F5F7FC; --plate-3:#EAEFF8;
-    --rule:#D3DAE8; --rule-soft:#E4E9F2; --rail:#C3CCDE;
-    --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580;
-    --focus:var(--l-phy);
-    --l-pps:#D62B1F; --l-bee:#9C6500; --l-phy:#1560D8; --l-smt:#0E8C4E;
-    --l-em:#6B3FD4;  --l-csl:#C42B77; --l-evs:#0A857E; --l-eg:#BF5210; --l-pd:#5A6883;
-    --ok:#0E8C4E; --warn:#9C6500; --bad:#D62B1F; --badge-ink:#FFFFFF;
-    --lift:0 1px 1px rgba(10,16,36,.05), 0 10px 26px -18px rgba(10,16,36,.4);
-    --lift-lg:0 2px 4px rgba(10,16,36,.06), 0 20px 44px -22px rgba(10,16,36,.45);
-    --lift-edge:0 4px 10px -6px rgba(10,16,36,.28);
+    --bg:#FDFCFA; --plate:#FFFFFF; --plate-2:#F5F4EE; --plate-3:#ECE9E0;
+    --rule:#E2DFD6; --rule-soft:#ECE9E0; --rail:#D7D3C7;
+    --ink:#26272B; --ink-2:#5E636E; --ink-3:#828894;
+    --focus:#0E5454;
+    --l-pps:#B34949; --l-bee:#B45309; --l-phy:#1E40AF; --l-smt:#0E5454;
+    --l-em:#6D28D9;  --l-csl:#BE185D; --l-evs:#0E5454; --l-eg:#C2410C; --l-pd:#4B5563;
+    --ok:#0E5454; --warn:#B45309; --bad:#B34949; --badge-ink:#FFFFFF;
+    --lift:0 1px 2px rgba(38,39,43,.06), 0 10px 26px -18px rgba(38,39,43,.2);
+    --lift-lg:0 2px 5px rgba(38,39,43,.08), 0 20px 44px -22px rgba(38,39,43,.25);
+    --lift-edge:0 4px 10px -6px rgba(38,39,43,.15);
   }
 }
 :root[data-theme="light"] {
-  --bg:#EEF1F7; --plate:#FFFFFF; --plate-2:#F5F7FC; --plate-3:#EAEFF8;
-  --rule:#D3DAE8; --rule-soft:#E4E9F2; --rail:#C3CCDE;
-  --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580;
-  --focus:var(--l-phy);
-  --l-pps:#D62B1F; --l-bee:#9C6500; --l-phy:#1560D8; --l-smt:#0E8C4E;
-  --l-em:#6B3FD4;  --l-csl:#C42B77; --l-evs:#0A857E; --l-eg:#BF5210; --l-pd:#5A6883;
-  --ok:#0E8C4E; --warn:#9C6500; --bad:#D62B1F; --badge-ink:#FFFFFF;
-  --lift:0 1px 1px rgba(10,16,36,.05), 0 10px 26px -18px rgba(10,16,36,.4);
-  --lift-lg:0 2px 4px rgba(10,16,36,.06), 0 20px 44px -22px rgba(10,16,36,.45);
-  --lift-edge:0 4px 10px -6px rgba(10,16,36,.28);
+  --bg:#FDFCFA; --plate:#FFFFFF; --plate-2:#F5F4EE; --plate-3:#ECE9E0;
+  --rule:#E2DFD6; --rule-soft:#ECE9E0; --rail:#D7D3C7;
+  --ink:#26272B; --ink-2:#5E636E; --ink-3:#828894;
+  --focus:#0E5454;
+  --l-pps:#B34949; --l-bee:#B45309; --l-phy:#1E40AF; --l-smt:#0E5454;
+  --l-em:#6D28D9;  --l-csl:#BE185D; --l-evs:#0E5454; --l-eg:#C2410C; --l-pd:#4B5563;
+  --ok:#0E5454; --warn:#B45309; --bad:#B34949; --badge-ink:#FFFFFF;
+  --lift:0 1px 2px rgba(38,39,43,.06), 0 10px 26px -18px rgba(38,39,43,.2);
+  --lift-lg:0 2px 5px rgba(38,39,43,.08), 0 20px 44px -22px rgba(38,39,43,.25);
+  --lift-edge:0 4px 10px -6px rgba(38,39,43,.15);
   --badge-ink:#FFFFFF;
 }
 
@@ -957,6 +984,21 @@ dialog .btn { margin-top:8px; }
 </style>
 </head>
 <body>
+<div class="brand-test-bar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="tag">Local Test File</span>
+    <b>Bunkr Brand Kit Preview</b>
+    <span style="color:#A6B3CE;font-size:12px;">(Exact Brand Kit: Charcoal #26272B · Warm White #FDFCFA · Forest Teal #0E5454 · Terracotta #B34949)</span>
+  </div>
+  <div class="items">
+    <span>Icon: <svg viewBox="695 770 252 245" width="18" height="18" fill="#fff" style="vertical-align:middle;"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
+  <path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/></svg></span>
+    <span>Favicon: <img src="favicon.svg" width="18" height="18" style="vertical-align:middle;"></span>
+    <button type="button" onclick="gateShow('login')">Preview Auth Modal</button>
+    <button type="button" onclick="gateShow('claim')">Preview Travelcard</button>
+    <button type="button" onclick="document.getElementById('themeBtn').click()">Toggle Theme</button>
+  </div>
+</div>
 
 <nav class="nav" id="nav" aria-label="Sections">
   <a href="#today" data-p="today">
@@ -982,7 +1024,7 @@ dialog .btn { margin-top:8px; }
 
 <div class="top">
   <div class="mark">
-    <svg class="b-icon" viewBox="695 770 252 245" width="22" height="22" fill="currentColor" aria-hidden="true" style="flex:none;margin-right:3px"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
+    <svg class="b-icon" viewBox="695 770 252 245" fill="currentColor" aria-hidden="true"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
   <path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/></svg>
     <span class="txt">Bunkr</span>
     <span class="sub">Sec F · IT-I</span>
@@ -1134,7 +1176,7 @@ dialog .btn { margin-top:8px; }
   <div class="gate-in">
 
     <div class="hero">
-      <div class="hero-mark"><svg class="b-icon" viewBox="695 770 252 245" width="26" height="26" fill="currentColor" aria-hidden="true" style="flex:none;margin-right:6px"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
+      <div class="hero-mark"><svg class="b-icon" viewBox="695 770 252 245" fill="currentColor" aria-hidden="true"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
   <path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/></svg><b>Bunkr</b><em>Sec F · IT-I · 2026–27</em></div>
       <div class="hero-lines" id="heroLines"></div>
     </div>
@@ -1178,7 +1220,7 @@ dialog .btn { margin-top:8px; }
       <h1>Your travelcard</h1>
       <div class="sub">This card is yours for the year. Nobody else can take this name.</div>
       <div class="tcard">
-        <div class="brand"><svg class="b-icon" viewBox="695 770 252 245" width="20" height="20" fill="currentColor" aria-hidden="true" style="flex:none;margin-right:4px"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
+        <div class="brand"><svg class="b-icon" viewBox="695 770 252 245" fill="currentColor" aria-hidden="true"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
   <path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/></svg><span>Bunkr</span><em>Sec F · IT-I · 2026–27</em></div>
         <div>
           <div class="nm" id="cardName">Your name</div>
@@ -4305,10 +4347,7 @@ function openProfile() {
   const bIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   bIcon.setAttribute("class", "b-icon");
   bIcon.setAttribute("viewBox", "695 770 252 245");
-  bIcon.setAttribute("width", "20");
-  bIcon.setAttribute("height", "20");
   bIcon.setAttribute("fill", "currentColor");
-  bIcon.style.cssText = "flex:none;margin-right:4px";
   bIcon.innerHTML = `<path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
   <path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/>`;
   brand.appendChild(bIcon);
