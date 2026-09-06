@@ -1,0 +1,4 @@
+# Project Root Directory is "deploy" — nothing else needs to be uploaded.
+# Without this the CLI ships android/, node_modules and the APK (~32MB) and times out.
+/*
+!/deploy
