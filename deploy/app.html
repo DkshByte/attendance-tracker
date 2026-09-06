@@ -742,7 +742,11 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 }
 .cu-sub { font-size:13px; font-weight:600; color:var(--ink); flex:1; }
 .cu-fac { font-size:11px; color:var(--ink-3); white-space:nowrap; }
-.cu-confirm { margin-top:2px; align-self:flex-start; font-size:13px; padding:7px 16px; }
+.cu-confirm { margin-top:4px; align-self:flex-start; font-size:12.5px; padding:7px 16px; border-radius:999px; transition:background .18s var(--ease), color .18s var(--ease), border-color .18s var(--ease); }
+.cu-all-attended { background:var(--plate-2); border:1px solid var(--ok); color:var(--ok); }
+.cu-all-attended:hover { background:var(--ok); color:var(--badge-ink); }
+.cu-has-missed { background:var(--bad); border:1px solid var(--bad); color:#fff; }
+.cu-has-missed:hover { filter:brightness(1.1); }
 .cu-confirm:disabled { opacity:.5; cursor:default; }
 .cu-reset-row { display:flex; justify-content:center; padding:10px 0 2px; }
 .cu-reset-btn { font-size:12px; color:var(--ink-3); opacity:.6; }
@@ -3359,6 +3363,7 @@ const GAZETTED = [
   ["2026-03-26","Ram Navami"], ["2026-03-31","Mahavir Jayanti"], ["2026-04-03","Good Friday"],
   ["2026-05-01","Buddha Purnima"], ["2026-05-27","Id-ul-Zuha (Bakrid)"], ["2026-06-26","Muharram"],
   ["2026-08-15","Independence Day"], ["2026-08-26","Milad-un-Nabi / Id-e-Milad"],
+  ["2026-08-28","Raksha Bandhan"], ["2026-09-03","Janmashtami (Smarta)"],
   ["2026-09-04","Janmashtami (Vaishnva)"], ["2026-10-02","Mahatma Gandhi's Birthday"],
   ["2026-10-20","Dussehra"], ["2026-10-26","Maharishi Valmiki's Birthday"],
   ["2026-11-08","Diwali (Deepavali)"], ["2026-11-24","Guru Nanak's Birthday"], ["2026-12-25","Christmas Day"],
@@ -3372,7 +3377,6 @@ const RESTRICTED = [
   ["2026-03-20","Jamat-ul-Vida"], ["2026-04-05","Easter Sunday"], ["2026-04-14","Vaishakhi / Vishu / Meshadi"], ["2026-04-14","Dr. B. R. Ambedkar Jayanti", 1],
   ["2026-04-15","Vaisakhadi (Bengal) / Bahag Bihu (Assam)"], ["2026-05-09","Birthday of Guru Rabindranath Tagore"],
   ["2026-07-16","Rath Yatra"], ["2026-08-15","Parsi New Year's Day / Nauraj"], ["2026-08-26","Onam"],
-  ["2026-08-28","Raksha Bandhan", 1], ["2026-09-03","Janmashtami (Smarta)", 1],
   ["2026-09-05","Teachers' Day"], ["2026-09-14","Ganesh Chaturthi / Vinayaka Chaturthi"],
   ["2026-10-18","Dussehra (Saptami)"], ["2026-10-19","Dussehra (Mahashtami)", 1], ["2026-10-20","Dussehra (Mahanavmi)"],
   ["2026-10-29","Karaka Chaturthi (Karva Chauth)"], ["2026-11-08","Naraka Chaturdasi"],
@@ -3564,11 +3568,10 @@ function demo() {                                   // run demo() in the console
   ok(classDays("2026-09-04", "2026-09-04").length, 0, "a gazetted holiday is not a class day");
   ok(classesIn("2026-08-17", "2026-08-17").total, 5, "Monday runs five classes");
   ok(leaveCost("2000-01-01", "1999-01-01"), null, "leave that ends before it starts costs nothing");
-  ok(!!likelyOn("2026-08-28"), true, "Raksha Bandhan is one the institute usually takes");
-  ok(!!likelyOn("2026-09-14"), false, "Ganesh Chaturthi is not");
-  ok(classDays("2026-08-28", "2026-08-28").length, 1, "a likely closure is still a class day until it is marked Off");
-  ok(classDays("2026-09-04", "2026-09-04").length, 0, "a gazetted one never is");
-  ok(holidayNames("2026-09-03"), "Janmashtami (Smarta)", "the day before Janmashtami is on the calendar");
+  ok(classDays("2026-08-28", "2026-08-28").length, 0, "Raksha Bandhan is a gazetted closure");
+  ok(classDays("2026-09-03", "2026-09-03").length, 0, "Janmashtami (Smarta) is a gazetted closure");
+  ok(classDays("2026-09-04", "2026-09-04").length, 0, "Janmashtami (Vaishnva) is a gazetted holiday");
+  ok(holidayNames("2026-09-03"), "Janmashtami (Smarta)", "Janmashtami (Smarta) is on the calendar");
   ok(nextRunningDay("2026-09-06").di, 0, "Sunday rolls on to Monday, not to Tuesday");
   ok(nextRunningDay("2026-09-06").iso, "2026-09-07", "...and to the real date, not an index");
   ok(nextRunningDay("2026-10-25").iso, "2026-10-27", "a gazetted Monday is skipped for Tuesday");
@@ -4339,11 +4342,26 @@ function openCatchup() {
         card.appendChild(hdr);
 
         /* Prompt */
-        card.appendChild(el("div", "cu-q", "Did you miss any class today?"));
+        card.appendChild(el("div", "cu-q", "Did you miss any class on this day? (tick only the ones you missed)"));
 
         /* Per-class checkboxes — checked = missed */
         const checks = el("div", "cu-checks");
         const boxes = [];
+
+        /* Confirm button */
+        const confirmBtn = el("button", "btn cu-confirm", "Save");
+        confirmBtn.type = "button";
+
+        const updateBtn = () => {
+          const missed = boxes.filter(b => b.cb.checked).length;
+          if (missed === 0) {
+            confirmBtn.textContent = "✓ Attended all " + classes.length + " classes";
+            confirmBtn.className = "btn cu-confirm cu-all-attended";
+          } else {
+            confirmBtn.textContent = "Save (" + missed + " missed, " + (classes.length - missed) + " attended)";
+            confirmBtn.className = "btn cu-confirm cu-has-missed";
+          }
+        };
 
         classes.forEach(({ ii, k }) => {
           const sub = SUB[k];
@@ -4357,6 +4375,7 @@ function openCatchup() {
           cb.type = "checkbox";
           cb.id = uid;
           cb.className = "cu-cb";
+          cb.addEventListener("change", updateBtn);
           boxes.push({ cb, ii, k });
 
           const dot = el("span", "cu-dot");
@@ -4371,9 +4390,8 @@ function openCatchup() {
 
         card.appendChild(checks);
 
-        /* Confirm */
-        const confirmBtn = el("button", "btn cu-confirm", "Save this day");
-        confirmBtn.type = "button";
+        updateBtn();
+
         confirmBtn.addEventListener("click", () => {
           boxes.forEach(({ cb, ii, k }) => {
             att[iso + "|" + ii] = { m: cb.checked ? "A" : "P", s: k, t: Date.now() };
@@ -4381,7 +4399,7 @@ function openCatchup() {
           saveAtt(); renderAttendance();
           if (profile) { syncAttendance().catch(() => {}); pushScore().catch(() => {}); }
           card.classList.add("done");
-          confirmBtn.textContent = "✓ Saved";
+          confirmBtn.textContent = "✓ Recorded";
           confirmBtn.disabled = true;
           if ([...list.querySelectorAll(".cu-card")].every(c => c.classList.contains("done"))) {
             setTimeout(() => { document.getElementById("dlg").close(); renderCatchup(); }, 500);
