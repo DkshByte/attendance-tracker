@@ -10,21 +10,15 @@
 <script>
 /* ============================================================
    Bunkr — Entry Router
-   bunkr.website → landing.html (always, for new visitors)
-   bunkr.website?app=1 → app.html (force-bypass for existing users)
-
-   The "Open App" button on landing.html links to app.html directly,
-   so existing users who bookmark app.html or click through the
-   landing page are never blocked.
+   bunkr.website       → landing.html (always for new visitors)
+   bunkr.website?app=1 → app.html    (boot loader / force bypass)
    ============================================================ */
 (function () {
   "use strict";
-  /* ?app=1 hard-bypass — used by the boot loader and direct links */
   if (new URLSearchParams(window.location.search).get("app") === "1") {
     window.location.replace("app.html");
     return;
   }
-  /* Everyone else sees the landing page */
   window.location.replace("landing.html");
 })();
 </script>

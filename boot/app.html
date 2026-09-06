@@ -700,6 +700,55 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .cud .marks button { padding:5px 9px; font-size:12px; }
 .cud .w i { display:block; font-style:normal; color:var(--warn); font-weight:600; }
 
+/* ── Catch-up card (new per-class checklist UX) ── */
+.cu-card { display:flex; flex-direction:column; gap:0; background:var(--plate); padding:14px 14px 12px; }
+.cu-card.done { opacity:.45; pointer-events:none; }
+.cu-hdr { display:flex; align-items:baseline; gap:8px; margin-bottom:6px; }
+.cu-date { font-family:'Blinker',sans-serif; font-size:17px; font-weight:700;
+           color:var(--ink); letter-spacing:.005em; }
+.cu-count { font-size:11px; font-weight:600; color:var(--ink-3); }
+.cu-q { font-size:12px; font-weight:600; color:var(--ink-2); margin-bottom:8px; }
+.cu-checks { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; }
+.cu-cls {
+  display:flex; align-items:center; gap:9px; cursor:pointer;
+  padding:7px 10px; border-radius:10px; background:var(--plate-2);
+  border:1px solid transparent;
+  transition:background .15s var(--ease), border-color .15s var(--ease);
+  user-select:none;
+}
+.cu-cls:hover { background:var(--plate-3); border-color:var(--rule-soft); }
+/* when checked (missed) highlight the row */
+.cu-cls:has(.cu-cb:checked) {
+  background:rgba(var(--bad-rgb, 214,43,31),.08);
+  border-color:rgba(var(--bad-rgb, 214,43,31),.22);
+}
+.cu-cb {
+  appearance:none; -webkit-appearance:none;
+  width:16px; height:16px; border-radius:5px; flex-shrink:0;
+  border:1.5px solid var(--rule); background:var(--plate);
+  cursor:pointer; transition:background .15s, border-color .15s;
+  position:relative;
+}
+.cu-cb:checked {
+  background:var(--bad); border-color:var(--bad);
+}
+.cu-cb:checked::after {
+  content:""; position:absolute; inset:0; display:flex;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l3 3 5-6' stroke='%23fff' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/10px no-repeat;
+}
+.cu-dot {
+  width:8px; height:8px; border-radius:50%; flex-shrink:0;
+  background:var(--line, var(--ink-3));
+}
+.cu-sub { font-size:13px; font-weight:600; color:var(--ink); flex:1; }
+.cu-fac { font-size:11px; color:var(--ink-3); white-space:nowrap; }
+.cu-confirm { margin-top:2px; align-self:flex-start; font-size:13px; padding:7px 16px; }
+.cu-confirm:disabled { opacity:.5; cursor:default; }
+.cu-reset-row { display:flex; justify-content:center; padding:10px 0 2px; }
+.cu-reset-btn { font-size:12px; color:var(--ink-3); opacity:.6; }
+.cu-reset-btn:hover { opacity:1; color:var(--bad); }
+
+
 /* --- 1-Tap Bulk Marking --- */
 .bulk-btn {
   display:inline-flex; align-items:center; gap:6px; cursor:pointer;
@@ -4267,76 +4316,108 @@ function openCatchup() {
     box.dataset.line = "";
     const days = untouchedDays();
     box.appendChild(el("div", "d-name", "Catch up"));
-    const shutN = likelyClosures(days).length;
     box.appendChild(el("div", "d-full", days.length
-      ? "Every class day since " + longDate(SEM_START) + " that you have not touched. Mark a whole day at a time; open one to fix single classes."
-        + (shutN ? " " + shutN + " of them fell on a festival the institute usually takes off — Off keeps them out of your percentage entirely." : "")
-      : "Nothing left — every class day since " + longDate(SEM_START) + " has been marked."));
+      ? "For each day below, tick the classes you missed. Unticked ones are counted as attended."
+      : "All done — every class day since " + longDate(SEM_START) + " has been marked."));
 
     if (days.length) {
-      const all = el("button", "btn", "Mark all " + days.length + " days present");
-      all.type = "button";
-      all.addEventListener("click", () => {
-        if (!confirm("Mark every class on all " + days.length + " untouched days as present? You can change any of them afterwards.")) return;
-        days.forEach(({ iso, di }) => markDay(iso, di, "P"));
-        saveAtt(); renderAttendance();
-        if (profile) { syncAttendance().catch(() => {}); pushScore().catch(() => {}); }
-        draw();
-      });
-      box.appendChild(all);
+      const list = el("div", "cud");
 
-      const shut = likelyClosures(days);
-      if (shut.length) {
-        const off = el("button", "btn", "Mark the " + shut.length + " festival " +
-          (shut.length === 1 ? "day" : "days") + " Off");
-        off.type = "button";
-        off.addEventListener("click", () => {
-          shut.forEach(({ iso, di }) => markDay(iso, di, "C"));
+      days.forEach(({ iso, di }) => {
+        const classes = DAYS[di].items
+          .map((it, ii) => ({ it, ii, k: resolve(it) }))
+          .filter(x => x.k);
+        if (!classes.length) return;
+
+        const card = el("div", "d cu-card");
+
+        /* Day header */
+        const hdr = el("div", "cu-hdr");
+        hdr.appendChild(el("b", "cu-date", longDate(iso)));
+        hdr.appendChild(el("span", "cu-count",
+          classes.length + (classes.length === 1 ? " class" : " classes")));
+        card.appendChild(hdr);
+
+        /* Prompt */
+        card.appendChild(el("div", "cu-q", "Did you miss any class today?"));
+
+        /* Per-class checkboxes — checked = missed */
+        const checks = el("div", "cu-checks");
+        const boxes = [];
+
+        classes.forEach(({ ii, k }) => {
+          const sub = SUB[k];
+          const uid = "cu-" + iso + "-" + ii;
+
+          const lbl = document.createElement("label");
+          lbl.className = "cu-cls";
+          lbl.htmlFor = uid;
+
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.id = uid;
+          cb.className = "cu-cb";
+          boxes.push({ cb, ii, k });
+
+          const dot = el("span", "cu-dot");
+          dot.style.setProperty("--line", "var(--l-" + sub.line + ")");
+
+          lbl.appendChild(cb);
+          lbl.appendChild(dot);
+          lbl.appendChild(el("span", "cu-sub", sub.short));
+          lbl.appendChild(el("span", "cu-fac", sub.lab ? "Lab · " + sub.fac : sub.fac));
+          checks.appendChild(lbl);
+        });
+
+        card.appendChild(checks);
+
+        /* Confirm */
+        const confirmBtn = el("button", "btn cu-confirm", "Save this day");
+        confirmBtn.type = "button";
+        confirmBtn.addEventListener("click", () => {
+          boxes.forEach(({ cb, ii, k }) => {
+            att[iso + "|" + ii] = { m: cb.checked ? "A" : "P", s: k, t: Date.now() };
+          });
           saveAtt(); renderAttendance();
           if (profile) { syncAttendance().catch(() => {}); pushScore().catch(() => {}); }
-          draw();
+          card.classList.add("done");
+          confirmBtn.textContent = "✓ Saved";
+          confirmBtn.disabled = true;
+          if ([...list.querySelectorAll(".cu-card")].every(c => c.classList.contains("done"))) {
+            setTimeout(() => { document.getElementById("dlg").close(); renderCatchup(); }, 500);
+          }
         });
-        box.appendChild(off);
-      }
-
-      const list = el("div", "cud");
-      days.forEach(({ iso, di }) => {
-        const row = el("div", "d");
-        const w = el("div", "w");
-        w.appendChild(el("b", null, longDate(iso)));
-        const n = DAYS[di].items.filter(it => resolve(it)).length;
-        const names = holidayNames(iso);
-        w.appendChild(document.createTextNode(n + (n === 1 ? " class" : " classes") + (names ? " · " + names : "")));
-        if (likelyOn(iso)) w.appendChild(el("i", "flag", "usually closed — Off"));
-        row.appendChild(w);
-        const marks = el("div", "marks");
-        [["P", "All present"], ["A", "All absent"], ["C", "Off"]].forEach(([mk, lbl]) => {
-          const btn = el("button", null, lbl);
-          btn.type = "button"; btn.dataset.m = mk;
-          btn.setAttribute("aria-label", lbl + " — " + longDate(iso));
-          btn.addEventListener("click", () => {
-            markDay(iso, di, mk);
-            saveAtt(); renderAttendance();
-            if (profile) { syncAttendance().catch(() => {}); pushScore().catch(() => {}); }
-            row.classList.add("done");
-            btn.setAttribute("aria-pressed", "true");
-          });
-          marks.appendChild(btn);
-        });
-        row.appendChild(marks);
-        const open = el("button", "link", "Open");
-        open.type = "button";
-        open.addEventListener("click", () => {
-          document.getElementById("attDate").value = iso;
-          document.getElementById("dlg").close();
-          renderAttendance();
-          document.getElementById("attRail").scrollIntoView({ block:"start" });
-        });
-        row.appendChild(open);
-        list.appendChild(row);
+        card.appendChild(confirmBtn);
+        list.appendChild(card);
       });
+
       box.appendChild(list);
     }
+
+    /* ── Redo / reset — always available at the bottom ── */
+    const resetRow = el("div", "cu-reset-row");
+    const resetBtn = el("button", "link cu-reset-btn", "↺ Redo catch-up from scratch");
+    resetBtn.type = "button";
+    resetBtn.addEventListener("click", async () => {
+      if (!confirm("Delete ALL attendance records and redo the catch-up from scratch?")) return;
+      resetBtn.textContent = "Clearing…";
+      resetBtn.disabled = true;
+      try {
+        if (profile) await wipeAttendance();
+        att = {};
+        saveAtt();
+        renderAttendance();
+        renderCatchup();
+        draw();
+      } catch (err) {
+        resetBtn.textContent = "↺ Redo catch-up from scratch";
+        resetBtn.disabled = false;
+        alert("Cloud clear failed: " + (err && err.message || err));
+      }
+    });
+    resetRow.appendChild(resetBtn);
+    box.appendChild(resetRow);
+
     box.appendChild(actions());
   };
   draw();
