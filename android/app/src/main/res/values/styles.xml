@@ -16,15 +16,15 @@
           The window behind the WebView. Left transparent, the system paints white
           there for the frame or two before the page renders, which reads as a flash.
         -->
-        <item name="android:background">#07090C</item>
-        <item name="android:windowBackground">#07090C</item>
+        <item name="android:background">#000000</item>
+        <item name="android:windowBackground">#000000</item>
     </style>
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <!-- pre-Android 12 launch window -->
         <item name="android:background">@drawable/launch_screen</item>
         <!-- Android 12+ draws its own splash and ignores the window background -->
-        <item name="windowSplashScreenBackground">#07090C</item>
+        <item name="windowSplashScreenBackground">#000000</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
 

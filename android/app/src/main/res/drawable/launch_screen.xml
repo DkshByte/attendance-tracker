@@ -9,14 +9,7 @@
 
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#07090C" />
-        </shape>
-    </item>
-
-    <item android:gravity="center">
-        <shape android:shape="oval">
-            <size android:width="26dp" android:height="26dp" />
-            <solid android:color="#E4322B" />
+            <solid android:color="#000000" />
         </shape>
     </item>
 
