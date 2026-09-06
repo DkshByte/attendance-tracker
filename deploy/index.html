@@ -238,15 +238,24 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
   background:transparent; color:var(--line); box-shadow:inset 0 0 0 1px var(--line);
 }
 
-/* ============ status plate ============ */
+/* ============ status plate & carousel slides ============ */
 .plate {
+  flex:0 0 calc(100% - 36px); min-width:calc(100% - 36px); max-width:380px; width:calc(100% - 36px);
+  scroll-snap-align:start; scroll-snap-stop:always;
   position:relative; overflow:hidden;
-  margin:16px 0 4px; padding:18px 18px 16px;
+  margin:0; padding:18px 18px 16px;
   background:var(--glass-plate);
   backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
-  border:1px solid var(--glass-border); border-radius:14px;
+  border:1px solid var(--glass-border); border-radius:16px;
   box-shadow:var(--lift), var(--glass-highlight);
+  box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between;
+  transition:border-color .2s var(--ease), transform .18s var(--ease);
 }
+@media (min-width:640px) {
+  .plate { flex:0 0 360px; min-width:360px; width:360px; }
+}
+.plate-main { display:flex; flex-direction:column; }
 .plate-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:9px; }
 .plate-when { font-size:13px; color:var(--ink-2); font-weight:500; }
 .plate-when b { color:var(--ink); font-weight:600; }
@@ -255,13 +264,13 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
   letter-spacing:.03em;
 }
 .plate h1 {
-  font-size:clamp(30px, 8.4vw, 44px); line-height:1.02; letter-spacing:-.012em;
+  font-size:clamp(26px, 7.5vw, 36px); line-height:1.06; letter-spacing:-.012em;
   text-wrap:balance; margin-bottom:6px;
 }
-.plate .who { font-size:14.5px; color:var(--ink-2); }
+.plate .who { font-size:13.5px; color:var(--ink-2); line-height:1.35; }
 .plate .who b { color:var(--ink); font-weight:600; }
 
-.gauge { margin-top:15px; }
+.gauge { margin-top:12px; }
 .gauge .track {
   height:4px; border-radius:2px; background:var(--rule); overflow:hidden;
 }
@@ -278,7 +287,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 
 .upnext {
   display:flex; align-items:center; gap:11px; width:100%; text-align:left;
-  margin-top:14px; padding:12px 14px; cursor:pointer;
+  margin-top:auto; padding:11px 13px; cursor:pointer;
   background:color-mix(in srgb, var(--plate-2) 65%, transparent);
   backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   border:1px solid var(--glass-border); border-radius:10px;
@@ -296,25 +305,26 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 
 /* ============ Today Slidable Attendance Carousel ============ */
 .att-carousel-wrap {
-  margin:14px 0 6px; position:relative;
+  margin:16px 0 6px; position:relative;
 }
 .att-carousel {
   display:flex; gap:12px; overflow-x:auto;
   scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
   scrollbar-width:none; padding:4px 2px 8px;
+  align-items:stretch;
 }
 .att-carousel::-webkit-scrollbar { display:none; }
 .att-card {
-  flex:0 0 calc(100% - 36px); min-width:calc(100% - 36px); max-width:380px;
+  flex:0 0 calc(100% - 36px); min-width:calc(100% - 36px); max-width:380px; width:calc(100% - 36px);
   scroll-snap-align:start; scroll-snap-stop:always;
   background:var(--glass-plate); border:1px solid var(--glass-border); border-radius:16px;
   backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
   box-shadow:var(--lift), var(--glass-highlight);
-  padding:16px 18px 14px; display:flex; flex-direction:column; justify-content:space-between;
+  padding:18px 18px 16px; display:flex; flex-direction:column; justify-content:space-between;
   box-sizing:border-box; transition:border-color .2s var(--ease), transform .18s var(--ease);
 }
 @media (min-width:640px) {
-  .att-card { flex:0 0 320px; min-width:320px; }
+  .att-card { flex:0 0 340px; min-width:340px; width:340px; }
 }
 .att-card-top {
   display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;
@@ -1752,7 +1762,6 @@ input[type="date"] { padding:12px 14px; }
 
   <section id="today">
     <div id="plateBox"></div>
-    <div id="todayAttCardsBox"></div>
     <div id="eodNoticeBox"></div>
     <div id="taskDueBox"></div>
     <div class="h2row" style="margin-top:24px">
@@ -2393,7 +2402,6 @@ function renderToday() {
   const di = new Date().getDay() - 1;
   const live = di >= 0 && di < 6;                  /* Sunday: di is -1, and it owns no rail */
   renderPlate();
-  renderTodayAttCards();
   const up = live ? null : nextRunningDay(isoOf(new Date()));
   const dayIdx = live ? di : (up ? up.di : 0);
   document.getElementById("todayHead").textContent =
@@ -2422,6 +2430,16 @@ function renderToday() {
 
 function renderPlate() {
   const box = document.getElementById("plateBox");
+  if (!box) return;
+
+  /* Remember scroll position if re-rendering */
+  let activeIdx = 0;
+  const oldCarousel = document.getElementById("todayHeroCarousel");
+  if (oldCarousel && oldCarousel.offsetWidth) {
+    const cardW = (oldCarousel.firstElementChild ? oldCarousel.firstElementChild.offsetWidth : 0) + 12;
+    if (cardW > 0) activeIdx = Math.min(3, Math.max(0, Math.round(oldCarousel.scrollLeft / cardW)));
+  }
+
   box.textContent = "";
   const now = nowMin(), di = new Date().getDay() - 1;
   const day = di >= 0 && di < 6 ? DAYS[di] : null;
@@ -2441,10 +2459,12 @@ function renderPlate() {
     if (up) { nextDay = DAYS[up.di]; next = nextDay.items[0]; }
   }
 
+  /* ---------------- SLIDE 1: Status Tile ---------------- */
   const plate = el("div", "plate");
+  const pMain = el("div", "plate-main");
   if (profile) {
     const hi = el("div", "plate-hi", "Hi, " + profile.name.split(/\s+/)[0]);
-    plate.appendChild(hi);
+    pMain.appendChild(hi);
   }
   const row = el("div", "plate-row");
   const when = el("div", "plate-when");
@@ -2454,9 +2474,9 @@ function renderPlate() {
     row.appendChild(el("span", "badge", "Closed"));
     when.textContent = new Date().toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long" });
     row.appendChild(when);
-    plate.appendChild(row);
-    plate.appendChild(el("h1", null, hol.n));
-    plate.appendChild(el("div", "who", "Institute closed — gazetted holiday."));
+    pMain.appendChild(row);
+    pMain.appendChild(el("h1", null, hol.n));
+    pMain.appendChild(el("div", "who", "Institute closed — gazetted holiday."));
   } else if (current) {
     const key = resolve(current);
     const span = current.span || 1;
@@ -2468,8 +2488,8 @@ function renderPlate() {
     when.appendChild(document.createTextNode("ends "));
     when.appendChild(el("b", null, TIMES[(current.i + span - 1 < 3 ? current.i + span - 1 : current.i + span) + 1]));
     row.appendChild(when);
-    plate.appendChild(row);
-    plate.appendChild(el("h1", null, key ? SUB[key].name : "Practical — batches split"));
+    pMain.appendChild(row);
+    pMain.appendChild(el("h1", null, key ? SUB[key].name : "Practical — batches split"));
     const who = el("div", "who");
     if (key) {
       who.appendChild(el("b", null, SUB[key].fac));
@@ -2477,7 +2497,7 @@ function renderPlate() {
     } else {
       who.textContent = "F1 " + SUB[current.split.F1].short + " · F2 " + SUB[current.split.F2].short;
     }
-    plate.appendChild(who);
+    pMain.appendChild(who);
 
     const g = el("div", "gauge");
     const track = el("div", "track");
@@ -2489,7 +2509,7 @@ function renderPlate() {
     const r = el("span"); r.appendChild(el("b", null, left + " min")); r.appendChild(document.createTextNode(" left"));
     cap.appendChild(r);
     g.appendChild(cap);
-    plate.appendChild(g);
+    pMain.appendChild(g);
   } else {
     plate.dataset.line = "";
     const lunching = day && now >= LUNCH_FROM && now < LUNCH_TO;
@@ -2499,17 +2519,18 @@ function renderPlate() {
     row.appendChild(el("span", "badge ghost", lunching ? "Lunch" : closed ? "No service" : "Between classes"));
     when.textContent = new Date().toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long" });
     row.appendChild(when);
-    plate.appendChild(row);
-    plate.appendChild(el("h1", null,
+    pMain.appendChild(row);
+    pMain.appendChild(el("h1", null,
       lunching ? "Lunch until 11:30"
       : closed ? "No classes today"
       : before ? "Classes haven't started"
       : after ? "Day's over"
       : "Free right now"));
-    plate.appendChild(el("div", "who", closed
+    pMain.appendChild(el("div", "who", closed
       ? "The line does not run on " + (day ? day.d : "Sunday") + "."
       : "Nothing scheduled at this moment."));
   }
+  plate.appendChild(pMain);
 
   if (next) {
     const key = resolve(next), span = next.span || 1;
@@ -2527,23 +2548,8 @@ function renderPlate() {
     b.addEventListener("click", () => openDetail(next, DAYS.indexOf(nextDay)));
     plate.appendChild(b);
   }
-  box.appendChild(plate);
-}
 
-function renderTodayAttCards() {
-  const box = document.getElementById("todayAttCardsBox");
-  if (!box) return;
-
-  /* Remember scroll position if re-rendering */
-  let activeIdx = 0;
-  const oldCarousel = document.getElementById("todayAttCarousel");
-  if (oldCarousel && oldCarousel.offsetWidth) {
-    const cardW = (oldCarousel.firstElementChild ? oldCarousel.firstElementChild.offsetWidth : 0) + 12;
-    if (cardW > 0) activeIdx = Math.min(3, Math.max(0, Math.round(oldCarousel.scrollLeft / cardW)));
-  }
-
-  box.textContent = "";
-
+  /* ---------------- SLIDE 2: Overall Attendance ---------------- */
   const t = tally(), tb = termBudget();
   const keys = Object.keys(t);
   const totalP = keys.reduce((n, k) => n + t[k].p, 0);
@@ -2552,103 +2558,95 @@ function renderTodayAttCards() {
   const isClear = clear(totalP, totalH);
   const bp = bunkPlan();
 
-  const wrap = el("div", "att-carousel-wrap");
-  const carousel = el("div", "att-carousel");
-  carousel.id = "todayAttCarousel";
-
-  /* ---------------- CARD 1: Overall Attendance ---------------- */
-  const c1 = el("div", "att-card");
-  const c1Top = el("div", "att-card-top");
-  c1Top.appendChild(el("span", "att-card-lbl", "Overall Attendance"));
-  const c1Badge = el("span", "att-badge " + (!totalH ? "ghost" : (isClear ? "good" : "warn")),
-    !totalH ? "Not Started" : (isClear ? "On Track" : "Below Target"));
-  c1Top.appendChild(c1Badge);
-  c1.appendChild(c1Top);
-
-  const c1Hero = el("div", "att-card-hero");
-  const c1Val = el("span", "att-card-val" + (totalH ? (isClear ? " good" : " warn") : ""),
-    totalH ? (overall + "%") : "—");
-  c1Hero.appendChild(c1Val);
-  if (totalH) {
-    const diff = overall - targetPct;
-    const diffEl = el("span", "att-diff " + (diff >= 0 ? "good" : "warn"),
-      (diff >= 0 ? "+" : "") + diff + "% vs " + targetPct + "%");
-    c1Hero.appendChild(diffEl);
-  } else {
-    c1Hero.appendChild(el("span", "att-card-unit", "Target " + targetPct + "%"));
-  }
-  c1.appendChild(c1Hero);
-
-  const c1Sub = el("div", "att-card-sub",
-    totalH ? (totalP + " attended · " + (totalH - totalP) + " missed · " + totalH + " held so far")
-           : "Mark your classes on today's line or the attendance board to start tracking.");
-  c1.appendChild(c1Sub);
-
-  const c1Gauge = el("div", "att-mini-gauge");
-  const c1Fill = el("i", isClear ? "good" : "warn");
-  c1Fill.style.width = Math.min(100, Math.max(0, overall || 0)) + "%";
-  c1Gauge.appendChild(c1Fill);
-  c1.appendChild(c1Gauge);
-
-  const c1Act = el("button", "att-card-act", "View attendance board →");
-  c1Act.type = "button";
-  c1Act.addEventListener("click", () => { show("attendance"); showATab("board"); });
-  c1.appendChild(c1Act);
-  carousel.appendChild(c1);
-
-  /* ---------------- CARD 2: Safe Bunk Budget ---------------- */
   const c2 = el("div", "att-card");
   const c2Top = el("div", "att-card-top");
-  c2Top.appendChild(el("span", "att-card-lbl", "Safe Bunk Budget"));
-  const hasLost = bp.lost.length > 0;
-  const safeSkips = bp.left;
-  const c2Badge = el("span", "att-badge " + (hasLost ? "warn" : (safeSkips > 0 ? "good" : "ghost")),
-    hasLost ? "Attention" : (safeSkips > 0 ? "Safe Room" : "Zero Margin"));
+  c2Top.appendChild(el("span", "att-card-lbl", "Overall Attendance"));
+  const c2Badge = el("span", "att-badge " + (!totalH ? "ghost" : (isClear ? "good" : "warn")),
+    !totalH ? "Not Started" : (isClear ? "On Track" : "Below Target"));
   c2Top.appendChild(c2Badge);
   c2.appendChild(c2Top);
 
   const c2Hero = el("div", "att-card-hero");
-  const c2Val = el("span", "att-card-val" + (hasLost ? " warn" : (safeSkips > 0 ? " good" : "")),
-    hasLost ? "Deficit" : String(safeSkips));
+  const c2Val = el("span", "att-card-val" + (totalH ? (isClear ? " good" : " warn") : ""),
+    totalH ? (overall + "%") : "—");
   c2Hero.appendChild(c2Val);
-  c2Hero.appendChild(el("span", "att-card-unit",
-    hasLost ? "needs recovery" : (safeSkips === 1 ? "safe bunk left" : "safe bunks left")));
+  if (totalH) {
+    const diff = overall - targetPct;
+    const diffEl = el("span", "att-diff " + (diff >= 0 ? "good" : "warn"),
+      (diff >= 0 ? "+" : "") + diff + "% vs " + targetPct + "%");
+    c2Hero.appendChild(diffEl);
+  } else {
+    c2Hero.appendChild(el("span", "att-card-unit", "Target " + targetPct + "%"));
+  }
   c2.appendChild(c2Hero);
 
   const c2Sub = el("div", "att-card-sub",
-    hasLost ? (bp.lost.map(x => SUB[x.k].short).join(", ") + " cannot reach " + targetPct + "% — attend upcoming classes to recover.")
-            : (!safeSkips ? ("Attend all " + tb.overall.r + " remaining classes to stay at or above " + targetPct + "%.")
-                          : (safeSkips + " classes you can safely skip across subjects while staying ≥ " + targetPct + "%.")));
+    totalH ? (totalP + " attended · " + (totalH - totalP) + " missed · " + totalH + " held so far")
+           : "Mark your classes on today's line or the attendance board to start tracking.");
   c2.appendChild(c2Sub);
 
-  const c2Act = el("button", "att-card-act", "Open bunk planner →");
-  c2Act.type = "button";
-  c2Act.addEventListener("click", () => { show("attendance"); showATab("bunk"); });
-  c2.appendChild(c2Act);
-  carousel.appendChild(c2);
+  const c2Gauge = el("div", "att-mini-gauge");
+  const c2Fill = el("i", isClear ? "good" : "warn");
+  c2Fill.style.width = Math.min(100, Math.max(0, overall || 0)) + "%";
+  c2Gauge.appendChild(c2Fill);
+  c2.appendChild(c2Gauge);
 
-  /* ---------------- CARD 3: Subject Snapshot ---------------- */
+  const c2Act = el("button", "att-card-act", "View attendance board →");
+  c2Act.type = "button";
+  c2Act.addEventListener("click", () => { show("attendance"); showATab("board"); });
+  c2.appendChild(c2Act);
+
+  /* ---------------- SLIDE 3: Safe Bunk Budget ---------------- */
   const c3 = el("div", "att-card");
   const c3Top = el("div", "att-card-top");
-  c3Top.appendChild(el("span", "att-card-lbl", "Subject Snapshot"));
-  const belowCount = keys.filter(k => !clear(t[k].p, t[k].h)).length;
-  const c3Badge = el("span", "att-badge " + (!keys.length ? "ghost" : (belowCount ? "warn" : "good")),
-    !keys.length ? "0 Tracked" : (belowCount ? (belowCount + " below " + targetPct + "%") : "All Clear"));
+  c3Top.appendChild(el("span", "att-card-lbl", "Safe Bunk Budget"));
+  const hasLost = bp.lost.length > 0;
+  const safeSkips = bp.left;
+  const c3Badge = el("span", "att-badge " + (hasLost ? "warn" : (safeSkips > 0 ? "good" : "ghost")),
+    hasLost ? "Attention" : (safeSkips > 0 ? "Safe Room" : "Zero Margin"));
   c3Top.appendChild(c3Badge);
   c3.appendChild(c3Top);
 
   const c3Hero = el("div", "att-card-hero");
-  const c3Val = el("span", "att-card-val",
-    keys.length ? (keys.length - belowCount) + "/" + keys.length : "0");
+  const c3Val = el("span", "att-card-val" + (hasLost ? " warn" : (safeSkips > 0 ? " good" : "")),
+    hasLost ? "Deficit" : String(safeSkips));
   c3Hero.appendChild(c3Val);
-  c3Hero.appendChild(el("span", "att-card-unit", "subjects at or above target"));
+  c3Hero.appendChild(el("span", "att-card-unit",
+    hasLost ? "needs recovery" : (safeSkips === 1 ? "safe bunk left" : "safe bunks left")));
   c3.appendChild(c3Hero);
 
-  const c3Subs = el("div", "att-card-subs");
+  const c3Sub = el("div", "att-card-sub",
+    hasLost ? (bp.lost.map(x => SUB[x.k].short).join(", ") + " cannot reach " + targetPct + "% — attend upcoming classes to recover.")
+            : (!safeSkips ? ("Attend all " + tb.overall.r + " remaining classes to stay at or above " + targetPct + "%.")
+                          : (safeSkips + " classes you can safely skip across subjects while staying ≥ " + targetPct + "%.")));
+  c3.appendChild(c3Sub);
+
+  const c3Act = el("button", "att-card-act", "Open bunk planner →");
+  c3Act.type = "button";
+  c3Act.addEventListener("click", () => { show("attendance"); showATab("bunk"); });
+  c3.appendChild(c3Act);
+
+  /* ---------------- SLIDE 4: Subject Snapshot ---------------- */
+  const c4 = el("div", "att-card");
+  const c4Top = el("div", "att-card-top");
+  c4Top.appendChild(el("span", "att-card-lbl", "Subject Snapshot"));
+  const belowCount = keys.filter(k => !clear(t[k].p, t[k].h)).length;
+  const c4Badge = el("span", "att-badge " + (!keys.length ? "ghost" : (belowCount ? "warn" : "good")),
+    !keys.length ? "0 Tracked" : (belowCount ? (belowCount + " below " + targetPct + "%") : "All Clear"));
+  c4Top.appendChild(c4Badge);
+  c4.appendChild(c4Top);
+
+  const c4Hero = el("div", "att-card-hero");
+  const c4Val = el("span", "att-card-val",
+    keys.length ? (keys.length - belowCount) + "/" + keys.length : "0");
+  c4Hero.appendChild(c4Val);
+  c4Hero.appendChild(el("span", "att-card-unit", "subjects on track"));
+  c4.appendChild(c4Hero);
+
+  const c4Subs = el("div", "att-card-subs");
   if (!keys.length) {
-    c3Subs.appendChild(el("div", "att-empty-note", "No subjects marked yet. Tap a class on today's line to log attendance."));
+    c4Subs.appendChild(el("div", "att-empty-note", "No subjects marked yet. Tap a class on today's line to log attendance."));
   } else {
-    /* Show tightest / lowest percentages first */
     const sorted = [...keys].sort((a, b) => (t[a].p / (t[a].h || 1)) - (t[b].p / (t[b].h || 1))).slice(0, 4);
     sorted.forEach(k => {
       const { p, h } = t[k];
@@ -2660,96 +2658,53 @@ function renderTodayAttCards() {
       pill.appendChild(dot);
       pill.appendChild(el("span", "att-sub-name", SUB[k].short));
       pill.appendChild(el("span", "att-sub-pct " + (isSubClear ? "good" : "warn"), pct + "%"));
-      c3Subs.appendChild(pill);
+      c4Subs.appendChild(pill);
     });
   }
-  c3.appendChild(c3Subs);
+  c4.appendChild(c4Subs);
 
-  const c3Act = el("button", "att-card-act", "All subjects ledger →");
-  c3Act.type = "button";
-  c3Act.addEventListener("click", () => { show("attendance"); showATab("board"); });
-  c3.appendChild(c3Act);
+  const c4Act = el("button", "att-card-act", "All subjects ledger →");
+  c4Act.type = "button";
+  c4Act.addEventListener("click", () => { show("attendance"); showATab("board"); });
+  c4.appendChild(c4Act);
+
+  /* ---------------- Assemble Horizontal Carousel ---------------- */
+  const wrap = el("div", "att-carousel-wrap");
+  const carousel = el("div", "att-carousel");
+  carousel.id = "todayHeroCarousel";
+
+  carousel.appendChild(plate);
+  carousel.appendChild(c2);
   carousel.appendChild(c3);
-
-  /* ---------------- CARD 4: Today's Status & Action ---------------- */
-  const c4 = el("div", "att-card");
-  const c4Top = el("div", "att-card-top");
-  c4Top.appendChild(el("span", "att-card-lbl", "Today's Status"));
-
-  const todayIso = nowISO();
-  const dToday = fromISO(todayIso);
-  const diToday = dToday.getDay() - 1;
-  const isSchoolDay = diToday >= 0 && diToday < 6 && DAYS[diToday] && DAYS[diToday].items.length && !gazettedOn(todayIso);
-  const items = isSchoolDay ? DAYS[diToday].items.map((it, ii) => ({ it, ii, k: resolve(it) })).filter(x => x.k) : [];
-  const attendedToday = items.filter(x => att[todayIso + "|" + x.ii] && att[todayIso + "|" + x.ii].m === "P").length;
-  const absentToday = items.filter(x => att[todayIso + "|" + x.ii] && att[todayIso + "|" + x.ii].m === "A").length;
-  const unmarkedToday = items.filter(x => !att[todayIso + "|" + x.ii]).length;
-  const allMarkedP = items.length > 0 && attendedToday === items.length;
-
-  const upDay = isSchoolDay ? null : nextRunningDay(todayIso);
-
-  const c4Badge = el("span", "att-badge " + (isSchoolDay ? (allMarkedP ? "good" : "ghost") : "ghost"),
-    isSchoolDay ? (DAYS[diToday].d + " · " + items.length + " classes") : (upDay ? (DAYS[upDay.di].d + " next") : "Off Today"));
-  c4Top.appendChild(c4Badge);
-  c4.appendChild(c4Top);
-
-  const c4Hero = el("div", "att-card-hero");
-  const c4Val = el("span", "att-card-val" + (attendedToday > 0 ? " good" : ""),
-    isSchoolDay ? (attendedToday + "/" + items.length) : (upDay ? String(DAYS[upDay.di].items.length) : "0"));
-  c4Hero.appendChild(c4Val);
-  c4Hero.appendChild(el("span", "att-card-unit",
-    isSchoolDay ? (allMarkedP ? "all attended ✓" : (unmarkedToday ? unmarkedToday + " left to mark" : "marked"))
-                : (upDay ? "classes on " + DAYS[upDay.di].d : "no classes")));
-  c4.appendChild(c4Hero);
-
-  const c4Sub = el("div", "att-card-sub",
-    isSchoolDay ? (attendedToday + " present" + (absentToday ? " · " + absentToday + " absent" : "") + (unmarkedToday ? " · " + unmarkedToday + " unrecorded" : " · all logged"))
-                : (upDay ? "Institute is off today. The next classes run on " + DAYS[upDay.di].d + "." : "No institute classes scheduled."));
-  c4.appendChild(c4Sub);
-
-  if (isSchoolDay && items.length > 0) {
-    const c4Act = el("button", "att-card-act pri", allMarkedP ? "✓ All present (undo)" : "⚡ Mark all present");
-    c4Act.type = "button";
-    c4Act.addEventListener("click", () => markAllDay(todayIso, "P"));
-    c4.appendChild(c4Act);
-  } else {
-    const c4Act = el("button", "att-card-act", "View schedule →");
-    c4Act.type = "button";
-    c4Act.addEventListener("click", () => show("week"));
-    c4.appendChild(c4Act);
-  }
   carousel.appendChild(c4);
 
-  wrap.appendChild(carousel);
-
-  /* ---------------- Dots Pagination ---------------- */
+  const cards = [plate, c2, c3, c4];
   const dotsBox = el("div", "att-carousel-dots");
-  const cards = [c1, c2, c3, c4];
   const dots = cards.map((card, idx) => {
     const dot = el("button", "att-dot" + (idx === activeIdx ? " active" : ""));
     dot.type = "button";
     dot.setAttribute("aria-label", "Slide " + (idx + 1));
     dot.addEventListener("click", () => {
-      card.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+      carousel.scrollTo({ left: card.offsetLeft - carousel.offsetLeft, behavior: "smooth" });
     });
     dotsBox.appendChild(dot);
     return dot;
   });
 
-  /* Update active dot on scroll */
   carousel.addEventListener("scroll", () => {
     const scrollLeft = carousel.scrollLeft;
-    const cardW = (c1.offsetWidth || 280) + 12;
+    const cardW = (plate.offsetWidth || 300) + 12;
     const curIdx = Math.min(cards.length - 1, Math.max(0, Math.round(scrollLeft / cardW)));
     dots.forEach((d, i) => d.classList.toggle("active", i === curIdx));
   }, { passive: true });
 
+  wrap.appendChild(carousel);
   wrap.appendChild(dotsBox);
   box.appendChild(wrap);
 
   if (activeIdx > 0 && cards[activeIdx]) {
     requestAnimationFrame(() => {
-      cards[activeIdx].scrollIntoView({ inline: "start", block: "nearest" });
+      carousel.scrollLeft = cards[activeIdx].offsetLeft - carousel.offsetLeft;
       dots.forEach((d, i) => d.classList.toggle("active", i === activeIdx));
     });
   }
