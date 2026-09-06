@@ -1,17 +1,28 @@
 {
-  "name": "secf-it1",
+  "name": "bunkr",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Glassmorphic attendance tracker, 75% bunk budget calculator, and live timetable for ADGIPS Sec F IT-1 (GGSIPU)",
+  "main": "timetable.html",
   "scripts": {
     "prep": "cp timetable.html deploy/index.html && cp timetable.html boot/app.html",
     "sync": "npm run prep && npx cap sync",
     "open": "npm run sync && npx cap open android",
     "build": "npm run sync && cd android && ./gradlew assembleDebug"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "bunkr",
+    "attendance-tracker",
+    "timetable",
+    "college-app",
+    "bunk-calculator",
+    "ggsipu",
+    "capacitor",
+    "supabase",
+    "glassmorphism"
+  ],
+  "author": "Daksh Sharma <dakshsharma3758@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://deploy-hazel-three-81.vercel.app",
   "type": "commonjs",
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^10.0.0",

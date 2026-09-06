@@ -2899,7 +2899,7 @@ function openICS() {
 
    The publishable key below is meant to be public — it ships in
    the source of every Supabase app. What protects the data is the
-   row-level security in students-setup.sql: a student can read and
+   row-level security in supabase/01-students-setup.sql: a student can read and
    write only the roster row they have claimed, claiming goes through
    a database function that cannot be raced, and percentages never
    leave the database. Everyone reads two views: roster (names and
@@ -3341,13 +3341,13 @@ function explain(err) {
   if (c === "23505" && m.includes("already claimed a name"))
     return ["This account already has a name", "Sign in — you don't need to claim again."];
   if (c === "23505") return ["Someone just took that", "Go back and pick another name or username."];
-  if (c === "PGRST205") return ["The roster is missing", "Run students-setup.sql in Supabase."];
+  if (c === "PGRST205") return ["The roster is missing", "Run supabase/01-students-setup.sql in Supabase."];
   if (c === "PGRST204" && m.includes("attendance_cleared_at"))
-    return ["Your account cannot record a clear", "Run STEP 5 of attendance-setup.sql in Supabase."];
+    return ["Your account cannot record a clear", "Run STEP 5 of supabase/02-attendance-setup.sql in Supabase."];
   if (c === "42501" && m.includes("row-level security"))
-    return ["The account rejected that record", "Run STEP 2 of attendance-setup.sql — the policies are missing."];
+    return ["The account rejected that record", "Run STEP 2 of supabase/02-attendance-setup.sql — the policies are missing."];
   if (c === "42501" || m.includes("permission denied"))
-    return ["Your account cannot reach the attendance table", "Run STEP 2 of attendance-setup.sql in Supabase — the grant is missing."];
+    return ["Your account cannot reach the attendance table", "Run STEP 2 of supabase/02-attendance-setup.sql in Supabase — the grant is missing."];
   if (err.status === 401 || c === "PGRST301") return ["Your session expired", "Sign in again."];
   if (c === "over_email_send_rate_limit") return ["Too many emails just now", "Wait an hour and try again."];
   if (err.status === 429 || c === "over_request_rate_limit")
