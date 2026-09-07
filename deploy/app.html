@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+2dee234-->
+<!--secf-app--><!--build:1.0.1+7846486-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -970,12 +970,18 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 
 .hlist { display:grid; grid-template-columns:repeat(auto-fill, minmax(272px,1fr)); gap:1px;
          background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; margin-top:8px; }
-.hrow { display:flex; gap:13px; align-items:baseline; padding:11px 14px; background:var(--plate); }
+.hrow { display:flex; gap:13px; align-items:baseline; padding:11px 14px; background:var(--plate);
+         width:100%; border:0; font:inherit; color:inherit; text-align:left; cursor:pointer;
+         transition:background .18s var(--ease); }
+.hrow:hover { background:var(--plate-3); }
+.hrow:focus-visible { outline:2px solid var(--focus); outline-offset:-2px; }
 .hrow .d { font-size:12.5px; color:var(--ink-3); width:96px; flex:none; font-weight:600; }
 .hrow .n { font-size:13.5px; }
+.hrow .w { font-size:11.5px; font-weight:600; color:var(--ink-3); }
 .hrow.res .n { color:var(--ink-2); }
 .hrow.res .d::before { content:"○ "; }
 .hrow.past { opacity:.45; }
+.hempty { grid-column:1/-1; padding:14px; background:var(--plate); color:var(--ink-2); font-size:13.5px; }
 
 /* --- contact links --- */
 .clinks { display:grid; gap:8px; margin-top:16px; }
@@ -2405,6 +2411,7 @@ input[type="date"] { padding:12px 14px; }
   <section id="holidays" hidden>
     <div class="h2row">
       <h2>Closures 2026</h2>
+      <button class="link" id="pastToggle" type="button" aria-pressed="false">Show past</button>
       <button class="link" id="resToggle" type="button" aria-pressed="false">Show restricted</button>
     </div>
     <div class="hkey">
@@ -3580,13 +3587,26 @@ const gazettedOn = iso => (HOLIDAYS[iso] || []).filter(h => h.gaz)[0];
 const likelyOn = iso => (HOLIDAYS[iso] || []).filter(h => h.likely)[0];
 const holidayNames = iso => (HOLIDAYS[iso] || []).map(h => h.n).join(" · ");
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-let showRestricted = false;
+let showRestricted = false, showPast = false;
+
+/* What a closure actually costs. Three of 2026's gazetted days land on a weekend —
+   Diwali among them — and a weekend closure takes nothing off the timetable. */
+const classCountOn = iso => { const di = fromISO(iso).getDay() - 1; return di >= 0 && di <= 5 ? DAYS[di].items.length : 0; };
+
+/* By September most of the year is behind you, and the page used to open on January.
+   It now opens on the current month; Show past puts the rest back. Outside 2026
+   there is no "past" to cut, so everything shows. */
+function pastCut() {
+  const t = isoOf(new Date());
+  return (showPast || t < "2026-01-01" || t > "2026-12-31") ? null : t.slice(0, 7) + "-01";
+}
 
 function renderMonths() {
   const box = document.getElementById("months");
   box.textContent = "";
   const todayISO = isoOf(new Date());
-  for (let m = 0; m < 12; m++) {
+  const cut = pastCut();
+  for (let m = cut ? +cut.slice(5, 7) - 1 : 0; m < 12; m++) {
     const mo = el("div", "mo");
     mo.appendChild(el("h3", null, MONTHS[m]));
     const g = el("div", "mgrid");
@@ -3620,22 +3640,31 @@ function renderHolidayList() {
   const box = document.getElementById("hlist");
   box.textContent = "";
   const todayISO = isoOf(new Date());
+  const cut = pastCut();
   const rest = showRestricted ? RESTRICTED : RESTRICTED.filter(h => h[2]);
   const rows = [...GAZETTED.map(h => [h[0], h[1], true, false]), ...rest.map(h => [h[0], h[1], false, !!h[2]])]
+    .filter(r => !cut || r[0] >= cut)
     .sort((a, b) => a[0].localeCompare(b[0]));
   rows.forEach(([iso, name, gaz, likely]) => {
-    const r = el("div", "hrow" + (gaz ? "" : " res") + (iso < todayISO ? " past" : ""));
+    const r = el("button", "hrow" + (gaz ? "" : " res") + (iso < todayISO ? " past" : ""));
+    r.type = "button";
     const d = fromISO(iso);
     r.appendChild(el("div", "d", d.toLocaleDateString("en-IN", { day:"2-digit", month:"short" }) + " · " + d.toLocaleDateString("en-IN", { weekday:"short" })));
-    r.appendChild(el("div", "n", name + (likely ? " · usually closed" : "")));
+    const n = el("div", "n", name + (likely ? " · usually closed" : ""));
+    if (!classCountOn(iso)) n.appendChild(el("span", "w", " · weekend"));
+    r.appendChild(n);
+    r.addEventListener("click", () => openHoliday(iso));
     box.appendChild(r);
   });
+  if (!rows.length) box.appendChild(el("div", "hempty",
+    showRestricted ? "Nothing left in 2026." : "No closures left in 2026. Show restricted for the rest."));
 
   const next = GAZETTED.find(h => h[0] >= todayISO);
   const nh = document.getElementById("nextHol");
   if (next) {
     const days = Math.round((fromISO(next[0]) - fromISO(todayISO)) / 86400000);
-    nh.textContent = "Next closure: " + next[1] + (days === 0 ? ", today" : days === 1 ? ", tomorrow" : ", in " + days + " days");
+    nh.textContent = "Next closure: " + next[1] + (days === 0 ? ", today" : days === 1 ? ", tomorrow" : ", in " + days + " days")
+      + (classCountOn(next[0]) ? "" : " — a weekend, so nothing comes off");
   } else nh.textContent = "";
 }
 
@@ -3651,12 +3680,20 @@ function openHoliday(iso) {
   box.appendChild(el("div", "d-name", d.toLocaleDateString("en-IN", { day:"numeric", month:"long" })));
   box.appendChild(el("div", "d-full", hits.map(h => h.n).join(" · ")));
   const list = el("div", "d-rows");
+  const n = classCountOn(iso);
   const r = el("div", "d-row");
   r.appendChild(el("span", null, "Classes"));
-  r.appendChild(el("span", null, gaz ? "None — institute closed"
+  r.appendChild(el("span", null, !n ? "None on this day anyway — the closure costs you nothing"
+    : gaz ? "None — institute closed"
     : lik ? "The institute usually shuts. Still counted until you mark them Off."
     : "Held unless the institute says otherwise"));
   list.appendChild(r);
+  if (n && (gaz || lik)) {
+    const r2 = el("div", "d-row");
+    r2.appendChild(el("span", null, gaz ? "Off the timetable" : "At risk"));
+    r2.appendChild(el("span", null, n + (n === 1 ? " class" : " classes") + (gaz ? " that will not be held" : " if it shuts")));
+    list.appendChild(r2);
+  }
   box.appendChild(list);
   box.appendChild(actions());
   openDlg();
@@ -3756,6 +3793,9 @@ function demo() {                                   // run demo() in the console
   ok(classDays("2026-09-03", "2026-09-03").length, 0, "Janmashtami (Smarta) is a gazetted closure");
   ok(classDays("2026-09-04", "2026-09-04").length, 0, "Janmashtami (Vaishnva) is a gazetted holiday");
   ok(holidayNames("2026-09-03"), "Janmashtami (Smarta)", "Janmashtami (Smarta) is on the calendar");
+  ok(classCountOn("2026-11-08"), 0, "Diwali falls on a Sunday, so it takes nothing off");
+  ok(classCountOn("2026-10-02"), 5, "Gandhi Jayanti is a Friday and takes the whole day off");
+  ok(classCountOn("2026-03-21"), 0, "a Saturday closure costs nothing — Saturday has no classes");
   ok(nextRunningDay("2026-09-06").di, 0, "Sunday rolls on to Monday, not to Tuesday");
   ok(nextRunningDay("2026-09-06").iso, "2026-09-07", "...and to the real date, not an index");
   ok(nextRunningDay("2026-10-25").iso, "2026-10-27", "a gazetted Monday is skipped for Tuesday");
@@ -6150,6 +6190,12 @@ document.getElementById("resToggle").addEventListener("click", e => {
   showRestricted = !showRestricted;
   e.currentTarget.setAttribute("aria-pressed", showRestricted);
   e.currentTarget.textContent = showRestricted ? "Hide restricted" : "Show restricted";
+  renderMonths(); renderHolidayList();
+});
+document.getElementById("pastToggle").addEventListener("click", e => {
+  showPast = !showPast;
+  e.currentTarget.setAttribute("aria-pressed", showPast);
+  e.currentTarget.textContent = showPast ? "Hide past" : "Show past";
   renderMonths(); renderHolidayList();
 });
 document.getElementById("dlg").addEventListener("click", e => {
