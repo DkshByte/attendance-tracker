@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+7846486-->
+<!--secf-app--><!--build:1.0.1+f775c3e-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -5074,8 +5074,18 @@ function openICS() {
    leave the database. Everyone reads two views: roster (names and
    whether they are taken) and leaderboard_ranks (name and position).
    ============================================================ */
+/* The app never names supabase.co. Indian ISPs sinkhole the whole domain under a
+   MeitY order — no certificate, so fetch() throws before it is even an HTTP error —
+   and every cloud feature died on a student's own wifi. bunkr.website proxies
+   /auth/v1 and /rest/v1 to it (see deploy/vercel.json) and Vercel resolves Supabase
+   server-side, from outside the block. Being a rewrite and not a redirect, the
+   browser only ever sees our host, so an SNI or IP block would not catch it either.
+
+   Empty means same-origin on the web. The APK is its own capacitor origin, so there
+   the host has to be spelled out; vercel.json answers the preflight for it. */
 const CLOUD = {
-  url: "https://jyhfhbkidggwvfjmrsxh.supabase.co",
+  url: (window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform())
+    ? "https://www.bunkr.website" : "",
   key: "sb_publishable_8v8hGsWlqZOPRWcnGIZo8A_TnmaXQe-",
 };
 const USERNAME_RE = /^[a-z0-9_]{3,16}$/;

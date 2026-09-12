@@ -4,7 +4,7 @@
 Every assert here is a bug that actually shipped or nearly shipped once.
 No framework on purpose: this has to run on a laptop with nothing installed.
 """
-import re, sys, pathlib
+import json, re, sys, pathlib
 
 root = pathlib.Path(__file__).parent
 fail = []
@@ -127,6 +127,23 @@ for op in ("insert", "update", "delete"):
 check("class_overrides is not granted to anon",
       "revoke all on public.class_overrides from anon" in ovr,
       "the publishable key is public, and the note is free text")
+
+# 8c. Every cloud feature reaches Supabase through bunkr.website, because Indian ISPs
+#     sinkhole supabase.co outright. Naming the host again would work on the machine of
+#     whoever changed it and fail silently for the whole section.
+vj = json.loads((root / "deploy/vercel.json").read_text())
+rw = {r["source"]: r["destination"] for r in vj.get("rewrites", [])}
+for pfx in ("/auth/v1", "/rest/v1"):
+    src = f"{pfx}/:path*"
+    check(f"{pfx} is proxied by vercel.json",
+          src in rw and "supabase.co" in rw[src],
+          "the app would have to name supabase.co, which students cannot resolve")
+check("the app does not name supabase.co as its API host",
+      not re.search(r'url:\s*"https://\w+\.supabase\.co"', html),
+      "CLOUD.url must stay same-origin (or bunkr.website on native) or the block applies again")
+check("CSP does not need the supabase host",
+      "supabase.co" not in vj["headers"][0]["headers"][2]["value"],
+      "a connect-src naming the blocked host is dead config")
 
 # 9. The download buttons must point at an asset that exists. The landing page spent a
 #    release pointing at a filename the release did not have.
