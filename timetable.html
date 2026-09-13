@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+f775c3e-->
+<!--secf-app--><!--build:1.0.1+a8d24d0-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -195,7 +195,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 /* --- nav --- */
 .nav {
   position:fixed; left:0; right:0; bottom:0; z-index:40;
-  display:grid; grid-template-columns:repeat(6,1fr);
+  display:grid; grid-auto-flow:column; grid-auto-columns:1fr;
   background:color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter:blur(18px) saturate(1.4);
   border-top:1px solid var(--rule);
@@ -1085,7 +1085,7 @@ textarea {
 /* ============ desktop rail nav ============ */
 @media (min-width:980px) {
   .nav {
-    top:0; right:auto; bottom:0; width:212px; grid-template-columns:1fr;
+    top:0; right:auto; bottom:0; width:212px; grid-auto-flow:row; grid-template-columns:1fr;
     grid-auto-rows:max-content; align-content:start; gap:2px;
     border-top:0; border-right:1px solid var(--rule); padding:78px 14px 0;
   }
@@ -1293,6 +1293,8 @@ button.drow:hover { background:var(--glass-plate-hover); }
 .crx-pick:focus-visible, .crx-note:focus-visible { outline:2px solid var(--ink-2); outline-offset:1px; }
 .crx-note { margin-bottom:8px; }
 .crx-hint { font-size:12px; line-height:1.45; color:var(--ink-3); margin-bottom:4px; }
+#cr .d-row span:first-child { text-transform:none; letter-spacing:0; font-size:13.5px; color:var(--ink-2); }
+#cr .d-row .link { flex:none; }
 
 .stop.suspended .card { opacity:.55; }
 .stop.suspended .card .name { text-decoration:line-through; }
@@ -2175,6 +2177,9 @@ input[type="date"] { padding:12px 14px; }
   <a href="#holidays" data-p="holidays">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="3.4" y="5.4" width="17.2" height="15.2" rx="2.4"/><path d="M8 3.2v4M16 3.2v4M3.4 10.4h17.2"/><circle cx="12" cy="15" r="1.9" fill="currentColor" stroke="none"/></svg>
     Holidays</a>
+  <a href="#cr" data-p="cr" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.2l7.4 2.9v5.4c0 4.6-3.1 8.1-7.4 9.3-4.3-1.2-7.4-4.7-7.4-9.3V6.1z"/><path d="M8.8 12.1l2.2 2.2 4.2-4.4"/></svg>
+    CR</a>
 </nav>
 
 
@@ -2421,6 +2426,50 @@ input[type="date"] { padding:12px 14px; }
     </div>
     <div class="months" id="months"></div>
     <div class="hlist" id="hlist"></div>
+  </section>
+
+  <!-- Only the CR sees this page. Hiding it is the convenience; RLS on is_cr() is the
+       check (supabase/07 and 08). Every change here goes to the whole section. -->
+  <section id="cr" hidden>
+    <div class="h2row">
+      <h2>CR controls</h2>
+      <span class="daynote">Everything here changes the app for the whole section.</span>
+    </div>
+
+    <div class="h2row"><h2>Holidays</h2></div>
+    <div class="lv">
+      <input type="date" id="crHolDate" aria-label="Holiday date">
+      <select id="crHolKind" class="crx-pick" aria-label="What happens that day" style="width:auto">
+        <option value="closed">Closed — no classes</option>
+        <option value="open">Classes held anyway</option>
+      </select>
+    </div>
+    <div class="lv">
+      <input type="text" id="crHolName" class="crx-note" maxlength="60" placeholder="Name, e.g. College fest" aria-label="Holiday name" style="flex:1;margin:0">
+      <button class="btn pri" id="crHolSave" type="button" style="flex:none;padding:11px 18px">Save</button>
+    </div>
+    <div class="crx-hint" id="crHolHint"></div>
+    <div class="d-rows" id="crHolList"></div>
+
+    <div class="h2row"><h2>Term end</h2></div>
+    <div class="lv">
+      <input type="date" id="crTermDate" aria-label="Last teaching day">
+      <button class="btn pri" id="crTermSave" type="button" style="flex:none;padding:11px 18px">Save</button>
+      <span class="daynote" id="crTermNote"></span>
+    </div>
+
+    <div class="h2row">
+      <h2>Classes</h2>
+      <input type="date" id="crDay" aria-label="Day to manage">
+    </div>
+    <div class="crx-hint">Tap a class to cancel it or say what ran instead.</div>
+    <div class="d-rows" id="crDayList"></div>
+
+    <div class="h2row"><h2>Verdicts this term</h2></div>
+    <div class="d-rows" id="crOvrList"></div>
+
+    <div class="h2row"><h2>Roster</h2></div>
+    <button class="btn" id="crRoster" type="button">Add a student or release a claim</button>
   </section>
 
   <footer class="app-footer">
@@ -3510,7 +3559,7 @@ function crPanel(iso, period, ovr, note) {
       await setOverride(iso, period, kind === "on" ? null : kind, subject, why.value);
       sayStateAfterSave(note, iso, period);
       document.getElementById("dlg").close();
-      renderToday(); renderAttendance();
+      renderToday(); renderAttendance(); renderCR();
     } catch (err) {
       hint.textContent = explain(err).join(" — ");
       save.textContent = was;
@@ -3575,9 +3624,24 @@ const RESTRICTED = [
   ["2026-11-24","Guru Teg Bahadur's Martyrdom Day"], ["2026-12-23","Hazrat Ali's Birthday"],
   ["2026-12-24","Christmas Eve", 1],
 ];
+/* What the CR has said about the calendar (supabase/08-cr-controls.sql). Cached so a
+   phone with no signal still agrees with the section. 'closed' is a closure like any
+   gazetted one; 'open' means classes ran on a day the list above calls a closure. */
+let crHolidays = readMap("bunkr-cr-holidays"), crSemEnd = null;
+try { crSemEnd = localStorage.getItem("bunkr-cr-semend"); } catch (e) {}
+
 const HOLIDAYS = {};
-GAZETTED.forEach(([d, n]) => (HOLIDAYS[d] = HOLIDAYS[d] || []).push({ n, gaz:true }));
-RESTRICTED.forEach(([d, n, likely]) => (HOLIDAYS[d] = HOLIDAYS[d] || []).push({ n, gaz:false, likely:!!likely }));
+function buildHolidays() {
+  Object.keys(HOLIDAYS).forEach(k => delete HOLIDAYS[k]);
+  GAZETTED.forEach(([d, n]) => (HOLIDAYS[d] = HOLIDAYS[d] || []).push({ n, gaz:true }));
+  RESTRICTED.forEach(([d, n, likely]) => (HOLIDAYS[d] = HOLIDAYS[d] || []).push({ n, gaz:false, likely:!!likely }));
+  Object.entries(crHolidays).forEach(([d, { kind, name }]) => {
+    const hits = HOLIDAYS[d] = HOLIDAYS[d] || [];
+    if (kind === "open") hits.forEach(h => { h.gaz = false; h.likely = false; });
+    hits.push({ n: name, gaz: kind === "closed", cr: kind });
+  });
+}
+buildHolidays();
 const gazettedOn = iso => (HOLIDAYS[iso] || []).filter(h => h.gaz)[0];
 
 /* Restricted on paper, shut in practice. The university order only fixes the gazetted
@@ -3617,7 +3681,7 @@ function renderMonths() {
     for (let d = 1; d <= last; d++) {
       const iso = "2026-" + pad(m + 1) + "-" + pad(d);
       const hits = HOLIDAYS[iso] || [];
-      const gaz = hits.some(h => h.gaz), res = hits.some(h => !h.gaz), lik = hits.some(h => h.likely);
+      const gaz = hits.some(h => h.gaz), res = hits.some(h => !h.gaz), lik = hits.some(h => h.likely) || hits.some(h => h.cr);
       if (!hits.length || (!gaz && !lik && !showRestricted)) {
         const c = el("span", new Date(2026, m, d).getDay() === 0 ? "sun" : null, String(d));
         if (iso === todayISO) c.className = (c.className ? c.className + " " : "") + "today";
@@ -3641,16 +3705,17 @@ function renderHolidayList() {
   box.textContent = "";
   const todayISO = isoOf(new Date());
   const cut = pastCut();
-  const rest = showRestricted ? RESTRICTED : RESTRICTED.filter(h => h[2]);
-  const rows = [...GAZETTED.map(h => [h[0], h[1], true, false]), ...rest.map(h => [h[0], h[1], false, !!h[2]])]
+  const rows = Object.entries(HOLIDAYS)
+    .flatMap(([iso, hits]) => hits.filter(h => h.gaz || h.likely || h.cr || showRestricted)
+                                  .map(h => [iso, h.n, h.gaz, h.likely, h.cr]))
     .filter(r => !cut || r[0] >= cut)
     .sort((a, b) => a[0].localeCompare(b[0]));
-  rows.forEach(([iso, name, gaz, likely]) => {
+  rows.forEach(([iso, name, gaz, likely, cr]) => {
     const r = el("button", "hrow" + (gaz ? "" : " res") + (iso < todayISO ? " past" : ""));
     r.type = "button";
     const d = fromISO(iso);
     r.appendChild(el("div", "d", d.toLocaleDateString("en-IN", { day:"2-digit", month:"short" }) + " · " + d.toLocaleDateString("en-IN", { weekday:"short" })));
-    const n = el("div", "n", name + (likely ? " · usually closed" : ""));
+    const n = el("div", "n", name + (likely ? " · usually closed" : cr === "open" ? " · classes held, per CR" : cr ? " · per CR" : ""));
     if (!classCountOn(iso)) n.appendChild(el("span", "w", " · weekend"));
     r.appendChild(n);
     r.addEventListener("click", () => openHoliday(iso));
@@ -3659,7 +3724,8 @@ function renderHolidayList() {
   if (!rows.length) box.appendChild(el("div", "hempty",
     showRestricted ? "Nothing left in 2026." : "No closures left in 2026. Show restricted for the rest."));
 
-  const next = GAZETTED.find(h => h[0] >= todayISO);
+  const nextIso = Object.keys(HOLIDAYS).filter(d => d >= todayISO && gazettedOn(d)).sort()[0];
+  const next = nextIso && [nextIso, gazettedOn(nextIso).n];
   const nh = document.getElementById("nextHol");
   if (next) {
     const days = Math.round((fromISO(next[0]) - fromISO(todayISO)) / 86400000);
@@ -3672,9 +3738,10 @@ function openHoliday(iso) {
   const box = document.getElementById("dlgIn");
   box.textContent = "";
   const hits = HOLIDAYS[iso], d = fromISO(iso), gaz = hits.some(h => h.gaz), lik = hits.some(h => h.likely);
+  const held = hits.some(h => h.cr === "open");
   box.dataset.line = gaz ? "pps" : "";
   const top = el("div", "d-top");
-  top.appendChild(el("span", gaz ? "badge" : "badge ghost", gaz ? "Closed" : lik ? "Usually closed" : "Restricted"));
+  top.appendChild(el("span", gaz ? "badge" : "badge ghost", gaz ? "Closed" : held ? "Classes held" : lik ? "Usually closed" : "Restricted"));
   top.appendChild(el("span", "plate-when", d.toLocaleDateString("en-IN", { weekday:"long" })));
   box.appendChild(top);
   box.appendChild(el("div", "d-name", d.toLocaleDateString("en-IN", { day:"numeric", month:"long" })));
@@ -3685,6 +3752,7 @@ function openHoliday(iso) {
   r.appendChild(el("span", null, "Classes"));
   r.appendChild(el("span", null, !n ? "None on this day anyway — the closure costs you nothing"
     : gaz ? "None — institute closed"
+    : held ? "Held — the CR says classes run on this day"
     : lik ? "The institute usually shuts. Still counted until you mark them Off."
     : "Held unless the institute says otherwise"));
   list.appendChild(r);
@@ -3882,6 +3950,7 @@ const SEM_START = "2026-08-17";                  /* the session opened for Sec F
 const SEM_END_FALLBACK = "2026-12-11";           /* last teaching day — terms move, so it is editable */
 let semEnd = SEM_END_FALLBACK;
 try { semEnd = localStorage.getItem("adgips-semend") || SEM_END_FALLBACK; } catch (e) {}
+if (crSemEnd) semEnd = crSemEnd;                  /* the CR's date outranks a guess on one phone */
 const saveSemEnd = () => { try { localStorage.setItem("adgips-semend", semEnd); } catch (e) {} };
 
 const nowISO = () => isoOf(new Date());
@@ -4425,6 +4494,7 @@ function renderBudget() {
   const input = document.getElementById("semEndInput");
   input.value = semEnd;
   input.min = SEM_START;
+  input.disabled = !!crSemEnd;
   ["lvFrom", "lvTo"].forEach(id => {
     const f = document.getElementById(id);
     f.min = nowISO(); f.max = semEnd;
@@ -4433,7 +4503,7 @@ function renderBudget() {
   const daysLeft = classDays(nowISO(), semEnd).length;
   document.getElementById("termNote").textContent =
     daysLeft + (daysLeft === 1 ? " class day left" : " class days left") +
-    " · " + classDays(SEM_START, semEnd).length + " in the term";
+    " · " + classDays(SEM_START, semEnd).length + " in the term" + (crSemEnd ? " · date set by the CR" : "");
 
   const { overall: o, left } = termBudget();
   if (!o.total) {
@@ -5013,10 +5083,10 @@ function buildICS() {
       const title = key ? SUB[key].short + " · " + SUB[key].name
                         : "Lab · F1 " + SUB[item.split.F1].short + " / F2 " + SUB[item.split.F2].short;
       const who = key ? SUB[key].fac : SUB[item.split.F1].fac + " / " + SUB[item.split.F2].fac;
-      const skips = GAZETTED.filter(([iso]) => {
+      const skips = Object.keys(HOLIDAYS).filter(iso => {
         const d = fromISO(iso);
-        return d.getDay() === di + 1 && d >= first;
-      }).map(([iso]) => compact(fromISO(iso)) + "T" + icsTime(startMin(item.i)));
+        return gazettedOn(iso) && d.getDay() === di + 1 && d >= first;
+      }).map(iso => compact(fromISO(iso)) + "T" + icsTime(startMin(item.i)));
       out.push(
         "BEGIN:VEVENT",
         "UID:secf-" + di + "-" + ii + "@adgips",
@@ -5497,6 +5567,8 @@ const swapAt = (iso, period) => {
 };
 
 const isCancelled = (iso, period) => {
+  /* a day the CR closed held nothing, including for anyone who marked it beforehand */
+  if (crHolidays[iso] && crHolidays[iso].kind === "closed") return true;
   const o = overrideAt(iso, period);
   if (o) return o.kind === "off";
   return votesFor(iso, period) >= CANCEL_MIN;
@@ -5549,6 +5621,53 @@ async function setOverride(iso, period, kind, subject, note) {
   }, t);
   overrides[key] = row;
 }
+/* ---- the CR's calendar: holidays and the last teaching day ----
+   Read by everyone, signed in or not; written only by the CR (RLS on is_cr()). */
+function applyCR() {
+  try {
+    localStorage.setItem("bunkr-cr-holidays", JSON.stringify(crHolidays));
+    crSemEnd ? localStorage.setItem("bunkr-cr-semend", crSemEnd) : localStorage.removeItem("bunkr-cr-semend");
+  } catch (e) {}
+  buildHolidays();
+  if (crSemEnd) semEnd = crSemEnd;
+  renderMonths(); renderHolidayList(); renderAll();
+}
+async function loadCR() {
+  const [hol, term] = await Promise.all([
+    call("/rest/v1/cr_holidays?select=on_date,kind,name&order=on_date.asc"),
+    call("/rest/v1/term?select=sem_end")
+  ]);
+  crHolidays = {};
+  hol.forEach(h => { crHolidays[h.on_date] = { kind: h.kind, name: h.name }; });
+  crSemEnd = term.length ? term[0].sem_end : null;
+  applyCR();
+}
+async function crUpsert(table, row) {
+  const t = await token();
+  if (!t || !isCR()) throw new Error("Only the CR can do that");
+  await call("/rest/v1/" + table, { method:"POST",
+    headers:{ Prefer:"return=minimal,resolution=merge-duplicates" },
+    body: JSON.stringify(Object.assign(row, { by_user: sess.user.id, at: new Date().toISOString() })) }, t);
+}
+async function crSaveHoliday(iso, kind, name) {
+  await crUpsert("cr_holidays", { on_date: iso, kind, name });
+  crHolidays[iso] = { kind, name };
+  applyCR();
+}
+async function crDropHoliday(iso) {
+  /* RLS turns a refused delete into "0 rows", not an error — so ask for the rows back */
+  const gone = await call("/rest/v1/cr_holidays?on_date=eq." + iso,
+    { method:"DELETE", headers:{ Prefer:"return=representation" } }, await token());
+  if (!gone || !gone.length) throw new Error("The server did not remove it — are you still the CR?");
+  delete crHolidays[iso];
+  applyCR();
+}
+async function crSaveTerm(iso) {
+  await crUpsert("term", { id: true, sem_end: iso });
+  crSemEnd = iso;
+  applyCR();
+}
+
 const fetchDirectory = async () => call("/rest/v1/directory?select=*&order=sno.asc", {}, await token());
 const crRelease = async sno => call("/rest/v1/rpc/cr_release", { method:"POST",
   body: JSON.stringify({ p_sno: sno }) }, await token());
@@ -6116,7 +6235,7 @@ async function renderRanks() {
    Wiring
    ============================================================ */
 function renderAll() {
-  renderToday(); renderNetwork(); renderWeekRail(); renderAttendance();
+  renderToday(); renderNetwork(); renderWeekRail(); renderAttendance(); renderCR();
 }
 
 /* the seg buttons and the first-run batch step go through here, so neither can
@@ -6124,11 +6243,11 @@ function renderAll() {
 function setBatch(bt) {
   batch = bt;
   try { localStorage.setItem(nsKey("adgips-batch"), batch); } catch (e) {}
-  document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", x.dataset.batch === batch));
+  document.querySelectorAll(".seg button[data-batch]").forEach(x => x.setAttribute("aria-pressed", x.dataset.batch === batch));
   renderAll();
 }
 
-document.querySelectorAll(".seg button").forEach(b => {
+document.querySelectorAll(".seg button[data-batch]").forEach(b => {
   b.setAttribute("aria-pressed", b.dataset.batch === batch);
   b.addEventListener("click", () => setBatch(b.dataset.batch));
 });
@@ -6775,9 +6894,10 @@ document.addEventListener("click", e => {
 
 /* pages — clicks drive them; the hash is a bonus for back/forward and
    deep links, and is unavailable from a data: URL */
-const PAGES = ["today", "week", "ranks", "directory", "attendance", "holidays"];
+const PAGES = ["today", "week", "ranks", "directory", "attendance", "holidays", "cr"];
 function show(id) {
-  if (!PAGES.includes(id)) id = "today";
+  if (!PAGES.includes(id) || (id === "cr" && !isCR())) id = "today";
+  if (id === "cr") { renderCR(); loadCR().catch(() => {}); }
   if (id === "ranks") renderRanks();
   if (id === "directory") renderDirectory();
   PAGES.forEach(p => {
@@ -7283,11 +7403,113 @@ async function openCR() {
   } catch (err) { list.textContent = explain(err).join(" — "); }
 }
 
+/* ---------- the CR page ----------
+   The inputs are static markup so a re-render never eats a half-typed holiday; only
+   the lists are rebuilt, and renderAll can call this as often as it likes. */
+function renderCR() {
+  if (!isCR()) return;
+  const todayIso = nowISO();
+  const rowBtn = (label, value, onClick, cls) => {
+    const r = el("div", "d-row");
+    r.appendChild(el("span", null, label));
+    const b = el("button", "link" + (cls ? " " + cls : ""), value);
+    b.type = "button";
+    b.addEventListener("click", () => onClick(b));
+    r.appendChild(b);
+    return r;
+  };
+
+  /* holidays */
+  const hol = document.getElementById("crHolList");
+  hol.textContent = "";
+  const days = Object.keys(crHolidays).sort();
+  if (!days.length) hol.appendChild(el("div", "d-note", "You have not added any. The built-in university list still applies — see Holidays."));
+  days.forEach(iso => {
+    const h = crHolidays[iso];
+    hol.appendChild(rowBtn(longDate(iso) + " · " + h.name + (h.kind === "open" ? " · classes held" : " · closed"),
+      "Remove", async b => {
+        if (!confirm("Remove " + h.name + " on " + longDate(iso) + " for everyone?")) return;
+        b.textContent = "…";
+        try { await crDropHoliday(iso); } catch (err) { b.textContent = explain(err)[0]; }
+      }));
+  });
+  const hd = document.getElementById("crHolDate"), hint = document.getElementById("crHolHint");
+  const built = hd.value && (HOLIDAYS[hd.value] || []).filter(x => !x.cr).map(x => x.n).join(" · ");
+  hint.textContent = !hd.value ? "Pick a date, name it, save. Everyone's budget updates."
+    : crHolidays[hd.value] ? "Already set to " + crHolidays[hd.value].name + " — saving replaces it."
+    : built ? "The built-in list has " + built + " on this day." : "";
+
+  /* term */
+  const td = document.getElementById("crTermDate");
+  if (document.activeElement !== td) td.value = semEnd;
+  td.min = SEM_START;
+  document.getElementById("crTermNote").textContent = crSemEnd
+    ? classDays(todayIso, semEnd).length + " class days left" : "Not set yet — everyone is on the app's guess.";
+
+  /* one day's classes */
+  const dd = document.getElementById("crDay");
+  if (!dd.value) dd.value = todayIso;
+  dd.min = SEM_START; dd.max = semEnd;
+  const list = document.getElementById("crDayList");
+  list.textContent = "";
+  const di = fromISO(dd.value).getDay() - 1, day = DAYS[di];
+  if (!day || !day.items.length) list.appendChild(el("div", "d-note", "No classes on this day."));
+  else if (gazettedOn(dd.value)) list.appendChild(el("div", "d-note", "Closed — " + holidayNames(dd.value) + "."));
+  else day.items.forEach(item => {
+    const o = overrideAt(dd.value, item.i), v = votesFor(dd.value, item.i);
+    const state = o ? (o.kind === "off" ? "Cancelled" : "Arranged: " + (SUB[o.subject] ? SUB[o.subject].short : o.subject))
+      : v ? v + " reported off" : "Running";
+    list.appendChild(rowBtn(label(item.i, item.span || 1) + " · " + describe(item), state,
+      () => openDetail(item, di, dd.value)));
+  });
+
+  /* every verdict on record */
+  const ol = document.getElementById("crOvrList");
+  ol.textContent = "";
+  const keys = Object.keys(overrides).sort();
+  if (!keys.length) ol.appendChild(el("div", "d-note", "No classes cancelled or swapped yet."));
+  keys.forEach(k => {
+    const o = overrides[k], odi = fromISO(o.on_date).getDay() - 1;
+    const item = DAYS[odi] && DAYS[odi].items.find(it => it.i === o.period);
+    if (!item) return;
+    ol.appendChild(rowBtn(longDate(o.on_date) + " · " + label(item.i, item.span || 1),
+      o.kind === "off" ? "Cancelled" : "→ " + (SUB[o.subject] ? SUB[o.subject].short : o.subject),
+      () => openDetail(item, odi, o.on_date)));
+  });
+}
+
+document.getElementById("crHolDate").addEventListener("change", renderCR);
+document.getElementById("crDay").addEventListener("change", renderCR);
+document.getElementById("crRoster").addEventListener("click", openCR);
+document.getElementById("crHolSave").addEventListener("click", async e => {
+  const b = e.currentTarget, iso = document.getElementById("crHolDate").value;
+  const name = document.getElementById("crHolName").value.trim();
+  const hint = document.getElementById("crHolHint");
+  if (!iso || !name) { hint.textContent = "Needs a date and a name."; return; }
+  b.disabled = true; b.textContent = "Saving…";
+  try {
+    await crSaveHoliday(iso, document.getElementById("crHolKind").value, name);
+    document.getElementById("crHolName").value = "";
+    hint.textContent = "Saved. Everyone gets it next time the app opens.";
+  } catch (err) { hint.textContent = explain(err).join(" — "); }
+  b.disabled = false; b.textContent = "Save";
+});
+document.getElementById("crTermSave").addEventListener("click", async e => {
+  const b = e.currentTarget, iso = document.getElementById("crTermDate").value;
+  const note = document.getElementById("crTermNote");
+  if (!iso || iso < SEM_START) { note.textContent = "A term cannot end before " + longDate(SEM_START) + "."; return; }
+  b.disabled = true; b.textContent = "Saving…";
+  try { await crSaveTerm(iso); note.textContent = "Saved for everyone."; }
+  catch (err) { note.textContent = explain(err).join(" — "); }
+  b.disabled = false; b.textContent = "Save";
+});
+
 /* ---------- user pill in the top bar ---------- */
 const userPill = document.getElementById("userPill");
 const userDrop = document.getElementById("userDrop");
 
 function updateUserPill() {
+  document.querySelector('.nav a[data-p="cr"]').hidden = !isCR();
   if (!profile) { userPill.hidden = true; return; }
   userPill.hidden = false;
   document.getElementById("userAvatar").textContent = initials(profile.name);
@@ -7351,15 +7573,16 @@ function adoptUser(id) {
 /* batch defaults to your roster batch, and stays switchable */
 function afterSignIn() {
   adoptUser(profile && profile.sno);
-  document.querySelectorAll(".seg button").forEach(x =>
+  document.querySelectorAll(".seg button[data-batch]").forEach(x =>
     x.setAttribute("aria-pressed", x.dataset.batch === batch));
   updateUserPill();
   renderAll();
   renderRanks();
   /* The week the app can actually show, not just today — the CR can now rule on a
      class before it runs, and a verdict nobody fetches is a verdict nobody sees. */
-  const iso = isoOf(new Date());
-  loadCancelled(isoOfWeekday(0), isoOfWeekday(5))
+  /* The whole term, not just this week: tally() applies every verdict to every mark,
+     so a class called off last week has to still be known this week. */
+  loadCancelled(SEM_START, semEnd > isoOfWeekday(5) ? semEnd : isoOfWeekday(5))
     .then(renderAll).catch(() => {});                          // offline just means no reports
 
   /* the account's records come down first, so a second device does not look empty
@@ -7372,6 +7595,7 @@ if (NATIVE && locked && profile) { showLock(true); tryUnlock(); }
 measureTop();
 renderMonths();
 renderHolidayList();
+loadCR().catch(() => {});                        /* offline or not set up yet: the cached copy stands */
 renderLineKey();
 renderAlertBtn();
 paintHero();

@@ -128,6 +128,21 @@ check("class_overrides is not granted to anon",
       "revoke all on public.class_overrides from anon" in ovr,
       "the publishable key is public, and the note is free text")
 
+# 8b'. Holidays and the term end change every student's budget, so the same lock applies.
+crc = (root / "supabase/08-cr-controls.sql").read_text()
+for tbl, ops in (("cr_holidays", ("insert", "update", "delete")), ("term", ("insert", "update"))):
+    check(f"{tbl} has RLS enabled", f"alter table public.{tbl} enable row level security" in crc,
+          "without it any signed-in student can rewrite the calendar")
+    body = crc[crc.find(f"create table if not exists public.{tbl}"):]
+    body = body[:body.find("-- ---------- STEP", 10)]
+    for op in ops:
+        pol = re.search(rf"for {op}\s+(?:using|with check)[\s\S]*?;", body)
+        check(f"{tbl} {op} is gated on is_cr()", bool(pol) and "public.is_cr()" in pol.group(0),
+              f"{op} would be open to anyone signed in")
+    check(f"{tbl} gives anon read only", f"grant select on public.{tbl} to anon;" in body
+          and not re.search(rf"grant[^;]*(insert|update|delete)[^;]*public\.{tbl} to anon", body),
+          "the publishable key is public")
+
 # 8c. Every cloud feature reaches Supabase through bunkr.website, because Indian ISPs
 #     sinkhole supabase.co outright. Naming the host again would work on the machine of
 #     whoever changed it and fail silently for the whole section.
