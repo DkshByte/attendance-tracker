@@ -143,6 +143,29 @@ for tbl, ops in (("cr_holidays", ("insert", "update", "delete")), ("term", ("ins
           and not re.search(rf"grant[^;]*(insert|update|delete)[^;]*public\.{tbl} to anon", body),
           "the publishable key is public")
 
+# 8b''. Notices are CR free text and the handover function can hand out every CR power.
+n09 = (root / "supabase/09-notices-and-fixes.sql").read_text()
+check("notices has RLS enabled", "alter table public.notices enable row level security" in n09,
+      "any signed-in student could post to the whole section")
+for op in ("insert", "delete"):
+    pol = re.search(rf"on public\.notices\s+for {op}\s+(?:using|with check)[\s\S]*?;", n09)
+    check(f"notices {op} is gated on is_cr()", bool(pol) and "public.is_cr()" in pol.group(0),
+          f"{op} would be open to anyone signed in")
+check("notices is not granted to anon", "revoke all on public.notices from anon" in n09,
+      "the publishable key is public, and the body is free text")
+fn = n09[n09.find("function public.cr_set_role"):]
+check("cr_set_role refuses non-CRs first", "if not public.is_cr()" in fn[:400],
+      "any student could make themselves CR")
+check("cr_set_role keeps at least one CR", "make someone else CR first" in fn,
+      "the last CR could remove themselves and nobody could run the section")
+check("attendance accepts the cleared mark 'X'", "('P','A','C','X')" in n09,
+      "the app writes 'X' when a mark is cleared; without it every clear fails")
+
+# 8b'''. A mark is keyed by its position in the day, a verdict by its period. Mixing them
+#        called off the wrong subject on every day but Wednesday.
+check("tally maps a mark's position to its period", "periodOf(iso, +id.slice(bar + 1))" in html,
+      "CR verdicts would land on the wrong class")
+
 # 8c. Every cloud feature reaches Supabase through bunkr.website, because Indian ISPs
 #     sinkhole supabase.co outright. Naming the host again would work on the machine of
 #     whoever changed it and fail silently for the whole section.

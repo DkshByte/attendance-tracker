@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+a8d24d0-->
+<!--secf-app--><!--build:1.0.1+13bdb68-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1293,6 +1293,8 @@ button.drow:hover { background:var(--glass-plate-hover); }
 .crx-pick:focus-visible, .crx-note:focus-visible { outline:2px solid var(--ink-2); outline-offset:1px; }
 .crx-note { margin-bottom:8px; }
 .crx-hint { font-size:12px; line-height:1.45; color:var(--ink-3); margin-bottom:4px; }
+.notice { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 8px; margin-bottom:12px; }
+.notice .link { margin-left:auto; }
 #cr .d-row span:first-child { text-transform:none; letter-spacing:0; font-size:13.5px; color:var(--ink-2); }
 #cr .d-row .link { flex:none; }
 
@@ -2151,9 +2153,9 @@ input[type="date"] { padding:12px 14px; }
     </div>
 
     <div class="apk-front-meta">
-      <span>Release v1.0.0 · ~7.0 MB</span>
+      <span>Latest release · ~7 MB</span>
       <span>•</span>
-      <a href="https://github.com/DkshByte/attendance-tracker/releases/tag/v1.0.0" target="_blank" rel="noopener noreferrer">GitHub Release</a>
+      <a href="https://github.com/DkshByte/attendance-tracker/releases/latest" target="_blank" rel="noopener noreferrer">GitHub Release</a>
     </div>
   </div>
 </div>
@@ -2238,6 +2240,7 @@ input[type="date"] { padding:12px 14px; }
 <main class="page">
 
   <section id="today">
+    <div id="noticeBox"></div>
     <div id="plateBox"></div>
     <div id="eodNoticeBox"></div>
     <div id="taskDueBox"></div>
@@ -2415,7 +2418,7 @@ input[type="date"] { padding:12px 14px; }
 
   <section id="holidays" hidden>
     <div class="h2row">
-      <h2>Closures 2026</h2>
+      <h2>Closures</h2>
       <button class="link" id="pastToggle" type="button" aria-pressed="false">Show past</button>
       <button class="link" id="resToggle" type="button" aria-pressed="false">Show restricted</button>
     </div>
@@ -2435,6 +2438,16 @@ input[type="date"] { padding:12px 14px; }
       <h2>CR controls</h2>
       <span class="daynote">Everything here changes the app for the whole section.</span>
     </div>
+
+    <div class="h2row"><h2>Notices</h2></div>
+    <input type="text" id="crNoteBody" class="crx-note" maxlength="280" placeholder="Tell the section something, e.g. Lab file due Friday" aria-label="Notice">
+    <div class="lv">
+      <span class="daynote">Show until</span>
+      <input type="date" id="crNoteUntil" aria-label="Show the notice until">
+      <button class="btn pri" id="crNotePost" type="button" style="flex:none;padding:11px 18px">Post</button>
+    </div>
+    <div class="crx-hint" id="crNoteHint">Everyone signed in sees it at the top of Today.</div>
+    <div class="d-rows" id="crNoteList"></div>
 
     <div class="h2row"><h2>Holidays</h2></div>
     <div class="lv">
@@ -2469,7 +2482,7 @@ input[type="date"] { padding:12px 14px; }
     <div class="d-rows" id="crOvrList"></div>
 
     <div class="h2row"><h2>Roster</h2></div>
-    <button class="btn" id="crRoster" type="button">Add a student or release a claim</button>
+    <button class="btn" id="crRoster" type="button">Add students, release claims, choose the CR</button>
   </section>
 
   <footer class="app-footer">
@@ -2964,6 +2977,7 @@ function renderToday() {
   updateBulkBtns();
   renderDueBanner();
   renderEODNotice();
+  renderNotices();
 }
 
 function renderPlate() {
@@ -2988,14 +3002,15 @@ function renderPlate() {
     day.items.forEach(item => {
       const span = item.span || 1;
       if (now >= startMin(item.i) && now < endMin(item.i, span)) current = item;
-      else if (startMin(item.i) > now && !next) next = item;
+      else if (startMin(item.i) > now && !next && !isCancelled(isoOf(new Date()), item.i)) next = item;
     });
   }
   let nextIso = isoOf(new Date());
   if (!next) {                                     /* nothing left today: roll on to the next day that runs */
     const t = new Date(); t.setDate(t.getDate() + 1);
     const up = nextRunningDay(isoOf(t));
-    if (up) { nextDay = DAYS[up.di]; next = nextDay.items[0]; nextIso = up.iso; }
+    if (up) { nextDay = DAYS[up.di]; nextIso = up.iso;
+              next = nextDay.items.find(it => !isCancelled(up.iso, it.i)) || nextDay.items[0]; }
   }
 
   /* ---------------- SLIDE 1: Status Tile ---------------- */
@@ -3015,14 +3030,14 @@ function renderPlate() {
     row.appendChild(when);
     pMain.appendChild(row);
     pMain.appendChild(el("h1", null, hol.n));
-    pMain.appendChild(el("div", "who", "Institute closed — gazetted holiday."));
+    pMain.appendChild(el("div", "who", crHolidays[isoOf(new Date())] ? "Closed — announced by the CR." : "Institute closed — gazetted holiday."));
   } else if (current) {
     const key = resolve(current);
     const span = current.span || 1;
     const ln = key ? lineOf(key) : lineOf(current.split.F1);
     plate.dataset.line = ln;
     const ends = endMin(current.i, span), left = ends - now;
-    row.appendChild(el("span", "badge", "In class"));
+    row.appendChild(el("span", "badge", isCancelled(isoOf(new Date()), current.i) ? "Cancelled" : "In class"));
     when.innerHTML = "";
     when.appendChild(document.createTextNode("ends "));
     when.appendChild(el("b", null, TIMES[(current.i + span - 1 < 3 ? current.i + span - 1 : current.i + span) + 1]));
@@ -3661,29 +3676,31 @@ const classCountOn = iso => { const di = fromISO(iso).getDay() - 1; return di >=
    It now opens on the current month; Show past puts the rest back. Outside 2026
    there is no "past" to cut, so everything shows. */
 function pastCut() {
-  const t = isoOf(new Date());
-  return (showPast || t < "2026-01-01" || t > "2026-12-31") ? null : t.slice(0, 7) + "-01";
+  return showPast ? null : isoOf(new Date()).slice(0, 7) + "-01";
 }
 
 function renderMonths() {
   const box = document.getElementById("months");
   box.textContent = "";
   const todayISO = isoOf(new Date());
-  const cut = pastCut();
-  for (let m = cut ? +cut.slice(5, 7) - 1 : 0; m < 12; m++) {
+  const start = fromISO(pastCut() || SEM_START.slice(0, 4) + "-01-01");
+  const thisYear = new Date().getFullYear();
+  const lastYear = Math.max(thisYear, +semEnd.slice(0, 4));
+  for (const cur = new Date(start.getFullYear(), start.getMonth(), 1); cur.getFullYear() <= lastYear; cur.setMonth(cur.getMonth() + 1)) {
+    const y = cur.getFullYear(), m = cur.getMonth();
     const mo = el("div", "mo");
-    mo.appendChild(el("h3", null, MONTHS[m]));
+    mo.appendChild(el("h3", null, MONTHS[m] + (y !== thisYear ? " " + y : "")));
     const g = el("div", "mgrid");
     ["S","M","T","W","T","F","S"].forEach(w => g.appendChild(el("span", "wd", w)));
-    const first = new Date(2026, m, 1).getDay();
+    const first = new Date(y, m, 1).getDay();
     for (let i = 0; i < first; i++) g.appendChild(el("span"));
-    const last = new Date(2026, m + 1, 0).getDate();
+    const last = new Date(y, m + 1, 0).getDate();
     for (let d = 1; d <= last; d++) {
-      const iso = "2026-" + pad(m + 1) + "-" + pad(d);
+      const iso = y + "-" + pad(m + 1) + "-" + pad(d);
       const hits = HOLIDAYS[iso] || [];
       const gaz = hits.some(h => h.gaz), res = hits.some(h => !h.gaz), lik = hits.some(h => h.likely) || hits.some(h => h.cr);
       if (!hits.length || (!gaz && !lik && !showRestricted)) {
-        const c = el("span", new Date(2026, m, d).getDay() === 0 ? "sun" : null, String(d));
+        const c = el("span", new Date(y, m, d).getDay() === 0 ? "sun" : null, String(d));
         if (iso === todayISO) c.className = (c.className ? c.className + " " : "") + "today";
         g.appendChild(c);
         continue;
@@ -3722,7 +3739,7 @@ function renderHolidayList() {
     box.appendChild(r);
   });
   if (!rows.length) box.appendChild(el("div", "hempty",
-    showRestricted ? "Nothing left in 2026." : "No closures left in 2026. Show restricted for the rest."));
+    showRestricted ? "Nothing left on the calendar." : "No closures listed from here on. The CR can add them on the CR page."));
 
   const nextIso = Object.keys(HOLIDAYS).filter(d => d >= todayISO && gazettedOn(d)).sort()[0];
   const next = nextIso && [nextIso, gazettedOn(nextIso).n];
@@ -3888,20 +3905,25 @@ function demo() {                                   // run demo() in the console
     "2026-09-07|1": { m:"A", s:sub1 },
     "2026-09-07|2": { m:"P", s:sub1 },
   };
+  /* Monday's classes sit in periods 1, 2, 3 — the verdict keys below are periods */
+  ok(periodOf("2026-09-07", 0), 1, "Monday's first class is period 1, not period 0");
+  overrides = { "2026-09-07|1": { kind:"off" } };
+  ok(tally()[sub1].h, 2, "calling off period 1 drops Monday's first class, not its second");
+  ok(tally()[sub1].p, 1, "...so the present it removes is the first class's");
   overrides = {};
   ok(tally()[sub1].h, 3, "with no verdict, every marked class is held");
   ok(tally()[sub1].p, 2, "...and present is counted as marked");
 
-  overrides = { "2026-09-07|1": { kind:"off" } };
+  overrides = { "2026-09-07|2": { kind:"off" } };
   ok(tally()[sub1].h, 2, "a class the CR called off is held against nobody");
-  ok(tally()[sub1].p, 2, "...and calling one off never removes a present");
+  ok(tally()[sub1].p, 2, "...and calling off an absence never removes a present");
 
-  overrides = { "2026-09-07|2": { kind:"swap", subject:sub2 } };
+  overrides = { "2026-09-07|3": { kind:"swap", subject:sub2 } };
   ok(tally()[sub1].h, 2, "an arranged period leaves the subject that did not run");
   ok(tally()[sub2].h, 1, "...and lands on the one that did");
   ok(tally()[sub2].p, 1, "...carrying the mark with it");
 
-  overrides = { "2026-09-07|2": { kind:"swap", subject:"NOSUCHSUBJECT" } };
+  overrides = { "2026-09-07|3": { kind:"swap", subject:"NOSUCHSUBJECT" } };
   ok(tally()[sub1].h, 3, "a swap to a subject the app does not know is ignored, not dropped");
 
   overrides = { "2026-09-07|0": { kind:"swap", subject:sub2 } };
@@ -3923,6 +3945,15 @@ function demo() {                                   // run demo() in the console
   return "checks ok";
 }
 
+/* A mark is stored under the class's position in its day (iso|ii); a verdict, a vote
+   and a notification id speak in timetable periods (item.i). On Monday the first
+   class is period 1, so reading one as the other called off the wrong subject. Every
+   bridge between the two goes through here. null: the day has no such class. */
+const periodOf = (iso, ii) => {
+  const day = DAYS[fromISO(iso).getDay() - 1];
+  return day && day.items[ii] ? day.items[ii].i : null;
+};
+
 function tally() {
   const t = {};
   Object.entries(att).forEach(([id, { m, s }]) => {
@@ -3931,9 +3962,9 @@ function tally() {
        held against nobody, and an arranged period counts towards the subject that
        actually ran — including for the students who marked it before the CR said so. */
     const bar = id.indexOf("|");
-    const iso = id.slice(0, bar), period = +id.slice(bar + 1);
-    if (isCancelled(iso, period)) return;
-    const key = swapAt(iso, period) || s;
+    const iso = id.slice(0, bar), period = periodOf(iso, +id.slice(bar + 1));
+    if (period !== null && isCancelled(iso, period)) return;
+    const key = (period !== null && swapAt(iso, period)) || s;
     if (!SUB[key]) return;
     const e = t[key] = t[key] || { p:0, h:0 };
     e.h++; if (m === "P") e.p++;
@@ -4004,6 +4035,7 @@ function classesIn(fromIso, toIso, skipMarked) {
   classDays(fromIso, toIso).forEach(({ iso, di }) => {
     DAYS[di].items.forEach((it, ii) => {
       if (skipMarked && att[iso + "|" + ii]) return;
+      if (isCancelled(iso, it.i)) return;           /* called off ahead of time: nothing to attend */
       const k = resolve(it);
       if (!k) { unknown++; return; }            /* a split practical, batch not chosen yet */
       per[k] = (per[k] || 0) + 1; total++;
@@ -4052,7 +4084,7 @@ function vanishUntil() {
     const cost = {};
     DAYS[di].items.forEach((it, ii) => {
       const k = resolve(it);
-      if (!k || att[iso + "|" + ii]) return;
+      if (!k || att[iso + "|" + ii] || isCancelled(iso, it.i)) return;
       cost[k] = (cost[k] || 0) + 1;
     });
     if (Object.keys(cost).some(k => cost[k] > (room[k] || 0))) break;
@@ -4157,7 +4189,7 @@ function upcomingClasses(n) {
   for (const { iso, di } of classDays(nowISO(), semEnd)) {
     for (let ii = 0; ii < DAYS[di].items.length; ii++) {
       const k = resolve(DAYS[di].items[ii]);
-      if (!k || att[iso + "|" + ii]) continue;
+      if (!k || att[iso + "|" + ii] || isCancelled(iso, DAYS[di].items[ii].i)) continue;
       out.push({ iso, di, ii, k, it: DAYS[di].items[ii] });
       if (out.length >= n) return out;
     }
@@ -4779,6 +4811,7 @@ function openCatchup() {
         if (profile) await wipeAttendance();
         att = {};
         saveAtt();
+        if (profile) pushScore().catch(() => {});
         renderAttendance();
         renderCatchup();
         draw();
@@ -5096,7 +5129,7 @@ function buildICS() {
         "DESCRIPTION:" + who.replace(/,/g, "\\,"),
         "DTSTART:" + compact(first) + "T" + icsTime(startMin(item.i)),
         "DTEND:" + compact(first) + "T" + icsTime(endMin(item.i, span)),
-        "RRULE:FREQ=WEEKLY;BYDAY=" + BYDAY[di] + ";UNTIL=20261231T235959"
+        "RRULE:FREQ=WEEKLY;BYDAY=" + BYDAY[di] + ";UNTIL=" + semEnd.replace(/-/g, "") + "T235959"
       );
       if (skips.length) out.push("EXDATE:" + skips.join(","));
       out.push("END:VEVENT");
@@ -5114,7 +5147,7 @@ function openICS() {
   top.appendChild(el("span", "badge ghost", "Export"));
   box.appendChild(top);
   box.appendChild(el("div", "d-name", "timetable.ics"));
-  box.appendChild(el("div", "d-full", "Every class as a weekly repeat until 31 Dec 2026, with gazetted closures already skipped. Copy this, save it as timetable.ics, and open it with your calendar."));
+  box.appendChild(el("div", "d-full", "Every class as a weekly repeat until " + longDate(semEnd) + ", with closures already skipped. Copy this, save it as timetable.ics, and open it with your calendar."));
   const ta = el("textarea");
   ta.value = text; ta.readOnly = true;
   ta.setAttribute("aria-label", "Calendar file contents");
@@ -5420,11 +5453,11 @@ async function pushMark(id, rec) {
   if (!profile) return;
   const t = await token();
   if (!t) return;
-  if (!rec) {
-    const [on_date, slot] = id.split("|");
-    return call("/rest/v1/attendance?on_date=eq." + on_date + "&slot=eq." + slot,
-      { method:"DELETE", headers:{ Prefer:"return=minimal" } }, t);
-  }
+  /* A cleared mark is written as 'X', not deleted. A deleted row reads exactly like
+     "the cloud never saw this", so the next device still holding the old mark would
+     upload it straight back. ponytail: a clear made offline is not queued, so that one
+     can still come back — a local tombstone list is the upgrade if it bites. */
+  if (!rec) rec = { m:"X", s:"" };
   return call(ATT_UPSERT, {
     method: "POST",
     headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
@@ -5469,6 +5502,7 @@ async function runSync(t) {
     const id = r.on_date + "|" + r.slot, theirs = Date.parse(r.updated_at) || 0;
     remote[id] = theirs;
     if (mergeMark(att[id], theirs) === "keep") return;   // ours is newer: it goes up below
+    if (r.mark === "X") { if (att[id]) { delete att[id]; pulled++; } return; }   // cleared elsewhere
     const mine = att[id];
     if (!mine || mine.m !== r.mark) pulled++;
     att[id] = { m:r.mark, s:subOf(r.subject), t:theirs };
@@ -5545,6 +5579,7 @@ async function loadCancelled(fromISO, toISO) {
   const ov = await call("/rest/v1/class_overrides?select=on_date,period,kind,subject,note&" + q, {}, t);
   overrides = {};
   ov.forEach(r => { overrides[r.on_date + "|" + r.period] = r; });
+  try { localStorage.setItem("bunkr-overrides", JSON.stringify(overrides)); } catch (e) {}
   const mine = await call("/rest/v1/cancellations?select=on_date,period&" + q, {}, t);
   myReports = {};
   mine.forEach(r => { myReports[r.on_date + "|" + r.period] = true; });
@@ -5555,7 +5590,7 @@ const votesFor = (iso, period) => cancelVotes[iso + "|" + period] || 0;
    A vote is what the section believes; an override is what the CR knows. So an
    override answers on its own and the votes are not consulted — otherwise a class
    the CR has already called off would still read "2 of 3 reported this". */
-let overrides = {};
+let overrides = readMap("bunkr-overrides");     /* cached: offline percentages must match online ones */
 const overrideAt = (iso, period) => overrides[iso + "|" + period] || null;
 
 /* The subject that actually ran in a slot, or null if the timetable was right.
@@ -6169,7 +6204,7 @@ function renderBunk() {
     ln.style.background = "var(--l-" + SUB[c.k].line + ")";
     row.appendChild(ln);
     const w = el("div", "w");
-    w.appendChild(el("b", null, SUB[c.k].short + " · " + TIMES[c.it.i]));
+    w.appendChild(el("b", null, SUB[c.k].short + " · " + TIMES[c.it.i < 3 ? c.it.i : c.it.i + 1]));
     w.appendChild(el("span", null, longDate(c.iso)));
     w.appendChild(el("i", "bk-tag " + call.v, call.full));
     row.appendChild(w);
@@ -6430,7 +6465,7 @@ async function syncAlerts() {
     classDays(isoOf(now), isoOf(until)).forEach(({ iso, di }) => {
       DAYS[di].items.forEach((it, ii) => {
         const key = resolve(it);
-        if (!key) return;                          /* a split practical, batch not chosen */
+        if (!key || isCancelled(iso, it.i)) return;  /* a split practical, batch not chosen — or called off */
         const span = it.span || 1, when = label(it.i, span);
         const where = SUB[key].fac + " · " + (SUB[key].lab ? "Lab" : "Room 2311");
 
@@ -6897,7 +6932,7 @@ document.addEventListener("click", e => {
 const PAGES = ["today", "week", "ranks", "directory", "attendance", "holidays", "cr"];
 function show(id) {
   if (!PAGES.includes(id) || (id === "cr" && !isCR())) id = "today";
-  if (id === "cr") { renderCR(); loadCR().catch(() => {}); }
+  if (id === "cr") { renderCR(); refreshSection(); }
   if (id === "ranks") renderRanks();
   if (id === "directory") renderDirectory();
   PAGES.forEach(p => {
@@ -6973,7 +7008,7 @@ if (NATIVE && Capacitor.Plugins.App) {
     if (open && open !== "today") return show("today");
     App.exitApp();
   });
-  App.addListener("resume", () => { renderAll(); syncAlerts(); });
+  App.addListener("resume", () => { renderAll(); syncAlerts(); refreshSection(); });
   App.addListener("pause", () => { if (locked && profile) showLock(true); });
 }
 
@@ -7240,10 +7275,10 @@ function openProfile() {
   const t = tally();
   let p = 0, h = 0;
   Object.values(t).forEach(v => { p += v.p; h += v.h; });
-  const b = termBudget().overall;
+  const bp = bunkPlan();
   const stats = el("div", "pstats");
   [[h ? pctOf(p, h) + "%" : "—", "Overall", h ? (clear(p, h) ? "ok" : "bad") : ""],
-   [String(Math.max(0, b.canBunk)), "Bunks left", b.canBunk > 0 ? "ok" : b.canBunk < 0 ? "bad" : ""],
+   [String(bp.left), "Bunks left", bp.lost.length ? "bad" : bp.left ? "ok" : ""],
    [p + "/" + h, "Attended", ""]].forEach(([v, k, cls]) => {
     const d = el("div", cls);
     d.appendChild(el("b", null, v));
@@ -7385,10 +7420,25 @@ async function openCR() {
   try {
     const dir = await fetchDirectory();
     list.textContent = "";
-    list.appendChild(el("div", "d-note", "Release a wrong claim — the name goes back on the list."));
+    list.appendChild(el("div", "d-note", "Release a wrong claim — the name goes back on the list. Make someone CR to share the controls or hand them on."));
     dir.forEach(d => {
       const r = el("div", "d-row");
       r.appendChild(el("span", null, "#" + d.sno + " " + d.name));
+      const rb = el("button", "link", d.role === "cr" ? "Remove CR" : "Make CR");
+      rb.type = "button";
+      rb.addEventListener("click", async () => {
+        const to = d.role === "cr" ? "student" : "cr";
+        const self = d.sno === profile.sno;
+        if (!confirm(to === "cr" ? "Give " + d.name + " every CR control?"
+          : self ? "Stop being CR yourself? You lose this page." : "Remove " + d.name + " as CR?")) return;
+        rb.textContent = "…";
+        try {
+          await crSetRole(d.sno, to);
+          d.role = to; rb.textContent = to === "cr" ? "Remove CR" : "Make CR";
+          if (self) { await loadProfile(); updateUserPill(); document.getElementById("dlg").close(); show("today"); }
+        } catch (err) { rb.textContent = explain(err)[0]; }
+      });
+      r.appendChild(rb);
       const b = el("button", "link", "Release");
       b.type = "button";
       b.addEventListener("click", async () => {
@@ -7418,6 +7468,18 @@ function renderCR() {
     r.appendChild(b);
     return r;
   };
+
+  /* notices */
+  const nl = document.getElementById("crNoteList");
+  nl.textContent = "";
+  const nu = document.getElementById("crNoteUntil");
+  if (!nu.value) nu.value = dayAfter(dayAfter(todayIso));
+  nu.min = todayIso;
+  liveNotices().forEach(n => nl.appendChild(rowBtn(n.body + " · until " + longDate(n.until), "Delete", async b => {
+    if (!confirm("Delete this notice for everyone?")) return;
+    b.textContent = "…";
+    try { await crDropNotice(n.id); } catch (err) { b.textContent = explain(err)[0]; }
+  })));
 
   /* holidays */
   const hol = document.getElementById("crHolList");
@@ -7478,6 +7540,18 @@ function renderCR() {
   });
 }
 
+document.getElementById("crNotePost").addEventListener("click", async e => {
+  const b = e.currentTarget, hint = document.getElementById("crNoteHint");
+  const body = document.getElementById("crNoteBody").value.trim(), until = document.getElementById("crNoteUntil").value;
+  if (!body || !until || until < nowISO()) { hint.textContent = "Needs a message and a date from today on."; return; }
+  b.disabled = true; b.textContent = "Posting…";
+  try {
+    await crPostNotice(body, until);
+    document.getElementById("crNoteBody").value = "";
+    hint.textContent = "Posted. Everyone sees it next time the app comes to the screen.";
+  } catch (err) { hint.textContent = explain(err).join(" — "); }
+  b.disabled = false; b.textContent = "Post";
+});
 document.getElementById("crHolDate").addEventListener("change", renderCR);
 document.getElementById("crDay").addEventListener("change", renderCR);
 document.getElementById("crRoster").addEventListener("click", openCR);
@@ -7503,6 +7577,74 @@ document.getElementById("crTermSave").addEventListener("click", async e => {
   catch (err) { note.textContent = explain(err).join(" — "); }
   b.disabled = false; b.textContent = "Save";
 });
+
+/* ---- notices from the CR ----
+   Signed-in only (free text). Cached so the banner survives no signal; a student can
+   hide one they have read, and it stays hidden on this phone. */
+let notices = [];
+try { notices = JSON.parse(localStorage.getItem("bunkr-notices") || "[]"); } catch (e) {}
+const seenNotices = () => { try { return JSON.parse(localStorage.getItem("bunkr-notices-hidden") || "[]"); } catch (e) { return []; } };
+const liveNotices = () => notices.filter(n => n.until >= nowISO());
+
+async function loadNotices() {
+  const t = await token();
+  if (!t) return;
+  notices = await call("/rest/v1/notices?select=id,body,until,at&until=gte." + nowISO() + "&order=at.desc", {}, t);
+  try { localStorage.setItem("bunkr-notices", JSON.stringify(notices)); } catch (e) {}
+  renderNotices(); renderCR();
+}
+async function crPostNotice(body, until) {
+  const t = await token();
+  if (!t || !isCR()) throw new Error("Only the CR can do that");
+  await call("/rest/v1/notices", { method:"POST", headers:{ Prefer:"return=minimal" },
+    body: JSON.stringify({ body, until, by_user: sess.user.id }) }, t);
+  await loadNotices();
+}
+async function crDropNotice(id) {
+  const gone = await call("/rest/v1/notices?id=eq." + id,
+    { method:"DELETE", headers:{ Prefer:"return=representation" } }, await token());
+  if (!gone || !gone.length) throw new Error("The server did not remove it — are you still the CR?");
+  await loadNotices();
+}
+
+function renderNotices() {
+  const box = document.getElementById("noticeBox");
+  box.textContent = "";
+  if (!profile) return;
+  const hidden = seenNotices();
+  liveNotices().filter(n => !hidden.includes(n.id)).forEach(n => {
+    const card = el("div", "cu notice");
+    card.appendChild(el("b", null, "From the CR"));
+    card.appendChild(document.createTextNode(" " + n.body));
+    const x = el("button", "link", "Hide");
+    x.type = "button";
+    x.addEventListener("click", () => {
+      try { localStorage.setItem("bunkr-notices-hidden", JSON.stringify(hidden.concat(n.id).slice(-50))); } catch (e) {}
+      renderNotices();
+    });
+    card.appendChild(x);
+    box.appendChild(card);
+  });
+}
+
+const crSetRole = async (sno, role) => call("/rest/v1/rpc/cr_set_role", { method:"POST",
+  body: JSON.stringify({ p_sno: sno, p_role: role }) }, await token());
+
+/* What the section shares — the CR's calendar, verdicts, votes, notices — fetched at
+   sign-in and again whenever the app comes back to the screen, so a class called off
+   at noon reaches a phone that has had the app open since morning. At most once a
+   minute: flicking between apps should not cost the college wifi a round trip. */
+let lastRefresh = 0;
+function refreshSection(force) {
+  if (!force && Date.now() - lastRefresh < 60000) return;
+  lastRefresh = Date.now();
+  loadCR().catch(() => {});
+  loadNotices().catch(() => {});
+  /* The whole term, not just this week: tally() applies every verdict to every mark,
+     so a class called off last week has to still be known this week. */
+  if (profile) loadCancelled(SEM_START, semEnd > isoOfWeekday(5) ? semEnd : isoOfWeekday(5))
+    .then(renderAll).catch(() => {});                          // offline just means no reports
+}
 
 /* ---------- user pill in the top bar ---------- */
 const userPill = document.getElementById("userPill");
@@ -7580,10 +7722,7 @@ function afterSignIn() {
   renderRanks();
   /* The week the app can actually show, not just today — the CR can now rule on a
      class before it runs, and a verdict nobody fetches is a verdict nobody sees. */
-  /* The whole term, not just this week: tally() applies every verdict to every mark,
-     so a class called off last week has to still be known this week. */
-  loadCancelled(SEM_START, semEnd > isoOfWeekday(5) ? semEnd : isoOfWeekday(5))
-    .then(renderAll).catch(() => {});                          // offline just means no reports
+  refreshSection(true);
 
   /* the account's records come down first, so a second device does not look empty
      and the catch-up below does not offer days that are already marked elsewhere */
@@ -7595,7 +7734,7 @@ if (NATIVE && locked && profile) { showLock(true); tryUnlock(); }
 measureTop();
 renderMonths();
 renderHolidayList();
-loadCR().catch(() => {});                        /* offline or not set up yet: the cached copy stands */
+refreshSection(true);                            /* offline or not set up yet: the cached copies stand */
 renderLineKey();
 renderAlertBtn();
 paintHero();
@@ -7646,7 +7785,7 @@ setInterval(() => {
 }, 30000);
 
 document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) heartbeatDevice();
+  if (!document.hidden) { heartbeatDevice(); refreshSection(); }
 });
 
 /* The loader wrote this copy but has not yet seen it work. Reaching this line is the
