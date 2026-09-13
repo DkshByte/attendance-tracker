@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+66815ba-->
+<!--secf-app--><!--build:1.0.1+67611eb-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -72,7 +72,7 @@
     --focus:var(--l-phy);
     --l-pps:#D62B1F; --l-bee:#9C6500; --l-phy:#1560D8; --l-smt:#0E8C4E;
     --l-em:#6B3FD4;  --l-csl:#C42B77; --l-evs:#0A857E; --l-eg:#BF5210; --l-pd:#5A6883;
-    --ok:#0E8C4E; --warn:#9C6500; --bad:#D62B1F; --badge-ink:#FFFFFF;
+    --ok:#08713D; --warn:#855700; --bad:#C0271C; --badge-ink:#FFFFFF;
     --lift:0 1px 1px rgba(10,16,36,.05), 0 10px 26px -18px rgba(10,16,36,.4);
     --lift-lg:0 2px 4px rgba(10,16,36,.06), 0 20px 44px -22px rgba(10,16,36,.45);
     --lift-edge:0 4px 10px -6px rgba(10,16,36,.28);
@@ -92,7 +92,7 @@
   --focus:var(--l-phy);
   --l-pps:#D62B1F; --l-bee:#9C6500; --l-phy:#1560D8; --l-smt:#0E8C4E;
   --l-em:#6B3FD4;  --l-csl:#C42B77; --l-evs:#0A857E; --l-eg:#BF5210; --l-pd:#5A6883;
-  --ok:#0E8C4E; --warn:#9C6500; --bad:#D62B1F; --badge-ink:#FFFFFF;
+  --ok:#08713D; --warn:#855700; --bad:#C0271C; --badge-ink:#FFFFFF;
   --lift:0 1px 1px rgba(10,16,36,.05), 0 10px 26px -18px rgba(10,16,36,.4);
   --lift-lg:0 2px 4px rgba(10,16,36,.06), 0 20px 44px -22px rgba(10,16,36,.45);
   --lift-edge:0 4px 10px -6px rgba(10,16,36,.28);
@@ -109,6 +109,8 @@
 *,*::before,*::after { box-sizing:border-box; }
 /* author rules outrank the UA sheet, so [hidden] needs saying out loud */
 [hidden] { display:none !important; }
+/* the phone-width pill and icon rules force display with !important; these must still hide */
+.user-pill[hidden], .iconbtn[hidden] { display:none !important; }
 html { -webkit-text-size-adjust:100%; }
 body {
   margin:0; background:var(--bg); color:var(--ink);
@@ -228,7 +230,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 .nav a {
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
   min-height:58px; padding:10px 1px 9px; text-decoration:none; color:var(--ink-3);
-  font-size:10px; font-weight:700; letter-spacing:.02em; text-transform:uppercase;
+  font-size:11px; font-weight:700; letter-spacing:.02em; text-transform:uppercase;
   white-space:nowrap;
   position:relative; transition:color .2s var(--ease), transform .16s var(--ease);
   -webkit-tap-highlight-color:transparent;
@@ -295,7 +297,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
   transition:background .18s var(--ease);
 }
 .upnext:hover { background:var(--plate-3); }
-.upnext .lbl { font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:700; flex:none; }
+.upnext .lbl { font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:700; flex:none; }
 .upnext .val { font-weight:700; font-size:16px; color:var(--line); flex:none; }
 .upnext .fac { flex:1; min-width:0; font-size:12.5px; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .upnext .t { font-size:15px; color:var(--ink); font-weight:700; flex:none; }
@@ -311,7 +313,7 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 }
 .stat:hover { background:var(--plate-3); }
 .stat b { font-size:24px; font-weight:700; line-height:1; letter-spacing:-.01em; color:var(--ink); }
-.stat span { font-size:10px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); }
+.stat span { font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); }
 .stat.ok b { color:var(--ok); }
 .stat.warn b { color:var(--warn); }
 .stat.bad b { color:var(--bad); }
@@ -340,7 +342,6 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
   width:100%; text-align:left; flex:1; cursor:pointer;
   display:flex; flex-direction:column; justify-content:center;
   background:var(--glass-plate);
-  backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--glass-border); border-radius:12px;
   padding:13px 15px;
   box-shadow:var(--glass-shadow), var(--glass-highlight);
@@ -441,7 +442,7 @@ h2::after { content:""; flex:1; height:1px; background:var(--rule-soft); }
   width:126px; flex:none; padding:16px 14px 16px 0;
 }
 .netrow .day .d { font-family:'Blinker', sans-serif; font-weight:700; font-size:19px; }
-.netrow .day .c { font-size:11.5px; color:var(--ink-3); font-weight:600; letter-spacing:.04em; }
+.netrow .day .c { font-size:12px; color:var(--ink-3); font-weight:600; letter-spacing:.04em; }
 .netrow.today .day .d { color:var(--l-pps); }
 .netrow .trk { position:relative; flex:1; display:flex; padding-top:22px; padding-bottom:14px; }
 .netrow .trk::before {
@@ -471,7 +472,7 @@ h2::after { content:""; flex:1; height:1px; background:var(--rule-soft); }
 .nc.live { border-color:var(--line); box-shadow:0 0 0 1px var(--line), var(--lift), var(--glass-highlight); }
 .nc .n { font-family:'Blinker', sans-serif; font-weight:700; font-size:17px; line-height:1.12; color:var(--line, var(--ink)); }
 .nc .f { font-size:12px; color:var(--ink-2); line-height:1.25; margin-top:1px; }
-.nc .b { font-size:10.5px; color:var(--ink-3); font-weight:600; letter-spacing:.07em; text-transform:uppercase; margin-top:3px; }
+.nc .b { font-size:11px; color:var(--ink-3); font-weight:600; letter-spacing:.07em; text-transform:uppercase; margin-top:3px; }
 .slot.empty .void {
   min-height:66px; display:flex; align-items:center; justify-content:center;
   font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); opacity:.65; font-weight:600;
@@ -501,7 +502,7 @@ h2::after { content:""; flex:1; height:1px; background:var(--rule-soft); }
 .keyrow .n { font-family:'Blinker', sans-serif; font-weight:700; font-size:18px; color:var(--line); line-height:1.15; }
 .keyrow .full { font-size:13.5px; color:var(--ink); }
 .keyrow .f { font-size:12.5px; color:var(--ink-2); }
-.keyrow .c { font-size:11.5px; color:var(--ink-3); font-weight:500; letter-spacing:.03em; margin-top:2px; }
+.keyrow .c { font-size:12px; color:var(--ink-3); font-weight:500; letter-spacing:.03em; margin-top:2px; }
 
 /* ============ attendance ============ */
 .bar-tools { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:16px 0 6px; }
@@ -784,6 +785,7 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
   backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
   box-shadow:var(--glass-shadow);
 }
+button.task-due-banner { width:100%; font:inherit; font-size:13px; font-weight:600; color:var(--ink); text-align:left; min-height:44px; }
 .task-due-banner:hover { transform:translateY(-1px); border-color:var(--warn); }
 
 /* --- End-of-Day 4:00 PM Prompt Card --- */
@@ -894,7 +896,7 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 
 /* one reading width for heading, list, calendar and toggles, so the switch sits over what it switches */
 #holidays { max-width:680px; }
-#holView button { padding:0 16px; }
+#holView { min-height:44px; }
 .hmonth { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin:24px 0 8px; }
 .hmonth:first-child { margin-top:2px; }
 .hgroup { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; }
@@ -906,7 +908,7 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .hrow:focus-visible { outline:2px solid var(--focus); outline-offset:-2px; }
 .hd { display:grid; justify-items:center; line-height:1; }
 .hd b { font-size:22px; font-weight:700; letter-spacing:-.01em; color:var(--ink); }
-.hd i { font-style:normal; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-top:4px; }
+.hd i { font-style:normal; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-top:4px; }
 .hn b { display:block; font-size:15px; font-weight:600; line-height:1.25; color:var(--ink); }
 .hn small { display:flex; align-items:center; gap:6px; margin-top:3px; font-size:12.5px; color:var(--ink-3); }
 .hn small i { width:8px; height:8px; border-radius:50%; flex:none; box-shadow:inset 0 0 0 2px var(--ink-3); }
@@ -955,7 +957,7 @@ dialog.sheet .d-in { max-height:92vh; overflow-y:auto; }
 .pstats div { padding:11px 12px; background:var(--plate-2); border:1px solid var(--rule); border-radius:12px; }
 .pstats b { display:block; font-family:'Blinker', sans-serif; font-weight:700;
             font-size:25px; line-height:1.05; letter-spacing:-.01em; }
-.pstats span { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); }
+.pstats span { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); }
 .pstats .ok b { color:var(--ok); } .pstats .bad b { color:var(--bad); }
 
 .chead { display:flex; align-items:baseline; gap:10px; margin:22px 0 4px; }
@@ -971,7 +973,7 @@ dialog.sheet .d-in { max-height:92vh; overflow-y:auto; }
 .cfield:focus-within { border-color:var(--rail); background:var(--plate-3); }
 .cfield > svg { width:20px; height:20px; flex:none; color:var(--ink-3); transition:color .2s var(--ease); }
 .cfield .m { flex:1; min-width:0; }
-.cfield label { display:block; font-size:9.5px; font-weight:700; letter-spacing:.12em;
+.cfield label { display:block; font-size:11px; font-weight:700; letter-spacing:.12em;
                 text-transform:uppercase; color:var(--ink-3); margin:0 0 1px; }
 .cfield input { width:100%; border:0; background:transparent; padding:0;
                 font-size:15px; font-weight:600; color:var(--ink); }
@@ -1228,6 +1230,7 @@ button.drow:hover { background:var(--glass-plate-hover); }
   color:var(--ink); background:var(--plate);
   border:1px solid var(--rule-soft, rgba(255,255,255,.09));
 }
+.crx-pick, .crx-note { min-height:44px; }
 .crx-pick:focus-visible, .crx-note:focus-visible { outline:2px solid var(--ink-2); outline-offset:1px; }
 .crx-note { margin-bottom:8px; }
 .crx-hint { font-size:12px; line-height:1.45; color:var(--ink-3); margin-bottom:4px; }
@@ -1285,6 +1288,9 @@ dialog .btn { margin-top:8px; }
   -webkit-tap-highlight-color:transparent;
 }
 .user-pill:hover { border-color:var(--rail); }
+.pill-btn { display:inline-flex; align-items:center; gap:8px; height:100%; padding:0; margin:0;
+            background:none; border:0; color:inherit; font:inherit; cursor:pointer; border-radius:999px; }
+.signin-btn { min-height:44px; padding:0 6px; font-weight:700; color:var(--ink); }
 .user-pill .avatar {
   width:28px; height:28px; border-radius:50%;
   display:flex; align-items:center; justify-content:center; text-align:center;
@@ -1360,7 +1366,7 @@ dialog .btn { margin-top:8px; }
 .pbatch-row .seg { display:flex; gap:2px; padding:2.5px; background:var(--plate-2); border:1px solid var(--rule-soft); border-radius:999px; }
 .pbatch-row .seg button {
   padding:5px 12px !important; font-size:12px; font-weight:700; border-radius:999px;
-  border:0; background:transparent; color:var(--ink-2); cursor:pointer; min-height:30px !important;
+  border:0; background:transparent; color:var(--ink-2); cursor:pointer; min-height:44px !important;
   transition:color .18s var(--ease), background .18s var(--ease);
 }
 .pbatch-row .seg button:hover:not([aria-pressed="true"]) { color:var(--ink); background:var(--plate-3); }
@@ -1371,7 +1377,7 @@ dialog .btn { margin-top:8px; }
    DIRECTORY / ATTENDANCE / HOLIDAYS ran together. The icons carry the meaning
    at this size, so the label steps down rather than the icon. */
 @media (max-width:400px) {
-  .nav a { font-size:10px; letter-spacing:.01em; gap:4px; }
+  .nav a { font-size:11px; letter-spacing:.01em; gap:4px; }
   .nav a svg { width:24px; height:24px; }
 }
 
@@ -1460,19 +1466,19 @@ dialog .btn { margin-top:8px; }
 .bk-row .n { flex:none; min-width:30px; text-align:right; }
 .bk-row .n b { display:block; font-family:"Barlow Condensed",sans-serif; font-weight:700;
                font-size:27px; line-height:1; }
-.bk-row .n span { display:block; font-size:9px; font-weight:700; letter-spacing:.07em;
+.bk-row .n span { display:block; font-size:11px; font-weight:700; letter-spacing:.07em;
                   text-transform:uppercase; color:var(--ink-3); margin-top:3px; }
 .bk-hint { font-size:12.5px; color:var(--ink-3); line-height:1.55; margin:2px 0 4px; }
 .bk-step { flex:none; display:flex; gap:5px; }
-.bk-step button { width:31px; height:31px; border-radius:9px; border:1px solid var(--rule);
+.bk-step button { width:44px; height:44px; border-radius:9px; border:1px solid var(--rule);
                   background:var(--plate); color:var(--ink); font:inherit; font-size:16px;
                   line-height:1; cursor:pointer; display:grid; place-items:center; }
 .bk-step button:disabled { opacity:.32; cursor:default; }
 .bk-step button:not(:disabled):hover { border-color:var(--rail); background:var(--plate-3); }
 
-.bk-tag { display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.07em;
-          text-transform:uppercase; padding:3px 7px; border-radius:6px; margin-top:4px; }
-.bk-tag.safe { background:color-mix(in srgb, var(--l-smt) 17%, transparent); color:var(--l-smt); }
+.bk-tag { display:inline-block; font-size:12px; font-weight:600; letter-spacing:0;
+          padding:3px 7px; border-radius:6px; margin-top:4px; }
+.bk-tag.safe { background:color-mix(in srgb, var(--ok) 12%, transparent); color:var(--ok); }
 .bk-tag.last { background:color-mix(in srgb, var(--l-eg) 17%, transparent); color:var(--l-eg); }
 .bk-tag.no,
 .bk-tag.over,
@@ -1547,7 +1553,7 @@ dialog .btn { margin-top:8px; }
   justify-content: center;
   flex-shrink: 0;
   z-index: 2;
-  animation: splashEmblemPop 0.65s cubic-bezier(0.16, 1.28, 0.3, 1) both;
+  animation: splashEmblemPop 0.65s var(--ease) both;
   will-change: transform, opacity;
 }
 
@@ -1692,6 +1698,8 @@ input[type="date"] { padding:12px 14px; }
    Bunkr Web Interstitial: Native APK Download Front
    Only shown on web browsers after splash animation finishes
    ============================================================ */
+.apk-front-glow-1, .apk-front-glow-2 { display:none !important; }
+.apk-front-badge-dot, .apk-front-emblem { box-shadow:none !important; }
 #bunkr-apk-front {
   position: fixed;
   inset: 0;
@@ -1767,7 +1775,7 @@ input[type="date"] { padding:12px 14px; }
   align-items: center;
   text-align: center;
   transform: translateY(14px) scale(0.97);
-  transition: transform 0.45s cubic-bezier(0.16, 1.25, 0.3, 1);
+  transition: transform 0.45s var(--ease);
 }
 
 #bunkr-apk-front.front-visible .apk-front-card {
@@ -2046,8 +2054,8 @@ input[type="date"] { padding:12px 14px; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
         </div>
         <div class="apk-front-perk-text">
-          <div class="apk-front-perk-title">120Hz Fluid Gestures & Haptics</div>
-          <div class="apk-front-perk-sub">Silky attendance swipe carousel with tactile vibration feedback.</div>
+          <div class="apk-front-perk-title">Mark from the notification</div>
+          <div class="apk-front-perk-sub">Present or Absent straight from the class reminder.</div>
         </div>
       </div>
 
@@ -2138,10 +2146,13 @@ input[type="date"] { padding:12px 14px; }
       <svg id="themeIconSun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></svg>
       <svg id="themeIconMoon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
-    <div class="user-pill" id="userPill" role="button" tabindex="0"
-         aria-haspopup="menu" aria-expanded="false" aria-label="Your account" hidden>
-      <span class="avatar" id="userAvatar"></span>
-      <span class="uname" id="userName"></span>
+    <button class="link signin-btn" id="signInBtn" type="button" hidden>Sign in</button>
+    <div class="user-pill" id="userPill" hidden>
+      <button class="pill-btn" id="pillBtn" type="button" aria-haspopup="true" aria-expanded="false"
+              aria-controls="userDrop" aria-label="Your account">
+        <span class="avatar" id="userAvatar"></span>
+        <span class="uname" id="userName"></span>
+      </button>
       <div class="user-drop" id="userDrop">
         <div class="drop-batch">
           <span class="drop-batch-lbl">Practical Batch</span>
@@ -2178,7 +2189,7 @@ input[type="date"] { padding:12px 14px; }
     <div id="eodNoticeBox"></div>
     <div id="taskDueBox"></div>
     <div class="h2row" style="margin-top:24px">
-      <h2 id="todayHead">Today's line</h2>
+      <h2 id="todayHead">Today's classes</h2>
       <button class="bulk-btn" id="markAllTodayBtn" type="button" title="Mark all today's classes present">Mark all present</button>
       <button class="link" id="alertBtn" type="button" aria-pressed="true" hidden>Class alerts</button>
     </div>
@@ -2199,9 +2210,7 @@ input[type="date"] { padding:12px 14px; }
 
     <div class="h2row" style="margin-top:0">
       <h2>The week</h2>
-      <button class="link" id="planBtn" type="button" aria-pressed="false">Plan a bunk</button>
     </div>
-    <div class="planbar" id="planBar" hidden></div>
 
     <div class="weekday">
       <div class="chips" id="dayChips"></div>
@@ -2226,15 +2235,15 @@ input[type="date"] { padding:12px 14px; }
     </div>
     <div id="board"></div>
 
-    <div class="h2row">
-      <h2>Mark a day</h2>
-    </div>
+    <details class="fold" id="foldMark">
+      <summary>Mark a past day</summary>
       <div class="bar-tools">
         <input type="date" id="attDate" aria-label="Date to mark">
         <button class="bulk-btn" id="markAllAttBtn" type="button" title="Mark all classes on this date present">Mark all present</button>
         <span class="daynote" id="attNote"></span>
       </div>
       <div class="railwrap" id="attRail"></div>
+    </details>
 
     <details class="fold" id="foldPlan">
       <summary>Plan a bunk</summary>
@@ -2371,10 +2380,7 @@ input[type="date"] { padding:12px 14px; }
     </div>
     <div class="h2row">
       <h2>Closures</h2>
-      <div class="seg" id="holView" role="group" aria-label="How to show closures">
-        <button type="button" data-v="list" aria-pressed="true">List</button>
-        <button type="button" data-v="cal" aria-pressed="false">Calendar</button>
-      </div>
+      <button class="link" id="holView" type="button">Calendar view</button>
     </div>
     <div class="hlist" id="hlist"></div>
     <div id="holCal" hidden>
@@ -2477,6 +2483,7 @@ input[type="date"] { padding:12px 14px; }
       <button class="go" id="liGo" type="button">Sign in</button>
       <div class="authlinks">
         <button class="link" type="button" data-goto="pick">First time? Claim your name</button>
+        <button class="link" type="button" id="liSkip">Just see the timetable</button>
         <button class="link" type="button" data-goto="forgot">Forgot password</button>
       </div>
     </div>
@@ -2753,7 +2760,7 @@ function renderRail(box, dayIdx, opts) {
     box.style.paddingLeft = "0";
     const e = el("div", "empty");
     e.appendChild(el("b", null, "No classes"));
-    e.appendChild(document.createTextNode(DAYS[dayIdx].d + " is clear. The line does not run today."));
+    e.appendChild(document.createTextNode("Nothing scheduled on " + DAYS[dayIdx].d + "."));
     box.appendChild(e);
     return;
   }
@@ -2928,7 +2935,7 @@ function renderToday() {
   const up = live ? null : nextRunningDay(isoOf(new Date()));
   const dayIdx = live ? di : (up ? up.di : 0);
   document.getElementById("todayHead").textContent =
-    live ? "Today's line" : DAYS[dayIdx].d + "'s line";
+    live ? "Today's classes" : DAYS[dayIdx].d + "'s classes";
 
   /* only the real today is markable — the Sunday view is next week's, not yet attended */
   const iso = isoOf(new Date());
@@ -3037,7 +3044,7 @@ function renderPlate() {
       : after ? "Day's over"
       : "Free right now"));
     plate.appendChild(el("div", "who", closed
-      ? "The line does not run on " + (day ? day.d : "Sunday") + "."
+      ? "No classes on " + (day ? day.d : "Sunday") + "."
       : after ? "Mark anything you missed below." : "Nothing scheduled at this moment."));
   }
   row.appendChild(when);
@@ -3071,7 +3078,9 @@ function renderPlate() {
     strip.appendChild(c);
   };
   stat(H ? pctOf(P, H) + "%" : "—", "Overall", H ? (clear(P, H) ? "ok" : "bad") : "", null);
-  stat(String(bp.left), bp.left === 1 ? "Bunk left" : "Bunks left", bp.lost.length ? "bad" : bp.left ? "" : "warn", "foldPlan");
+  const tight = tightest(bp);
+  stat(tight ? String(tight.left) : "—", tight ? "Skips · " + SUB[tight.k].short : "Skips left",
+       bp.lost.length ? "bad" : tight && tight.left <= 3 ? "warn" : "", "foldPlan");
   stat(String(below), "Below " + targetPct + "%", below ? "bad" : "", null);
   box.appendChild(strip);
 }
@@ -3205,7 +3214,7 @@ function renderLineKey() {
     m.appendChild(el("div", "n", s.short));
     m.appendChild(el("div", "full", s.name));
     m.appendChild(el("div", "f", s.fac));
-    m.appendChild(el("div", "c", s.code + " · " + LINES[s.line].name));
+    m.appendChild(el("div", "c", s.code));
     row.appendChild(m);
     box.appendChild(row);
   });
@@ -3225,7 +3234,7 @@ function openDetail(item, dayIdx, onIso) {
   if (key) {
     const s = SUB[key];
     top.appendChild(el("span", "badge", s.lab ? "Practical" : "Lecture"));
-    top.appendChild(el("span", "plate-when", LINES[s.line].name));
+    top.appendChild(el("span", "plate-when", s.code));
     box.appendChild(top);
     box.appendChild(el("div", "d-name", s.short));
     box.appendChild(el("div", "d-full", s.name));
@@ -3770,6 +3779,16 @@ function demo() {                                   // run demo() in the console
   ok(isCancelled("2026-09-07", 0), true, "...and with no verdict the votes decide again");
   cancelVotes = {};
 
+  /* Mark all present fills blanks only: a mark the student made is never overwritten */
+  overrides = {};
+  if (nowISO() > "2026-09-07") {
+    att = { "2026-09-07|0": { m:"A", s:sub1 } };
+    const fill = fillable("2026-09-07").map(x => x.id);
+    ok(fill.includes("2026-09-07|0"), false, "mark all never overwrites a mark already made");
+    ok(fill.length, DAYS[0].items.filter(it => resolve(it)).length - 1, "...and fills every other class that day");
+  }
+  ok(fillable("2999-01-04").length, 0, "a day that has not happened cannot be bulk-marked");
+
   att = keptAtt; overrides = keptOvr;
 
   /* the sync merge: records are irreplaceable, so this only ever resolves a collision */
@@ -3975,6 +3994,13 @@ function leaveCost(fromIso, toIso) {
    by construction, and an average of numbers each >= 75 is >= 75, so
    the total is not just a bound — it is reachable. That is the whole
    claim, and demo() holds it to it. */
+/* The subject with the least room. 75% is per subject, so this — not a sum across
+   subjects — is how many classes you can skip before *something* goes under. */
+function tightest(g) {
+  /* bunkPlan sorts tightest first; a subject with nothing left to attend is not a limit */
+  return g.subs.find(x => x.v.r > 0) || g.subs[0] || null;
+}
+
 function bunkPlan() {
   const b = termBudget(), subs = [];
   Object.keys(b.per).forEach(k => {
@@ -4026,6 +4052,7 @@ function upcomingClasses(n) {
     for (let ii = 0; ii < DAYS[di].items.length; ii++) {
       const k = resolve(DAYS[di].items[ii]);
       if (!k || att[iso + "|" + ii] || isCancelled(iso, DAYS[di].items[ii].i)) continue;
+      if (iso === nowISO() && startMin(DAYS[di].items[ii].i) <= nowMin()) continue;   /* already under way */
       out.push({ iso, di, ii, k, it: DAYS[di].items[ii] });
       if (out.length >= n) return out;
     }
@@ -4053,28 +4080,38 @@ function markDay(iso, di, mk) {
   });
 }
 
-/* 1-Tap bulk marking for a day with smart toggle (undo) */
+/* Bulk marking. It fills blanks only: a class that has not started yet cannot have been
+   attended, and a mark the student already made (an Absent, say) is theirs, not ours to
+   overwrite. Undo takes back exactly what this press added and nothing else. */
+let bulkUndo = null;                                /* { iso, ids } of the last fill */
+function fillable(iso) {
+  const di = fromISO(iso).getDay() - 1;
+  if (iso > nowISO() || di < 0 || di > 5 || !DAYS[di] || !DAYS[di].items.length || gazettedOn(iso)) return [];
+  const today = iso === nowISO(), now = nowMin();
+  return DAYS[di].items
+    .map((it, ii) => ({ it, id: iso + "|" + ii, k: resolve(it) }))
+    .filter(x => x.k && !att[x.id] && !isCancelled(iso, x.it.i) && (!today || startMin(x.it.i) <= now));
+}
+
 function markAllDay(iso, mk = "P") {
-  const d = fromISO(iso);
-  const di = d.getDay() - 1;
-  if (di < 0 || di > 5 || !DAYS[di] || !DAYS[di].items.length || gazettedOn(iso)) return;
-
-  const valid = DAYS[di].items.map((it, ii) => ({ it, ii, k: resolve(it) })).filter(x => x.k);
-  if (!valid.length) return;
-
-  const allP = valid.every(({ ii }) => att[iso + "|" + ii] && att[iso + "|" + ii].m === mk);
-
-  valid.forEach(({ ii, k }) => {
-    const id = iso + "|" + ii;
-    if (allP) delete att[id];
-    else att[id] = { m: mk, s: k, t: Date.now() };
-  });
-
-  saveAtt();
+  if (bulkUndo && bulkUndo.iso === iso) {
+    const ids = bulkUndo.ids;
+    bulkUndo = null;
+    const gone = ids.filter(id => att[id] && att[id].bulk);   /* a mark changed by hand since stays */
+    gone.forEach(id => { delete att[id]; });
+    saveAtt();
+    if (profile) gone.forEach(id => pushMark(id, null).catch(() => {}));
+  } else {
+    const fill = fillable(iso);
+    if (!fill.length) return;
+    const t = Date.now();
+    fill.forEach(x => { att[x.id] = { m: mk, s: x.k, t, bulk: true }; });
+    bulkUndo = { iso, ids: fill.map(x => x.id) };
+    saveAtt();
+  }
   renderToday();
   renderAttendance();
   updateBulkBtns();
-
   if (profile) {
     syncAttendance().catch(() => {});
     pushScore().catch(() => {});
@@ -4084,52 +4121,21 @@ function markAllDay(iso, mk = "P") {
 /* a drawn tick, the same stroke as every other icon; an emoji renders differently on every phone */
 function bulkLabel(btn, all) {
   btn.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.2 8.4 6.4 11.4 12.8 4.8"/></svg>';
-  btn.appendChild(document.createTextNode(all ? "All present · undo" : "Mark all present"));
+  btn.appendChild(document.createTextNode(all ? "Undo mark all" : "Mark all present"));
 }
 
 function updateBulkBtns() {
   const todayIso = nowISO();
-  const dToday = fromISO(todayIso);
-  const diToday = dToday.getDay() - 1;
-  const btnToday = document.getElementById("markAllTodayBtn");
-  if (btnToday) {
-    if (diToday < 0 || diToday > 5 || gazettedOn(todayIso) || !DAYS[diToday] || !DAYS[diToday].items.length) {
-      btnToday.style.display = "none";
-    } else {
-      btnToday.style.display = "";
-      const valid = DAYS[diToday].items.map((it, ii) => ({ it, ii, k: resolve(it) })).filter(x => x.k);
-      const allP = valid.length > 0 && valid.every(x => att[todayIso + "|" + x.ii] && att[todayIso + "|" + x.ii].m === "P");
-      if (allP) {
-        btnToday.classList.add("all-marked");
-        bulkLabel(btnToday, true);
-      } else {
-        btnToday.classList.remove("all-marked");
-        bulkLabel(btnToday, false);
-      }
-    }
-  }
-
-  const btnAtt = document.getElementById("markAllAttBtn");
+  const paint = (btn, iso) => {
+    if (!btn) return;
+    const undo = !!(bulkUndo && bulkUndo.iso === iso);
+    btn.style.display = undo || fillable(iso).length ? "" : "none";
+    btn.classList.toggle("all-marked", undo);
+    bulkLabel(btn, undo);
+  };
+  paint(document.getElementById("markAllTodayBtn"), todayIso);
   const attInput = document.getElementById("attDate");
-  if (btnAtt) {
-    const iso = (attInput && attInput.value) ? attInput.value : todayIso;
-    const d = fromISO(iso);
-    const di = d.getDay() - 1;
-    if (di < 0 || di > 5 || gazettedOn(iso) || !DAYS[di] || !DAYS[di].items.length) {
-      btnAtt.style.display = "none";
-    } else {
-      btnAtt.style.display = "";
-      const valid = DAYS[di].items.map((it, ii) => ({ it, ii, k: resolve(it) })).filter(x => x.k);
-      const allP = valid.length > 0 && valid.every(x => att[iso + "|" + x.ii] && att[iso + "|" + x.ii].m === "P");
-      if (allP) {
-        btnAtt.classList.add("all-marked");
-        bulkLabel(btnAtt, true);
-      } else {
-        btnAtt.classList.remove("all-marked");
-        bulkLabel(btnAtt, false);
-      }
-    }
-  }
+  paint(document.getElementById("markAllAttBtn"), (attInput && attInput.value) || todayIso);
 }
 
 function renderAttendance() {
@@ -4326,7 +4332,7 @@ function renderBoard() {
     const m = el("div", "m");
     m.appendChild(el("div", "n", SUB[k].short));
     m.appendChild(el("div", "st " + state,
-      state === "ok" ? "Good service" : state === "warn" ? "At the line" : "Below minimum"));
+      state === "ok" ? "On track" : state === "warn" ? "At the limit" : "Below " + targetPct + "%"));
     m.appendChild(el("div", "adv", advice(b)));
     const track = el("div", "track");
     const fill = el("i"); fill.style.width = Math.min(100, pct) + "%";
@@ -4617,31 +4623,6 @@ function openCatchup() {
       box.appendChild(list);
     }
 
-    /* ── Redo / reset — always available at the bottom ── */
-    const resetRow = el("div", "cu-reset-row");
-    const resetBtn = el("button", "link cu-reset-btn", "↺ Redo catch-up from scratch");
-    resetBtn.type = "button";
-    resetBtn.addEventListener("click", async () => {
-      if (!confirm("Delete ALL attendance records and redo the catch-up from scratch?")) return;
-      resetBtn.textContent = "Clearing…";
-      resetBtn.disabled = true;
-      try {
-        if (profile) await wipeAttendance();
-        att = {};
-        saveAtt();
-        if (profile) pushScore().catch(() => {});
-        renderAttendance();
-        renderCatchup();
-        draw();
-      } catch (err) {
-        resetBtn.textContent = "↺ Redo catch-up from scratch";
-        resetBtn.disabled = false;
-        alert("Cloud clear failed: " + (err && err.message || err));
-      }
-    });
-    resetRow.appendChild(resetBtn);
-    box.appendChild(resetRow);
-
     box.appendChild(actions());
   };
   draw();
@@ -4685,7 +4666,7 @@ function renderSubmissions() {
 
   const pending = submissions.filter(s => !s.done);
   if (summary) {
-    summary.textContent = "Submissions (" + pending.length + " pending)";
+    summary.textContent = pending.length ? pending.length + " pending" : "";
   }
 
   let items = submissions.slice();
@@ -4786,7 +4767,8 @@ function renderDueBanner() {
   const overdue = urgent.filter(s => s.dueDate < today).length;
   const dueToday = urgent.filter(s => s.dueDate === today).length;
 
-  const banner = el("div", "task-due-banner");
+  const banner = el("button", "task-due-banner");
+  banner.type = "button";
   let msg = "";
   if (overdue && dueToday) {
     msg = overdue + " overdue submission" + (overdue > 1 ? "s" : "") + " & " + dueToday + " due today";
@@ -5048,7 +5030,12 @@ async function token() {
         method: "POST", body: JSON.stringify({ refresh_token: sess.refresh_token }) });
       saveSess();
       return sess.access_token;
-    } catch (e) { sess = null; saveSess(); }
+    } catch (e) {
+      /* Only the server saying no ends a session. No signal in a basement lab threw a
+         TypeError here, which used to wipe the session and put the whole timetable
+         behind a sign-in form nobody could complete offline. */
+      if (e.status) { sess = null; saveSess(); }
+    }
   }
   return null;
 }
@@ -5289,7 +5276,8 @@ async function syncAttendance() {
   if (!profile) return;
   const t = await token();
   if (!t) {                                        /* a dead session is not a sync in progress */
-    syncState = { ok:false, msg:"Saved on this phone · sign in again to back it up" };
+    syncState = { ok:false, msg: navigator.onLine === false ? "Offline · saved on this phone"
+                                  : "Saved on this phone · sign in again to back it up" };
     renderSyncNote();
     return;
   }
@@ -5594,7 +5582,12 @@ async function renderDirectory() {
     count.textContent = what;
     box.textContent = "";
     box.appendChild(el("div", "none", fix));
+    document.getElementById("dirSearch").parentElement.hidden = true;
+    document.getElementById("dirFilter").hidden = true;
+    return;
   }
+  document.getElementById("dirSearch").parentElement.hidden = false;
+  document.getElementById("dirFilter").hidden = false;
 }
 /* 16px, one stroke weight, so a lit icon means something a dot never could */
 /* GitHub and LinkedIn get their own marks — a hand-drawn approximation of a logo
@@ -5869,6 +5862,7 @@ function project() {
 function renderPlan() {
   const bar = document.getElementById("planBar");
   const btn = document.getElementById("planBtn");
+  if (!btn || !bar) return;                        /* planning lives in Attendance → Plan a bunk */
   btn.setAttribute("aria-pressed", planning);
   btn.textContent = planning ? "Done" : "Plan a bunk";
   bar.hidden = !planning;
@@ -5924,12 +5918,12 @@ function renderBunk() {
   }
 
   /* the headline is the reachable number, never the average's looser one */
+  const tight = tightest(g);
   const head = el("div", "bk-head");
-  const state = g.lost.length ? "bad" : g.left ? "ok" : "warn";
-  head.appendChild(el("div", "bk-big " + state, String(g.left)));
-  head.appendChild(el("div", "bk-cap", g.left === 1
-    ? "class you can still skip"
-    : "classes you can still skip"));
+  const state = g.lost.length ? "bad" : tight.left > 3 ? "ok" : "warn";
+  head.appendChild(el("div", "bk-big " + state, String(tight.left)));
+  head.appendChild(el("div", "bk-cap", (tight.left === 1 ? "class" : "classes") + " you can skip in "
+    + SUB[tight.k].short + ", your tightest subject — " + g.left + " across all subjects if spread as listed"));
   box.appendChild(head);
 
   /* the one number the old headline got wrong is worth naming, not hiding */
@@ -5969,7 +5963,7 @@ function renderBunk() {
     const w = el("div", "w");
     w.appendChild(el("b", null, SUB[s.k].short));
     w.appendChild(el("span", null,
-      "Been to " + s.v.p + " of " + s.v.h + " · " + s.v.r + " still to come · you'd finish at " + s.end + "%"));
+      (s.v.h ? "Been to " + s.v.p + " of " + s.v.h : "Nothing marked yet") + " · " + s.v.r + " still to come · you'd finish at " + s.end + "%"));
     /* the count column already says "3"; the tag only speaks when it knows something
        the number does not — that this is the last one, or that there is none to take */
     const call = skipCall(s);
@@ -6159,9 +6153,10 @@ document.getElementById("semEndInput").addEventListener("change", e => {
 document.getElementById("icsBtn").addEventListener("click", openICS);
 document.getElementById("redoCatchup").addEventListener("click", openCatchup);
 document.getElementById("attClear").addEventListener("click", async () => {
-  if (!confirm(profile
-    ? "Delete every attendance record, on this device and in your account? This cannot be undone."
-    : "Delete every attendance record on this device? This cannot be undone.")) return;
+  const n = Object.keys(att).length;
+  if (!n) return alert("There are no marks to clear.");
+  if (!confirm("Delete all " + n + " marks" + (profile ? ", on this phone and in your account" : " on this phone")
+    + "? Your percentage starts again from nothing. This cannot be undone.")) return;
   att = {}; saveAtt(); renderAttendance();
   if (profile) {
     try { await wipeAttendance(); await pushScore(); }
@@ -6177,10 +6172,12 @@ document.getElementById("attClear").addEventListener("click", async () => {
 function setHolView(v) {
   document.getElementById("hlist").hidden = v !== "list";
   document.getElementById("holCal").hidden = v !== "cal";
-  document.querySelectorAll("#holView button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v));
+  const t = document.getElementById("holView");
+  t.textContent = v === "list" ? "Calendar view" : "List view";
+  t.dataset.v = v;
   try { localStorage.setItem("bunkr-hol-view", v); } catch (e) {}
 }
-document.querySelectorAll("#holView button").forEach(b => b.addEventListener("click", () => setHolView(b.dataset.v)));
+document.getElementById("holView").addEventListener("click", e => setHolView(e.currentTarget.dataset.v === "list" ? "cal" : "list"));
 try { setHolView(localStorage.getItem("bunkr-hol-view") === "cal" ? "cal" : "list"); } catch (e) { setHolView("list"); }
 document.getElementById("resToggle").addEventListener("click", e => {
   showRestricted = !showRestricted;
@@ -6827,7 +6824,8 @@ if (NATIVE && Capacitor.Plugins.App) {
     if (dlg.open) return dlg.close();
     if (userDrop.classList.contains("open")) return userDrop.classList.remove("open");
     /* back at the sign-in screen used to do nothing at all, which reads as a hang */
-    if (!document.getElementById("gate").hidden) return App.exitApp();
+    /* sign-in is a door now, not a wall: back closes it, and only a signed-out app exits */
+    if (!document.getElementById("gate").hidden) { gateClose(); renderAll(); return; }
     const open = PAGES.find(id => !document.getElementById(id).hidden);
     if (open && open !== "today") return show("today");
     App.exitApp();
@@ -6911,6 +6909,7 @@ liGo.addEventListener("click", async () => {
   } finally { idle(liGo); holdOff(liGo, "in"); }
 });
 document.getElementById("liPass").addEventListener("keydown", e => { if (e.key === "Enter") liGo.click(); });
+document.getElementById("liSkip").addEventListener("click", () => { gateClose(); renderAll(); updateUserPill(); });
 
 document.getElementById("pkSearch").addEventListener("input", drawRoster);
 
@@ -6923,7 +6922,7 @@ document.querySelectorAll("#dirFilter button").forEach(b =>
     drawDirectory();
   }));
 
-document.getElementById("planBtn").addEventListener("click", () => {
+(document.getElementById("planBtn") || document.createElement("i")).addEventListener("click", () => {
   planning = !planning;
   renderWeekRail(); renderPlan();
 });
@@ -7102,7 +7101,8 @@ function openProfile() {
   const bp = bunkPlan();
   const stats = el("div", "pstats");
   [[h ? pctOf(p, h) + "%" : "—", "Overall", h ? (clear(p, h) ? "ok" : "bad") : ""],
-   [String(bp.left), "Bunks left", bp.lost.length ? "bad" : bp.left ? "ok" : ""],
+   [tightest(bp) ? String(tightest(bp).left) : "—", tightest(bp) ? "Skips · " + SUB[tightest(bp).k].short : "Skips left",
+    bp.lost.length ? "bad" : tightest(bp) && tightest(bp).left <= 3 ? "" : "ok"],
    [p + "/" + h, "Attended", ""]].forEach(([v, k, cls]) => {
     const d = el("div", cls);
     d.appendChild(el("b", null, v));
@@ -7476,25 +7476,19 @@ const userDrop = document.getElementById("userDrop");
 
 function updateUserPill() {
   document.getElementById("dropCR").hidden = !isCR();
+  document.getElementById("signInBtn").hidden = !!profile;
   if (!profile) { userPill.hidden = true; return; }
   userPill.hidden = false;
   document.getElementById("userAvatar").textContent = initials(profile.name);
   document.getElementById("userName").textContent = profile.name.split(/\s+/)[0];
 }
-/* role=button carries no behaviour of its own: Enter and Space have to be wired
-   by hand, or the only route to Sign out is a finger. The dropdown lives inside
-   the pill, so this cannot be a real <button> without nesting one. */
-userPill.addEventListener("keydown", e => {
-  if (e.key !== "Enter" && e.key !== " ") return;
-  if (userDrop.contains(e.target)) return;         /* the menu items handle themselves */
-  e.preventDefault(); userPill.click();
-});
-userPill.addEventListener("click", e => {
-  if (e.target.closest(".user-drop")) return;        // let button handlers fire
-  userDrop.classList.toggle("open");
-});
+const pillBtn = document.getElementById("pillBtn");
+const setDrop = open => { userDrop.classList.toggle("open", open); pillBtn.setAttribute("aria-expanded", open); };
+pillBtn.addEventListener("click", () => setDrop(!userDrop.classList.contains("open")));
+userDrop.addEventListener("keydown", e => { if (e.key === "Escape") { setDrop(false); pillBtn.focus(); } });
+document.getElementById("signInBtn").addEventListener("click", () => gateShow("login"));
 document.addEventListener("click", e => {
-  if (!userPill.contains(e.target)) userDrop.classList.remove("open");
+  if (!userPill.contains(e.target)) setDrop(false);
 });
 document.getElementById("dropCR").addEventListener("click", () => {
   userDrop.classList.remove("open");
@@ -7585,7 +7579,11 @@ if (profile && obDone()) syncAlerts();
     return say("liHint", "That reset link has expired or was already used. Ask for a new one.", true);
   }
   const t = await token();
-  if (!t) { renderAll(); return gateShow("login"); }
+  /* Signed in but unreachable: the cached account is still yours, so open on it. */
+  if (!t && sess && profile) { gateClose(); return afterSignIn(); }
+  /* Signed out: the timetable is the same for the whole section, so show it. Sign in
+     is one tap away in the top bar, and marks made meanwhile move into the account. */
+  if (!t) { renderAll(); updateUserPill(); return; }
   try {
     await loadProfile();
   } catch (e) { /* offline: fall back to the cached profile */ }
@@ -7594,10 +7592,11 @@ if (profile && obDone()) syncAlerts();
   /* Check if our session was claimed by another device while we were closed */
   const myDev = getDeviceId();
   if (profile.active_device_id && profile.active_device_id !== myDev) {
+    const other = profile.active_device_name || "another device";   /* read before profile is cleared */
     renderAll();
     sess = null; profile = null; saveSess(); saveProfile();
     gateShow("login");
-    return say("liHint", "You were signed out because your account was logged in on " + (profile.active_device_name || "another device") + ".", true);
+    return say("liHint", "You were signed out because your account was logged in on " + other + ".", true);
   }
 
   claimThisDevice(t).catch(() => {});
@@ -7630,7 +7629,8 @@ try {
 /* Which copy is actually running. Without this, "did the update land?" can only be
    answered by diffing byte counts against the server, which is no way to debug a
    phone you are not holding. */
-const BUILD = (document.documentElement.innerHTML.match(/<!--build:([^>]*)-->/) || [, "dev"])[1];
+const BUILD = ([...document.childNodes].map(n => n.nodeType === 8 ? n.data : "").join(" ")
+  .match(/build:(\S+)/) || [, "dev"])[1];
 try {
   const stamp = document.getElementById("buildStamp");
   if (stamp) stamp.textContent = "· v" + BUILD;
@@ -7675,7 +7675,7 @@ try {
   const showApkFront = () => {
     if (isNativeApp || !apkFront) return;
     try {
-      if (sessionStorage.getItem("bunkr_dismiss_apk_prompt") === "1") {
+      if (localStorage.getItem("bunkr_dismiss_apk_prompt") === "1") {
         try { apkFront.remove(); } catch (e) { apkFront.style.display = "none"; }
         return;
       }
@@ -7688,7 +7688,7 @@ try {
   if (continueWebBtn && apkFront) {
     continueWebBtn.addEventListener("click", () => {
       try {
-        sessionStorage.setItem("bunkr_dismiss_apk_prompt", "1");
+        localStorage.setItem("bunkr_dismiss_apk_prompt", "1");
       } catch (e) {}
       apkFront.classList.add("front-leaving");
       setTimeout(() => {
@@ -7712,7 +7712,7 @@ try {
       showApkFront();
     }, 420);
   };
-  const timer = setTimeout(dismiss, 1950);
+  const timer = setTimeout(dismiss, 700);
   splash.addEventListener("click", () => { clearTimeout(timer); dismiss(); });
   splash.addEventListener("touchstart", () => { clearTimeout(timer); dismiss(); }, { passive: true });
 })();

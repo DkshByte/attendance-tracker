@@ -166,6 +166,12 @@ check("attendance accepts the cleared mark 'X'", "('P','A','C','X')" in n09,
 check("tally maps a mark's position to its period", "periodOf(iso, +id.slice(bar + 1))" in html,
       "CR verdicts would land on the wrong class")
 
+# 8b4. No signal is not a signed-out student. token() once wiped the session on any
+#      error, so an expired session in a basement lab hid the timetable behind sign-in.
+tok = html[html.find("async function token()"):][:900]
+check("token() keeps the session on a network error", "if (e.status)" in tok,
+      "a TypeError from no signal would sign the student out")
+
 # 8c. Every cloud feature reaches Supabase through bunkr.website, because Indian ISPs
 #     sinkhole supabase.co outright. Naming the host again would work on the machine of
 #     whoever changed it and fail silently for the whole section.
