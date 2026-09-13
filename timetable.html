@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+cdd5b8f-->
+<!--secf-app--><!--build:1.0.1+3a1e43f-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -238,166 +238,59 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
   background:transparent; color:var(--line); box-shadow:inset 0 0 0 1px var(--line);
 }
 
-/* ============ status plate & carousel slides ============ */
+/* ============ status plate ============
+   One card, not a carousel: on a phone slides 2-4 were a sliver at the right edge, so
+   the percentage the app exists for was the thing nobody saw. The numbers now sit in
+   their own strip underneath, always on screen. */
 .plate {
-  flex:0 0 calc(100% - 36px); min-width:calc(100% - 36px); max-width:380px; width:calc(100% - 36px);
-  scroll-snap-align:start; scroll-snap-stop:always;
-  position:relative; overflow:hidden;
-  margin:0; padding:18px 18px 16px;
+  position:relative; overflow:hidden; margin:0; padding:16px;
   background:var(--glass-plate);
   backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
   border:1px solid var(--glass-border); border-radius:16px;
   box-shadow:var(--lift), var(--glass-highlight);
-  box-sizing:border-box;
-  display:flex; flex-direction:column; justify-content:space-between;
-  transition:border-color .2s var(--ease), transform .18s var(--ease);
 }
-@media (min-width:640px) {
-  .plate { flex:0 0 360px; min-width:360px; width:360px; }
-}
-.plate-main { display:flex; flex-direction:column; }
-.plate-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:9px; }
-.plate-when { font-size:13px; color:var(--ink-2); font-weight:500; }
-.plate-when b { color:var(--ink); font-weight:600; }
-.plate-hi {
-  font-size:13.5px; font-weight:600; color:var(--ink-2); margin-bottom:6px;
-  letter-spacing:.03em;
-}
+.plate-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.plate-when { font-size:13px; color:var(--ink-2); font-weight:500; white-space:nowrap; }
+.plate-when b { color:var(--ink); font-weight:700; font-size:15px; }
 .plate h1 {
-  font-size:clamp(26px, 7.5vw, 36px); line-height:1.06; letter-spacing:-.012em;
+  font-size:clamp(26px, 7.5vw, 34px); line-height:1.06; letter-spacing:-.012em;
   text-wrap:balance; margin-bottom:6px;
 }
 .plate .who { font-size:13.5px; color:var(--ink-2); line-height:1.35; }
 .plate .who b { color:var(--ink); font-weight:600; }
 
-.gauge { margin-top:12px; }
-.gauge .track {
-  height:4px; border-radius:2px; background:var(--rule); overflow:hidden;
-}
-.gauge .track i {
-  display:block; height:100%; background:var(--line, var(--rail));
-  transform-origin:left; transition:width 1s linear;
-}
-.gauge .cap {
-  display:flex; justify-content:space-between; gap:12px;
-  margin-top:7px; font-size:12px; color:var(--ink-3); font-weight:500;
-  letter-spacing:.05em; text-transform:uppercase;
-}
-.gauge .cap b { color:var(--ink); font-weight:700; font-size:13.5px; }
+.gauge { display:flex; align-items:center; gap:10px; margin-top:14px; }
+.gauge .track { flex:1; height:4px; border-radius:2px; background:var(--rule); overflow:hidden; }
+.gauge .track i { display:block; height:100%; background:var(--line, var(--rail)); transition:width 1s linear; }
+.gauge span { font-size:12px; font-weight:600; color:var(--ink-3); white-space:nowrap; }
 
 .upnext {
-  display:flex; align-items:center; gap:11px; width:100%; text-align:left;
-  margin-top:auto; padding:11px 13px; cursor:pointer;
-  background:color-mix(in srgb, var(--plate-2) 65%, transparent);
-  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-  border:1px solid var(--glass-border); border-radius:10px;
-  box-shadow:var(--glass-highlight);
-  transition:border-color .2s var(--ease), transform .2s var(--ease), background .2s var(--ease);
+  display:flex; align-items:center; gap:10px; width:calc(100% + 32px); min-height:50px;
+  margin:14px -16px -16px; padding:12px 16px; text-align:left; cursor:pointer;
+  background:transparent; border:0; border-top:1px solid var(--rule-soft); color:inherit; font:inherit;
+  transition:background .18s var(--ease);
 }
-.upnext:hover { border-color:var(--glass-border-hover); transform:translateY(-1px); background:color-mix(in srgb, var(--plate-2) 90%, transparent); }
-.upnext .tick { width:11px; height:11px; border-radius:50%; flex:none;
-                box-shadow:inset 0 0 0 3px var(--line, var(--rail)); background:var(--plate); }
-.upnext .m { min-width:0; flex:1; }
-.upnext .lbl { font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:700; }
-.upnext .val { font-family:'Blinker', sans-serif; font-weight:700; font-size:19px; line-height:1.15; color:var(--line); }
-.upnext .fac { font-size:12.5px; color:var(--ink-2); }
+.upnext:hover { background:var(--plate-3); }
+.upnext .lbl { font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:700; flex:none; }
+.upnext .val { font-weight:700; font-size:16px; color:var(--line); flex:none; }
+.upnext .fac { flex:1; min-width:0; font-size:12.5px; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .upnext .t { font-size:15px; color:var(--ink); font-weight:700; flex:none; }
 
-/* ============ Today Slidable Attendance Carousel ============ */
-.att-carousel-wrap {
-  margin:16px 0 6px; position:relative;
+.stats {
+  display:grid; grid-template-columns:repeat(3, 1fr); gap:1px; margin-top:10px;
+  background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden;
 }
-.att-carousel {
-  display:flex; gap:12px; overflow-x:auto;
-  scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
-  scrollbar-width:none; padding:4px 2px 8px;
-  align-items:stretch;
+.stat {
+  display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:4px;
+  min-height:62px; padding:10px 13px; background:var(--plate); border:0; color:inherit; font:inherit;
+  text-align:left; cursor:pointer; transition:background .18s var(--ease);
 }
-.att-carousel::-webkit-scrollbar { display:none; }
-.att-card {
-  flex:0 0 calc(100% - 36px); min-width:calc(100% - 36px); max-width:380px; width:calc(100% - 36px);
-  scroll-snap-align:start; scroll-snap-stop:always;
-  background:var(--glass-plate); border:1px solid var(--glass-border); border-radius:16px;
-  backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
-  box-shadow:var(--lift), var(--glass-highlight);
-  padding:18px 18px 16px; display:flex; flex-direction:column; justify-content:space-between;
-  box-sizing:border-box; transition:border-color .2s var(--ease), transform .18s var(--ease);
-}
-@media (min-width:640px) {
-  .att-card { flex:0 0 340px; min-width:340px; width:340px; }
-}
-.att-card-top {
-  display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;
-}
-.att-card-lbl {
-  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-3);
-}
-.att-badge {
-  font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:.05em; font-family:'Blinker', sans-serif;
-  background:var(--plate-2); color:var(--ink-2);
-}
-.att-badge.good { background:color-mix(in srgb, var(--good) 16%, transparent); color:var(--good); }
-.att-badge.warn { background:color-mix(in srgb, var(--bad) 16%, transparent); color:var(--bad); }
-.att-badge.ghost { background:transparent; border:1px solid var(--rule); }
-.att-card-hero {
-  display:flex; align-items:baseline; gap:8px; margin:2px 0 6px;
-}
-.att-card-val {
-  font-family:'Blinker', sans-serif; font-weight:800; font-size:32px; letter-spacing:-.02em;
-  line-height:1; color:var(--ink);
-}
-.att-card-val.good { color:var(--good); }
-.att-card-val.warn { color:var(--bad); }
-.att-diff {
-  font-size:11.5px; font-weight:700; padding:2px 7px; border-radius:999px;
-}
-.att-diff.good { background:color-mix(in srgb, var(--good) 15%, transparent); color:var(--good); }
-.att-diff.warn { background:color-mix(in srgb, var(--bad) 15%, transparent); color:var(--bad); }
-.att-card-unit { font-size:13px; font-weight:600; color:var(--ink-3); }
-.att-card-sub { font-size:12.5px; line-height:1.4; color:var(--ink-2); margin-bottom:8px; }
-.att-mini-gauge {
-  width:100%; height:5px; background:var(--plate-2); border-radius:999px; overflow:hidden; margin-top:4px;
-}
-.att-mini-gauge i { display:block; height:100%; border-radius:999px; transition:width .3s var(--ease); }
-.att-mini-gauge i.good { background:var(--good); }
-.att-mini-gauge i.warn { background:var(--bad); }
-
-.att-card-subs {
-  display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin:4px 0 10px;
-}
-.att-sub-pill {
-  display:flex; align-items:center; gap:6px; background:var(--plate-2);
-  border:1px solid var(--rule-soft); border-radius:8px; padding:4px 8px;
-}
-.att-sub-dot { width:7px; height:7px; border-radius:50%; flex:none; background:var(--line, var(--ink)); }
-.att-sub-name {
-  font-size:11px; font-weight:700; color:var(--ink); flex:1;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.att-sub-pct { font-size:10.5px; font-weight:700; }
-.att-sub-pct.good { color:var(--good); }
-.att-sub-pct.warn { color:var(--bad); }
-.att-empty-note { font-size:11.5px; color:var(--ink-3); grid-column:1 / -1; padding:6px 0; }
-
-.att-card-act {
-  margin-top:auto; align-self:flex-start; border:0; background:transparent;
-  color:var(--focus); font-size:12px; font-weight:700; cursor:pointer; padding:4px 0;
-  transition:opacity .15s var(--ease);
-}
-.att-card-act:hover { opacity:.8; }
-.att-card-act.pri {
-  background:var(--ink); color:var(--bg); padding:6px 12px; border-radius:999px;
-  font-size:11.5px; margin-top:4px;
-}
-
-.att-carousel-dots {
-  display:flex; align-items:center; justify-content:center; gap:6px; margin-top:6px;
-}
-.att-dot {
-  border:0; background:var(--rule); width:6px; height:6px; border-radius:50%;
-  cursor:pointer; padding:0; transition:width .25s var(--ease), background .25s var(--ease), border-radius .25s var(--ease);
-}
-.att-dot.active { background:var(--ink); width:18px; border-radius:999px; }
+.stat:hover { background:var(--plate-3); }
+.stat b { font-size:24px; font-weight:700; line-height:1; letter-spacing:-.01em; color:var(--ink); }
+.stat span { font-size:10px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); }
+.stat.ok b { color:var(--ok); }
+.stat.warn b { color:var(--warn); }
+.stat.bad b { color:var(--bad); }
 
 /* ============ vertical rail (Today / mobile week) ============ */
 .railwrap { position:relative; margin-top:22px; padding-left:44px; }
@@ -622,8 +515,15 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
   transition:background .2s var(--ease), color .2s var(--ease);
 }
 .marks button:hover { color:var(--ink); }
-#todayRail .marks { margin-top:8px; }
-#todayRail .marks button { flex:1; justify-content:center; padding:11px 8px; font-size:13px; min-height:44px; }
+/* the marks are the bottom edge of the class they mark, not a second card under it */
+#todayRail .stop.has-marks .card { border-bottom-left-radius:0; border-bottom-right-radius:0; }
+#todayRail .stop.has-marks .card:hover { transform:none; }
+#todayRail .marks { margin-top:-1px; padding:3px; border-color:var(--glass-border); border-radius:0 0 12px 12px; }
+#todayRail .marks button { flex:1; justify-content:center; padding:11px 8px; font-size:13px; min-height:44px; border-radius:9px; }
+#todayRail .card.done, #todayRail .card.done + .marks { opacity:.62; }
+.badge.due { background:transparent; color:var(--warn); box-shadow:inset 0 0 0 1px var(--warn); }
+/* the live marker is the station while a class runs; two discs read as a glitch */
+.stop.live .node { opacity:0; }
 .marks .glyph { width:15px; height:15px; flex:none; display:block; }
 .marks button[aria-pressed="true"][data-m="P"] { background:var(--ok); color:var(--badge-ink); }
 .marks button[aria-pressed="true"][data-m="A"] { background:var(--bad); color:var(--badge-ink); }
@@ -853,8 +753,8 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .task-due-banner {
   display:flex; align-items:center; justify-content:space-between; gap:10px;
   padding:11px 15px; margin:12px 0 6px;
-  background:linear-gradient(135deg, rgba(255, 185, 46, 0.16) 0%, rgba(255, 185, 46, 0.04) 100%), rgba(22, 24, 30, 0.8);
-  border:1px solid rgba(255, 185, 46, 0.35);
+  background:var(--plate);
+  border:1px solid var(--warn);
   border-radius:12px; font-size:13px; font-weight:600; color:var(--ink);
   cursor:pointer; transition:transform .18s var(--ease);
   backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
@@ -866,8 +766,8 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .eod-card {
   display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
   padding:13px 16px; margin:14px 0 6px;
-  background:linear-gradient(135deg, rgba(255, 77, 64, 0.14) 0%, rgba(255, 185, 46, 0.09) 100%), rgba(20, 22, 28, 0.85);
-  border:1px solid rgba(255, 255, 255, 0.15); border-radius:14px;
+  background:var(--plate);
+  border:1px solid var(--rule); border-radius:14px;
   backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
   box-shadow:var(--glass-shadow), var(--glass-highlight);
   animation:rise .4s var(--ease);
@@ -2259,7 +2159,7 @@ input[type="date"] { padding:12px 14px; }
     <div id="taskDueBox"></div>
     <div class="h2row" style="margin-top:24px">
       <h2 id="todayHead">Today's line</h2>
-      <button class="bulk-btn" id="markAllTodayBtn" type="button" title="Mark all today's classes present">⚡ Mark all present</button>
+      <button class="bulk-btn" id="markAllTodayBtn" type="button" title="Mark all today's classes present">Mark all present</button>
       <button class="link" id="alertBtn" type="button" aria-pressed="true" hidden>Class alerts</button>
     </div>
     <div class="railwrap" id="todayRail"></div>
@@ -2307,7 +2207,7 @@ input[type="date"] { padding:12px 14px; }
     <div class="apane" data-at="mark">
       <div class="bar-tools">
         <input type="date" id="attDate" aria-label="Date to mark">
-        <button class="bulk-btn" id="markAllAttBtn" type="button" title="Mark all classes on this date present">⚡ Mark all present</button>
+        <button class="bulk-btn" id="markAllAttBtn" type="button" title="Mark all classes on this date present">Mark all present</button>
         <span class="daynote" id="attNote"></span>
       </div>
       <div class="railwrap" id="attRail"></div>
@@ -2794,10 +2694,11 @@ const MIN_H = { class:78, lunch:46, free:64 };
    card; if the card ever grows past that the live marker drifts, and the fix is to lay
    the rail out after a first paint instead of before it. */
 const MIN_H_MARKED = 128;
-function layout(segs, marked) {
+function layout(segs, markedUntil) {
   let top = 0;
   segs.forEach(s => {
-    const min = marked && s.kind === "class" ? MIN_H_MARKED : MIN_H[s.kind];
+    /* marks only hang off a class that has started, so only that one needs the room */
+    const min = markedUntil != null && s.kind === "class" && s.from <= markedUntil ? MIN_H_MARKED : MIN_H[s.kind];
     s.h = Math.max(min, Math.round(s.dur * PX_PER_MIN));
     s.top = top; top += s.h + 10;
   });
@@ -2820,8 +2721,10 @@ function renderRail(box, dayIdx, opts) {
     return;
   }
   box.style.paddingLeft = "";
-  const total = layout(segs, opts.mark);
   const live = opts.live, now = nowMin();
+  /* a free first period that is already over is not news by 10:30 */
+  if (live) while (segs[0].kind === "free" && segs[0].to <= now) segs.shift();
+  layout(segs, opts.mark ? now : null);
 
   segs.forEach(s => {
     const stop = el("div", "stop");
@@ -2846,6 +2749,7 @@ function renderRail(box, dayIdx, opts) {
       stop.appendChild(el("span", "node"));
       if (s.h > 92) stop.appendChild(el("span", "span"));
       stop.appendChild(opts.build ? opts.build(s, key) : classCard(s, key, dayIdx));
+      if (stop.querySelector(".marks")) stop.classList.add("has-marks");
     } else if (s.kind === "lunch") {
       stop.classList.add("lunch");
       if (live && now >= s.to) stop.classList.add("past");
@@ -2954,8 +2858,16 @@ function nextRunningDay(fromIso) {
 /* the card, plus the marks for the class you just walked out of */
 function todayCard(s, key, iso, ii, dayIdx) {
   const f = document.createDocumentFragment();
-  f.appendChild(classCard(s, key, dayIdx));
-  if (key) f.appendChild(markStrip(key, iso, ii, label(s.i, s.span)));
+  const card = f.appendChild(classCard(s, key, dayIdx));
+  /* A class that has not started cannot have been attended, so it offers no marks.
+     One that is over and still unmarked says so; one that is marked steps back. */
+  const now = nowMin();
+  if (!key || now < s.from || gazettedOn(iso) || isCancelled(iso, s.i)) return f;
+  if (now >= s.to) {
+    if (att[iso + "|" + ii]) card.classList.add("done");
+    else card.querySelector(".hd").appendChild(el("span", "badge due", "Not marked"));
+  }
+  f.appendChild(markStrip(key, iso, ii, label(s.i, s.span)));
   return f;
 }
 
@@ -3006,29 +2918,20 @@ function renderToday() {
 function renderPlate() {
   const box = document.getElementById("plateBox");
   if (!box) return;
-
-  /* Remember scroll position if re-rendering */
-  let activeIdx = 0;
-  const oldCarousel = document.getElementById("todayHeroCarousel");
-  if (oldCarousel && oldCarousel.offsetWidth) {
-    const cardW = (oldCarousel.firstElementChild ? oldCarousel.firstElementChild.offsetWidth : 0) + 12;
-    if (cardW > 0) activeIdx = Math.min(3, Math.max(0, Math.round(oldCarousel.scrollLeft / cardW)));
-  }
-
   box.textContent = "";
-  const now = nowMin(), di = new Date().getDay() - 1;
+  const now = nowMin(), di = new Date().getDay() - 1, todayIso = isoOf(new Date());
   const day = di >= 0 && di < 6 ? DAYS[di] : null;
-  const hol = gazettedOn(isoOf(new Date()));
+  const hol = gazettedOn(todayIso);
 
   let current = null, next = null, nextDay = day;
   if (day && !hol) {
     day.items.forEach(item => {
       const span = item.span || 1;
       if (now >= startMin(item.i) && now < endMin(item.i, span)) current = item;
-      else if (startMin(item.i) > now && !next && !isCancelled(isoOf(new Date()), item.i)) next = item;
+      else if (startMin(item.i) > now && !next && !isCancelled(todayIso, item.i)) next = item;
     });
   }
-  let nextIso = isoOf(new Date());
+  let nextIso = todayIso;
   if (!next) {                                     /* nothing left today: roll on to the next day that runs */
     const t = new Date(); t.setDate(t.getDate() + 1);
     const up = nextRunningDay(isoOf(t));
@@ -3036,37 +2939,26 @@ function renderPlate() {
               next = nextDay.items.find(it => !isCancelled(up.iso, it.i)) || nextDay.items[0]; }
   }
 
-  /* ---------------- SLIDE 1: Status Tile ---------------- */
   const plate = el("div", "plate");
-  const pMain = el("div", "plate-main");
-  if (profile) {
-    const hi = el("div", "plate-hi", "Hi, " + profile.name.split(/\s+/)[0]);
-    pMain.appendChild(hi);
-  }
   const row = el("div", "plate-row");
-  const when = el("div", "plate-when");
+  const when = el("span", "plate-when");
+  const shortDay = new Date().toLocaleDateString("en-IN", { weekday:"short", day:"numeric", month:"short" });
+  plate.appendChild(row);
 
   if (hol) {
     plate.dataset.line = "";
     row.appendChild(el("span", "badge", "Closed"));
-    when.textContent = new Date().toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long" });
-    row.appendChild(when);
-    pMain.appendChild(row);
-    pMain.appendChild(el("h1", null, hol.n));
-    pMain.appendChild(el("div", "who", crHolidays[isoOf(new Date())] ? "Closed — announced by the CR." : "Institute closed — gazetted holiday."));
+    when.textContent = shortDay;
+    plate.appendChild(el("h1", null, hol.n));
+    plate.appendChild(el("div", "who", crHolidays[todayIso] ? "Closed — announced by the CR." : "Institute closed — gazetted holiday."));
   } else if (current) {
-    const key = resolve(current);
-    const span = current.span || 1;
-    const ln = key ? lineOf(key) : lineOf(current.split.F1);
-    plate.dataset.line = ln;
+    const key = resolve(current), span = current.span || 1;
+    const off = isCancelled(todayIso, current.i);
     const ends = endMin(current.i, span), left = ends - now;
-    row.appendChild(el("span", "badge", isCancelled(isoOf(new Date()), current.i) ? "Cancelled" : "In class"));
-    when.innerHTML = "";
-    when.appendChild(document.createTextNode("ends "));
-    when.appendChild(el("b", null, TIMES[(current.i + span - 1 < 3 ? current.i + span - 1 : current.i + span) + 1]));
-    row.appendChild(when);
-    pMain.appendChild(row);
-    pMain.appendChild(el("h1", null, key ? SUB[key].name : "Practical — batches split"));
+    plate.dataset.line = key ? lineOf(key) : lineOf(current.split.F1);
+    row.appendChild(el("span", "badge", off ? "Cancelled" : "In class"));
+    if (!off) { when.appendChild(el("b", null, String(left))); when.appendChild(document.createTextNode(" min left")); }
+    plate.appendChild(el("h1", null, key ? SUB[key].name : "Practical — batches split"));
     const who = el("div", "who");
     if (key) {
       who.appendChild(el("b", null, SUB[key].fac));
@@ -3074,217 +2966,66 @@ function renderPlate() {
     } else {
       who.textContent = "F1 " + SUB[current.split.F1].short + " · F2 " + SUB[current.split.F2].short;
     }
-    pMain.appendChild(who);
-
-    const g = el("div", "gauge");
-    const track = el("div", "track");
-    const fill = el("i");
-    fill.style.width = Math.round(((now - startMin(current.i)) / (ends - startMin(current.i))) * 100) + "%";
-    track.appendChild(fill); g.appendChild(track);
-    const cap = el("div", "cap");
-    cap.appendChild(el("span", null, label(current.i, span)));
-    const r = el("span"); r.appendChild(el("b", null, left + " min")); r.appendChild(document.createTextNode(" left"));
-    cap.appendChild(r);
-    g.appendChild(cap);
-    pMain.appendChild(g);
+    plate.appendChild(who);
+    if (!off) {
+      const g = el("div", "gauge"), track = el("div", "track"), fill = el("i");
+      fill.style.width = Math.round(((now - startMin(current.i)) / (ends - startMin(current.i))) * 100) + "%";
+      track.appendChild(fill); g.appendChild(track);
+      g.appendChild(el("span", null, "till " + TIMES[(current.i + span - 1 < 3 ? current.i + span - 1 : current.i + span) + 1]));
+      plate.appendChild(g);
+    }
   } else {
     plate.dataset.line = "";
     const lunching = day && now >= LUNCH_FROM && now < LUNCH_TO;
     const closed = !day || !day.items.length;
     const before = day && day.items.length && now < startMin(day.items[0].i);
     const after = day && day.items.length && now >= dayEndMin(day);
-    row.appendChild(el("span", "badge ghost", lunching ? "Lunch" : closed ? "No service" : "Between classes"));
-    when.textContent = new Date().toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long" });
-    row.appendChild(when);
-    pMain.appendChild(row);
-    pMain.appendChild(el("h1", null,
+    row.appendChild(el("span", "badge ghost", lunching ? "Lunch" : closed ? "No classes" : before ? "Morning" : after ? "Done" : "Free"));
+    when.textContent = shortDay;
+    plate.appendChild(el("h1", null,
       lunching ? "Lunch until 11:30"
       : closed ? "No classes today"
       : before ? "Classes haven't started"
       : after ? "Day's over"
       : "Free right now"));
-    pMain.appendChild(el("div", "who", closed
+    plate.appendChild(el("div", "who", closed
       ? "The line does not run on " + (day ? day.d : "Sunday") + "."
-      : "Nothing scheduled at this moment."));
+      : after ? "Mark anything you missed below." : "Nothing scheduled at this moment."));
   }
-  plate.appendChild(pMain);
+  row.appendChild(when);
 
   if (next) {
-    const key = resolve(next), span = next.span || 1;
+    const key = resolve(next);
     const b = el("button", "upnext");
     b.type = "button";
     b.dataset.line = key ? lineOf(key) : lineOf(next.split.F1);
-    b.appendChild(el("span", "tick"));
-    const m = el("div", "m");
-    m.appendChild(el("div", "lbl", nextDay === day ? "Next station" : "Next · " + nextDay.d));
-    m.appendChild(el("div", "val", key ? SUB[key].short : "Practical (F1 / F2)"));
-    m.appendChild(el("div", "fac", key ? SUB[key].fac
-      : SUB[next.split.F1].fac + " / " + SUB[next.split.F2].fac));
-    b.appendChild(m);
+    b.appendChild(el("span", "lbl", nextDay === day ? "Next" : nextDay.short));
+    b.appendChild(el("span", "val", key ? SUB[key].short : "Practical"));
+    b.appendChild(el("span", "fac", key ? SUB[key].fac : "F1 / F2 split"));
     b.appendChild(el("span", "t", TIMES[next.i < 3 ? next.i : next.i + 1]));
     b.addEventListener("click", () => openDetail(next, DAYS.indexOf(nextDay), nextIso));
     plate.appendChild(b);
   }
+  box.appendChild(plate);
 
-  /* ---------------- SLIDE 2: Overall Attendance ---------------- */
-  const t = tally(), tb = termBudget();
-  const keys = Object.keys(t);
-  const totalP = keys.reduce((n, k) => n + t[k].p, 0);
-  const totalH = keys.reduce((n, k) => n + t[k].h, 0);
-  const overall = pctOf(totalP, totalH);
-  const isClear = clear(totalP, totalH);
-  const bp = bunkPlan();
-
-  const c2 = el("div", "att-card");
-  const c2Top = el("div", "att-card-top");
-  c2Top.appendChild(el("span", "att-card-lbl", "Overall Attendance"));
-  const c2Badge = el("span", "att-badge " + (!totalH ? "ghost" : (isClear ? "good" : "warn")),
-    !totalH ? "Not Started" : (isClear ? "On Track" : "Below Target"));
-  c2Top.appendChild(c2Badge);
-  c2.appendChild(c2Top);
-
-  const c2Hero = el("div", "att-card-hero");
-  const c2Val = el("span", "att-card-val" + (totalH ? (isClear ? " good" : " warn") : ""),
-    totalH ? (overall + "%") : "—");
-  c2Hero.appendChild(c2Val);
-  if (totalH) {
-    const diff = overall - targetPct;
-    const diffEl = el("span", "att-diff " + (diff >= 0 ? "good" : "warn"),
-      (diff >= 0 ? "+" : "") + diff + "% vs " + targetPct + "%");
-    c2Hero.appendChild(diffEl);
-  } else {
-    c2Hero.appendChild(el("span", "att-card-unit", "Target " + targetPct + "%"));
-  }
-  c2.appendChild(c2Hero);
-
-  const c2Sub = el("div", "att-card-sub",
-    totalH ? (totalP + " attended · " + (totalH - totalP) + " missed · " + totalH + " held so far")
-           : "Mark your classes on today's line or the attendance board to start tracking.");
-  c2.appendChild(c2Sub);
-
-  const c2Gauge = el("div", "att-mini-gauge");
-  const c2Fill = el("i", isClear ? "good" : "warn");
-  c2Fill.style.width = Math.min(100, Math.max(0, overall || 0)) + "%";
-  c2Gauge.appendChild(c2Fill);
-  c2.appendChild(c2Gauge);
-
-  const c2Act = el("button", "att-card-act", "View attendance board →");
-  c2Act.type = "button";
-  c2Act.addEventListener("click", () => { show("attendance"); showATab("board"); });
-  c2.appendChild(c2Act);
-
-  /* ---------------- SLIDE 3: Safe Bunk Budget ---------------- */
-  const c3 = el("div", "att-card");
-  const c3Top = el("div", "att-card-top");
-  c3Top.appendChild(el("span", "att-card-lbl", "Safe Bunk Budget"));
-  const hasLost = bp.lost.length > 0;
-  const safeSkips = bp.left;
-  const c3Badge = el("span", "att-badge " + (hasLost ? "warn" : (safeSkips > 0 ? "good" : "ghost")),
-    hasLost ? "Attention" : (safeSkips > 0 ? "Safe Room" : "Zero Margin"));
-  c3Top.appendChild(c3Badge);
-  c3.appendChild(c3Top);
-
-  const c3Hero = el("div", "att-card-hero");
-  const c3Val = el("span", "att-card-val" + (hasLost ? " warn" : (safeSkips > 0 ? " good" : "")),
-    hasLost ? "Deficit" : String(safeSkips));
-  c3Hero.appendChild(c3Val);
-  c3Hero.appendChild(el("span", "att-card-unit",
-    hasLost ? "needs recovery" : (safeSkips === 1 ? "safe bunk left" : "safe bunks left")));
-  c3.appendChild(c3Hero);
-
-  const c3Sub = el("div", "att-card-sub",
-    hasLost ? (bp.lost.map(x => SUB[x.k].short).join(", ") + " cannot reach " + targetPct + "% — attend upcoming classes to recover.")
-            : (!safeSkips ? ("Attend all " + tb.overall.r + " remaining classes to stay at or above " + targetPct + "%.")
-                          : (safeSkips + " classes you can safely skip across subjects while staying ≥ " + targetPct + "%.")));
-  c3.appendChild(c3Sub);
-
-  const c3Act = el("button", "att-card-act", "Open bunk planner →");
-  c3Act.type = "button";
-  c3Act.addEventListener("click", () => { show("attendance"); showATab("bunk"); });
-  c3.appendChild(c3Act);
-
-  /* ---------------- SLIDE 4: Subject Snapshot ---------------- */
-  const c4 = el("div", "att-card");
-  const c4Top = el("div", "att-card-top");
-  c4Top.appendChild(el("span", "att-card-lbl", "Subject Snapshot"));
-  const belowCount = keys.filter(k => !clear(t[k].p, t[k].h)).length;
-  const c4Badge = el("span", "att-badge " + (!keys.length ? "ghost" : (belowCount ? "warn" : "good")),
-    !keys.length ? "0 Tracked" : (belowCount ? (belowCount + " below " + targetPct + "%") : "All Clear"));
-  c4Top.appendChild(c4Badge);
-  c4.appendChild(c4Top);
-
-  const c4Hero = el("div", "att-card-hero");
-  const c4Val = el("span", "att-card-val",
-    keys.length ? (keys.length - belowCount) + "/" + keys.length : "0");
-  c4Hero.appendChild(c4Val);
-  c4Hero.appendChild(el("span", "att-card-unit", "subjects on track"));
-  c4.appendChild(c4Hero);
-
-  const c4Subs = el("div", "att-card-subs");
-  if (!keys.length) {
-    c4Subs.appendChild(el("div", "att-empty-note", "No subjects marked yet. Tap a class on today's line to log attendance."));
-  } else {
-    const sorted = [...keys].sort((a, b) => (t[a].p / (t[a].h || 1)) - (t[b].p / (t[b].h || 1))).slice(0, 4);
-    sorted.forEach(k => {
-      const { p, h } = t[k];
-      const pct = pctOf(p, h);
-      const isSubClear = clear(p, h);
-      const pill = el("div", "att-sub-pill");
-      pill.dataset.line = (SUB[k] && SUB[k].line) || "";
-      const dot = el("span", "att-sub-dot");
-      pill.appendChild(dot);
-      pill.appendChild(el("span", "att-sub-name", SUB[k].short));
-      pill.appendChild(el("span", "att-sub-pct " + (isSubClear ? "good" : "warn"), pct + "%"));
-      c4Subs.appendChild(pill);
-    });
-  }
-  c4.appendChild(c4Subs);
-
-  const c4Act = el("button", "att-card-act", "All subjects ledger →");
-  c4Act.type = "button";
-  c4Act.addEventListener("click", () => { show("attendance"); showATab("board"); });
-  c4.appendChild(c4Act);
-
-  /* ---------------- Assemble Horizontal Carousel ---------------- */
-  const wrap = el("div", "att-carousel-wrap");
-  const carousel = el("div", "att-carousel");
-  carousel.id = "todayHeroCarousel";
-
-  carousel.appendChild(plate);
-  carousel.appendChild(c2);
-  carousel.appendChild(c3);
-  carousel.appendChild(c4);
-
-  const cards = [plate, c2, c3, c4];
-  const dotsBox = el("div", "att-carousel-dots");
-  const dots = cards.map((card, idx) => {
-    const dot = el("button", "att-dot" + (idx === activeIdx ? " active" : ""));
-    dot.type = "button";
-    dot.setAttribute("aria-label", "Slide " + (idx + 1));
-    dot.addEventListener("click", () => {
-      carousel.scrollTo({ left: card.offsetLeft - carousel.offsetLeft, behavior: "smooth" });
-    });
-    dotsBox.appendChild(dot);
-    return dot;
-  });
-
-  carousel.addEventListener("scroll", () => {
-    const scrollLeft = carousel.scrollLeft;
-    const cardW = (plate.offsetWidth || 300) + 12;
-    const curIdx = Math.min(cards.length - 1, Math.max(0, Math.round(scrollLeft / cardW)));
-    dots.forEach((d, i) => d.classList.toggle("active", i === curIdx));
-  }, { passive: true });
-
-  wrap.appendChild(carousel);
-  wrap.appendChild(dotsBox);
-  box.appendChild(wrap);
-
-  if (activeIdx > 0 && cards[activeIdx]) {
-    requestAnimationFrame(() => {
-      carousel.scrollLeft = cards[activeIdx].offsetLeft - carousel.offsetLeft;
-      dots.forEach((d, i) => d.classList.toggle("active", i === activeIdx));
-    });
-  }
+  /* the three numbers a student actually asks about, one tap from the detail */
+  const t = tally(), bp = bunkPlan();
+  let P = 0, H = 0;
+  Object.values(t).forEach(v => { P += v.p; H += v.h; });
+  const below = Object.keys(t).filter(k => !clear(t[k].p, t[k].h)).length;
+  const strip = el("div", "stats");
+  const stat = (val, lbl, cls, tab) => {
+    const c = el("button", "stat" + (cls ? " " + cls : ""));
+    c.type = "button";
+    c.appendChild(el("b", null, val));
+    c.appendChild(el("span", null, lbl));
+    c.addEventListener("click", () => { show("attendance"); showATab(tab); });
+    strip.appendChild(c);
+  };
+  stat(H ? pctOf(P, H) + "%" : "—", "Overall", H ? (clear(P, H) ? "ok" : "bad") : "", "board");
+  stat(String(bp.left), bp.left === 1 ? "Bunk left" : "Bunks left", bp.lost.length ? "bad" : bp.left ? "" : "warn", "bunk");
+  stat(String(below), "Below " + targetPct + "%", below ? "bad" : "", "board");
+  box.appendChild(strip);
 }
 
 /* ============================================================
@@ -4290,6 +4031,12 @@ function markAllDay(iso, mk = "P") {
   }
 }
 
+/* a drawn tick, the same stroke as every other icon; an emoji renders differently on every phone */
+function bulkLabel(btn, all) {
+  btn.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.2 8.4 6.4 11.4 12.8 4.8"/></svg>';
+  btn.appendChild(document.createTextNode(all ? "All present · undo" : "Mark all present"));
+}
+
 function updateBulkBtns() {
   const todayIso = nowISO();
   const dToday = fromISO(todayIso);
@@ -4304,10 +4051,10 @@ function updateBulkBtns() {
       const allP = valid.length > 0 && valid.every(x => att[todayIso + "|" + x.ii] && att[todayIso + "|" + x.ii].m === "P");
       if (allP) {
         btnToday.classList.add("all-marked");
-        btnToday.innerHTML = "✓ All present <small style='opacity:.75'>(undo)</small>";
+        bulkLabel(btnToday, true);
       } else {
         btnToday.classList.remove("all-marked");
-        btnToday.textContent = "⚡ Mark all present";
+        bulkLabel(btnToday, false);
       }
     }
   }
@@ -4326,10 +4073,10 @@ function updateBulkBtns() {
       const allP = valid.length > 0 && valid.every(x => att[iso + "|" + x.ii] && att[iso + "|" + x.ii].m === "P");
       if (allP) {
         btnAtt.classList.add("all-marked");
-        btnAtt.innerHTML = "✓ All present <small style='opacity:.75'>(undo)</small>";
+        bulkLabel(btnAtt, true);
       } else {
         btnAtt.classList.remove("all-marked");
-        btnAtt.textContent = "⚡ Mark all present";
+        bulkLabel(btnAtt, false);
       }
     }
   }
@@ -4975,13 +4722,13 @@ function renderSubmissions() {
       const shortStr = d.toLocaleDateString("en-IN", { month:"short", day:"numeric" });
       let dueEl;
       if (!task.done && task.dueDate < today) {
-        dueEl = el("div", "task-due bad", "⚠ Overdue (" + shortStr + ")");
+        dueEl = el("div", "task-due bad", "Overdue · " + shortStr);
       } else if (!task.done && task.dueDate === today) {
-        dueEl = el("div", "task-due warn", "⚡ Due today");
+        dueEl = el("div", "task-due warn", "Due today");
       } else if (!task.done && task.dueDate === tomorrow) {
-        dueEl = el("div", "task-due warn", "📅 Due tomorrow");
+        dueEl = el("div", "task-due warn", "Due tomorrow");
       } else {
-        dueEl = el("div", "task-due", "📅 Due " + shortStr);
+        dueEl = el("div", "task-due", "Due " + shortStr);
       }
       main.appendChild(dueEl);
     }
@@ -5022,7 +4769,8 @@ function renderDueBanner() {
   } else {
     msg = dueToday + " submission" + (dueToday > 1 ? "s" : "") + " due today";
   }
-  banner.innerHTML = "<span>📌 <b>" + msg + "</b></span><span style='opacity:.75;font-size:12px'>View →</span>";
+  banner.appendChild(el("b", null, msg));
+  banner.appendChild(el("span", "link", "View"));
   banner.addEventListener("click", () => {
     show("attendance");
     showATab("tasks");
@@ -5118,7 +4866,8 @@ function renderEODNotice() {
   card.appendChild(txt);
 
   const acts = el("div", "eod-acts");
-  const btn = el("button", "bulk-btn", "⚡ Mark all present");
+  const btn = el("button", "bulk-btn");
+  bulkLabel(btn, false);
   btn.type = "button";
   btn.addEventListener("click", () => {
     markAllDay(iso, "P");
