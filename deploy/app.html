@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+13bdb68-->
+<!--secf-app--><!--build:1.0.1+cdd5b8f-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -938,20 +938,19 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 }
 
 /* ============ holidays ============ */
-.hkey { display:flex; gap:20px; flex-wrap:wrap; align-items:center; margin:2px 0 18px; font-size:13px; color:var(--ink-2); }
-.hkey span { display:flex; align-items:center; gap:8px; }
-.hkey i { width:12px; height:12px; border-radius:50%; background:var(--l-pps); flex:none; }
-.hkey i.res { width:12px; height:12px; background:transparent; box-shadow:inset 0 0 0 2px var(--ink-3); }
-.hkey .next { color:var(--ink); font-weight:600; }
+.hkey { display:flex; gap:8px 18px; flex-wrap:wrap; align-items:center; margin:0 0 14px; font-size:12.5px; color:var(--ink-2); }
+.hkey span { display:flex; align-items:center; gap:7px; }
+.hkey i { width:11px; height:11px; border-radius:50%; background:var(--l-pps); flex:none; }
+.hkey i.free { background:transparent; box-shadow:inset 0 0 0 2px var(--l-pps); }
+.hkey i.res { width:5px; height:5px; margin:0 3px; background:var(--ink-3); }
 
-.months { display:grid; grid-template-columns:repeat(auto-fill, minmax(152px,1fr)); gap:10px; }
-/* two columns at 360px means 17px day buttons. One month per row is ~44px. */
-@media (max-width:560px) { .months { grid-template-columns:1fr; } }
-.mo { padding:12px 11px 12px; background:var(--plate); border:1px solid var(--rule); border-radius:12px; }
-.mo h3 { font-size:14px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2); margin-bottom:9px; }
-.mgrid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+.months { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:10px; }
+.mo { padding:12px 12px 10px; background:var(--plate); border:1px solid var(--rule); border-radius:12px; }
+.mo h3 { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin-bottom:8px; }
+.mgrid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px 0; justify-items:center; }
+/* capped, or a one-column month on a phone grows 50px discs that shout over the list */
 .mgrid span, .mgrid button {
-  font-size:12px; line-height:1; border:0; background:none; padding:0;
+  width:100%; max-width:32px; font-size:12px; line-height:1; border:0; background:none; padding:0;
   color:var(--ink-2); font-weight:500;
   aspect-ratio:1; display:grid; place-items:center; border-radius:50%;
 }
@@ -959,29 +958,43 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .mgrid .sun { color:var(--ink-3); }
 .mgrid button { cursor:pointer; position:relative; transition:background .18s var(--ease); }
 .mgrid button:hover { background:var(--plate-3); }
-.mgrid button.gaz { background:var(--l-pps); color:#000; font-weight:800; }
+.mgrid button.gaz { background:var(--l-pps); color:var(--badge-ink); font-weight:700; }
 .mgrid button.gaz:hover { background:var(--l-pps); filter:brightness(1.12); }
+.mgrid button.gaz.free { background:transparent; color:var(--ink); box-shadow:inset 0 0 0 2px var(--l-pps); }
 .mgrid button.res::after {
   content:""; position:absolute; left:50%; bottom:1px; width:4px; height:4px; margin-left:-2px;
   border-radius:50%; background:var(--ink-3);
 }
-.mgrid button.gaz.res::after { background:#fff; }
+.mgrid button.gaz.res::after { display:none; }
 .mgrid .today, .mgrid button.today { box-shadow:inset 0 0 0 1.5px var(--focus); }
 
-.hlist { display:grid; grid-template-columns:repeat(auto-fill, minmax(272px,1fr)); gap:1px;
-         background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; margin-top:8px; }
-.hrow { display:flex; gap:13px; align-items:baseline; padding:11px 14px; background:var(--plate);
+/* one reading width for heading, list, calendar and toggles, so the switch sits over what it switches */
+#holidays { max-width:680px; }
+#holView button { padding:0 16px; }
+.hmonth { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin:24px 0 8px; }
+.hmonth:first-child { margin-top:2px; }
+.hgroup { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; }
+.hrow { display:grid; grid-template-columns:38px minmax(0,1fr) auto; gap:14px; align-items:center;
+         padding:12px 14px; background:var(--plate);
          width:100%; border:0; font:inherit; color:inherit; text-align:left; cursor:pointer;
          transition:background .18s var(--ease); }
 .hrow:hover { background:var(--plate-3); }
 .hrow:focus-visible { outline:2px solid var(--focus); outline-offset:-2px; }
-.hrow .d { font-size:12.5px; color:var(--ink-3); width:96px; flex:none; font-weight:600; }
-.hrow .n { font-size:13.5px; }
-.hrow .w { font-size:11.5px; font-weight:600; color:var(--ink-3); }
-.hrow.res .n { color:var(--ink-2); }
-.hrow.res .d::before { content:"○ "; }
-.hrow.past { opacity:.45; }
-.hempty { grid-column:1/-1; padding:14px; background:var(--plate); color:var(--ink-2); font-size:13.5px; }
+.hd { display:grid; justify-items:center; line-height:1; }
+.hd b { font-size:22px; font-weight:700; letter-spacing:-.01em; color:var(--ink); }
+.hd i { font-style:normal; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-top:4px; }
+.hn b { display:block; font-size:15px; font-weight:600; line-height:1.25; color:var(--ink); }
+.hn small { display:flex; align-items:center; gap:6px; margin-top:3px; font-size:12.5px; color:var(--ink-3); }
+.hn small i { width:8px; height:8px; border-radius:50%; flex:none; box-shadow:inset 0 0 0 2px var(--ink-3); }
+.hrow.gaz .hn small i { background:var(--l-pps); box-shadow:none; }
+.hrow.gaz.free .hn small i { background:transparent; box-shadow:inset 0 0 0 2px var(--l-pps); }
+.hrow.next .hn small { color:var(--ink); font-weight:600; }
+.hc { font-size:12.5px; font-weight:600; color:var(--ink-2); white-space:nowrap; text-align:right; }
+.hrow.free .hc, .hrow.res .hc { color:var(--ink-3); font-weight:500; }
+.hrow.res .hn b { color:var(--ink-2); font-weight:500; }
+.hrow.past { opacity:.5; }
+.hempty { padding:18px 16px; border:1px dashed var(--rule); border-radius:12px; color:var(--ink-2); font-size:13.5px; }
+.hmore { display:flex; gap:22px; margin-top:18px; }
 
 /* --- contact links --- */
 .clinks { display:grid; gap:8px; margin-top:16px; }
@@ -2416,19 +2429,29 @@ input[type="date"] { padding:12px 14px; }
     <div id="dirList"></div>
   </section>
 
+  <!-- One question: when is the next day off, and does it cost a class. The list
+       answers it; the calendar is the same data laid out by week, one tap away. -->
   <section id="holidays" hidden>
     <div class="h2row">
       <h2>Closures</h2>
+      <div class="seg" id="holView" role="group" aria-label="How to show closures">
+        <button type="button" data-v="list" aria-pressed="true">List</button>
+        <button type="button" data-v="cal" aria-pressed="false">Calendar</button>
+      </div>
+    </div>
+    <div class="hlist" id="hlist"></div>
+    <div id="holCal" hidden>
+      <div class="hkey">
+        <span><i></i>Closed</span>
+        <span><i class="free"></i>Closed, no class lost</span>
+        <span><i class="res"></i>Usually closed</span>
+      </div>
+      <div class="months" id="months"></div>
+    </div>
+    <div class="hmore">
       <button class="link" id="pastToggle" type="button" aria-pressed="false">Show past</button>
       <button class="link" id="resToggle" type="button" aria-pressed="false">Show restricted</button>
     </div>
-    <div class="hkey">
-      <span><i></i>Gazetted — institute closed</span>
-      <span><i class="res"></i>Restricted — institute decides</span>
-      <span class="next" id="nextHol"></span>
-    </div>
-    <div class="months" id="months"></div>
-    <div class="hlist" id="hlist"></div>
   </section>
 
   <!-- Only the CR sees this page. Hiding it is the convenience; RLS on is_cr() is the
@@ -3705,7 +3728,7 @@ function renderMonths() {
         g.appendChild(c);
         continue;
       }
-      const b = el("button", ((gaz ? "gaz " : "") + (res && (showRestricted || lik) ? "res " : "") + (iso === todayISO ? "today" : "")).trim(), String(d));
+      const b = el("button", ((gaz ? "gaz " : "") + (gaz && !classCountOn(iso) ? "free " : "") + (res && (showRestricted || lik) ? "res " : "") + (iso === todayISO ? "today" : "")).trim(), String(d));
       b.type = "button";
       b.title = hits.map(h => h.n).join(" · ");
       b.setAttribute("aria-label", d + " " + MONTHS[m] + " — " + b.title);
@@ -3721,34 +3744,56 @@ function renderHolidayList() {
   const box = document.getElementById("hlist");
   box.textContent = "";
   const todayISO = isoOf(new Date());
-  const cut = pastCut();
-  const rows = Object.entries(HOLIDAYS)
-    .flatMap(([iso, hits]) => hits.filter(h => h.gaz || h.likely || h.cr || showRestricted)
-                                  .map(h => [iso, h.n, h.gaz, h.likely, h.cr]))
-    .filter(r => !cut || r[0] >= cut)
-    .sort((a, b) => a[0].localeCompare(b[0]));
-  rows.forEach(([iso, name, gaz, likely, cr]) => {
-    const r = el("button", "hrow" + (gaz ? "" : " res") + (iso < todayISO ? " past" : ""));
-    r.type = "button";
+  /* one row per date: Diwali and Naraka Chaturdasi share a Sunday and are one day off */
+  const days = Object.keys(HOLIDAYS).sort()
+    .filter(iso => showPast || iso >= todayISO)
+    .map(iso => ({ iso, hits: HOLIDAYS[iso].filter(h => h.gaz || h.likely || h.cr || showRestricted) }))
+    .filter(x => x.hits.length);
+  if (!days.length) {
+    box.appendChild(el("div", "hempty", showRestricted
+      ? "Nothing left on the calendar."
+      : "No closures listed from here on. The CR can add them on the CR page."));
+    return;
+  }
+  const nextIso = (days.find(x => x.iso >= todayISO && gazettedOn(x.iso)) || {}).iso;
+  let group = null, month = "";
+  days.forEach(({ iso, hits }) => {
     const d = fromISO(iso);
-    r.appendChild(el("div", "d", d.toLocaleDateString("en-IN", { day:"2-digit", month:"short" }) + " · " + d.toLocaleDateString("en-IN", { weekday:"short" })));
-    const n = el("div", "n", name + (likely ? " · usually closed" : cr === "open" ? " · classes held, per CR" : cr ? " · per CR" : ""));
-    if (!classCountOn(iso)) n.appendChild(el("span", "w", " · weekend"));
-    r.appendChild(n);
-    r.addEventListener("click", () => openHoliday(iso));
-    box.appendChild(r);
-  });
-  if (!rows.length) box.appendChild(el("div", "hempty",
-    showRestricted ? "Nothing left on the calendar." : "No closures listed from here on. The CR can add them on the CR page."));
+    const m = MONTHS[d.getMonth()] + (d.getFullYear() !== new Date().getFullYear() ? " " + d.getFullYear() : "");
+    if (m !== month) {
+      month = m;
+      box.appendChild(el("div", "hmonth", m));
+      group = box.appendChild(el("div", "hgroup"));
+    }
+    const gaz = !!gazettedOn(iso), likely = hits.some(h => h.likely), cr = (hits.find(h => h.cr) || {}).cr;
+    const n = classCountOn(iso), wknd = d.getDay() === 0 || d.getDay() === 6;
+    const r = el("button", "hrow" + (gaz ? " gaz" : likely ? "" : " res") + (gaz && !n ? " free" : "")
+      + (iso < todayISO ? " past" : "") + (iso === nextIso ? " next" : ""));
+    r.type = "button";
 
-  const nextIso = Object.keys(HOLIDAYS).filter(d => d >= todayISO && gazettedOn(d)).sort()[0];
-  const next = nextIso && [nextIso, gazettedOn(nextIso).n];
-  const nh = document.getElementById("nextHol");
-  if (next) {
-    const days = Math.round((fromISO(next[0]) - fromISO(todayISO)) / 86400000);
-    nh.textContent = "Next closure: " + next[1] + (days === 0 ? ", today" : days === 1 ? ", tomorrow" : ", in " + days + " days")
-      + (classCountOn(next[0]) ? "" : " — a weekend, so nothing comes off");
-  } else nh.textContent = "";
+    const dt = el("span", "hd");
+    dt.appendChild(el("b", null, String(d.getDate())));
+    dt.appendChild(el("i", null, d.toLocaleDateString("en-IN", { weekday:"short" })));
+    r.appendChild(dt);
+
+    const nm = el("span", "hn");
+    nm.appendChild(el("b", null, hits.map(h => h.n).join(" · ")));
+    const days2 = Math.round((d - fromISO(todayISO)) / 86400000);
+    const kind = el("small");
+    kind.appendChild(el("i"));
+    kind.appendChild(document.createTextNode(
+      (cr === "closed" ? "Closed by the CR" : cr === "open" ? "Classes run, per the CR"
+        : gaz ? "Closed" : likely ? "Usually closed" : "Restricted")
+      + (iso === nextIso ? (days2 === 0 ? " · today" : days2 === 1 ? " · tomorrow" : " · in " + days2 + " days") : "")));
+    nm.appendChild(kind);
+    r.appendChild(nm);
+
+    r.appendChild(el("span", "hc", !n ? (wknd ? "Weekend" : "No classes")
+      : gaz ? n + (n === 1 ? " class off" : " classes off")
+      : likely ? n + " at risk" : ""));
+    r.addEventListener("click", () => openHoliday(iso));
+    group.appendChild(r);
+  });
 }
 
 function openHoliday(iso) {
@@ -6350,6 +6395,14 @@ document.getElementById("attClear").addEventListener("click", async () => {
     }
   }
 });
+function setHolView(v) {
+  document.getElementById("hlist").hidden = v !== "list";
+  document.getElementById("holCal").hidden = v !== "cal";
+  document.querySelectorAll("#holView button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v));
+  try { localStorage.setItem("bunkr-hol-view", v); } catch (e) {}
+}
+document.querySelectorAll("#holView button").forEach(b => b.addEventListener("click", () => setHolView(b.dataset.v)));
+try { setHolView(localStorage.getItem("bunkr-hol-view") === "cal" ? "cal" : "list"); } catch (e) { setHolView("list"); }
 document.getElementById("resToggle").addEventListener("click", e => {
   showRestricted = !showRestricted;
   e.currentTarget.setAttribute("aria-pressed", showRestricted);
