@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+67611eb-->
+<!--secf-app--><!--build:1.0.1+b082cd7-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -2635,7 +2635,7 @@ const SUB = {
   EM:    { line:"em",  short:"Mechanics",      code:"ICT 119",   name:"Engineering Mechanics", fac:"Mr. Naman Bajpai" },
   EGL:   { line:"eg",  short:"Graphics Lab",   code:"ICT 123",   name:"Engineering Graphics I Lab", fac:"Mr. Naman Bajpai", lab:true },
   CSL:   { line:"csl", short:"Comm Skills",    code:"ICT 113",   name:"Communication Skills", fac:"Ms. Isha" },
-  PD:    { line:"pd",  short:"Personality Dev", code:"PD",       name:"Personality Development", fac:"Ms. Isha" },
+  PD:    { line:"pd",  short:"Personality Dev", code:"PD",       name:"Personality Development", fac:"Ms. Isha", noAtt:true },
   EVSL:  { line:"evs", short:"EVS",            code:"EM 117 T",  name:"Environment Studies (lecture)", fac:"Dr. Kavita Gupta" },
   EVSP:  { line:"evs", short:"EVS Lab",        code:"ICT 117 P", name:"Environment Studies Lab", fac:"Dr. Kavita Gupta", lab:true },
 };
@@ -2686,6 +2686,9 @@ const pad = n => String(n).padStart(2, "0");
 const isoOf = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
 const fromISO = iso => { const [y,m,d] = iso.split("-").map(Number); return new Date(y, m-1, d); };
 const lineOf = k => (k && SUB[k]) ? SUB[k].line : "";
+
+/* PD runs on the timetable but takes no attendance, so it never enters the 75% maths */
+const tracked = k => !!(k && SUB[k] && !SUB[k].noAtt);
 
 /* which subject an item resolves to for the selected batch (null = both halves) */
 function resolve(item) {
@@ -2843,6 +2846,7 @@ function classCard(s, key, dayIdx) {
   const hd = el("div", "hd");
   hd.appendChild(el("span", "t", label(s.i, s.span)));
   if (key && SUB[key].lab) hd.appendChild(el("span", "badge ghost", "Lab"));
+  if (key && SUB[key].noAtt) hd.appendChild(el("span", "badge ghost", "No attendance"));
   if (!key) hd.appendChild(el("span", "badge ghost", "Batches split"));
   btn.appendChild(hd);
 
@@ -2906,7 +2910,7 @@ function todayCard(s, key, iso, ii, dayIdx) {
   /* A class that has not started cannot have been attended, so it offers no marks.
      One that is over and still unmarked says so; one that is marked steps back. */
   const now = nowMin();
-  if (!key || now < s.from || gazettedOn(iso) || isCancelled(iso, s.i)) return f;
+  if (!tracked(key) || now < s.from || gazettedOn(iso) || isCancelled(iso, s.i)) return f;
   if (now >= s.to) {
     if (att[iso + "|" + ii]) card.classList.add("done");
     else card.querySelector(".hd").appendChild(el("span", "badge due", "Not marked"));
@@ -3788,6 +3792,9 @@ function demo() {                                   // run demo() in the console
     ok(fill.length, DAYS[0].items.filter(it => resolve(it)).length - 1, "...and fills every other class that day");
   }
   ok(fillable("2999-01-04").length, 0, "a day that has not happened cannot be bulk-marked");
+  att = { "2026-09-10|6": { m:"A", s:"PD" } };
+  ok(tally().PD, undefined, "PD takes no attendance, so a mark on it counts for nothing");
+  ok(classesIn("2026-09-10", "2026-09-10").per.PD, undefined, "...and it is never a class still to come");
 
   att = keptAtt; overrides = keptOvr;
 
@@ -3820,7 +3827,7 @@ function tally() {
     const iso = id.slice(0, bar), period = periodOf(iso, +id.slice(bar + 1));
     if (period !== null && isCancelled(iso, period)) return;
     const key = (period !== null && swapAt(iso, period)) || s;
-    if (!SUB[key]) return;
+    if (!tracked(key)) return;
     const e = t[key] = t[key] || { p:0, h:0 };
     e.h++; if (m === "P") e.p++;
   });
@@ -3893,6 +3900,7 @@ function classesIn(fromIso, toIso, skipMarked) {
       if (isCancelled(iso, it.i)) return;           /* called off ahead of time: nothing to attend */
       const k = resolve(it);
       if (!k) { unknown++; return; }            /* a split practical, batch not chosen yet */
+      if (!tracked(k)) return;
       per[k] = (per[k] || 0) + 1; total++;
     });
   });
@@ -3939,7 +3947,7 @@ function vanishUntil() {
     const cost = {};
     DAYS[di].items.forEach((it, ii) => {
       const k = resolve(it);
-      if (!k || att[iso + "|" + ii] || isCancelled(iso, it.i)) return;
+      if (!tracked(k) || att[iso + "|" + ii] || isCancelled(iso, it.i)) return;
       cost[k] = (cost[k] || 0) + 1;
     });
     if (Object.keys(cost).some(k => cost[k] > (room[k] || 0))) break;
@@ -4051,7 +4059,7 @@ function upcomingClasses(n) {
   for (const { iso, di } of classDays(nowISO(), semEnd)) {
     for (let ii = 0; ii < DAYS[di].items.length; ii++) {
       const k = resolve(DAYS[di].items[ii]);
-      if (!k || att[iso + "|" + ii] || isCancelled(iso, DAYS[di].items[ii].i)) continue;
+      if (!tracked(k) || att[iso + "|" + ii] || isCancelled(iso, DAYS[di].items[ii].i)) continue;
       if (iso === nowISO() && startMin(DAYS[di].items[ii].i) <= nowMin()) continue;   /* already under way */
       out.push({ iso, di, ii, k, it: DAYS[di].items[ii] });
       if (out.length >= n) return out;
@@ -4066,7 +4074,7 @@ const likelyClosures = days => days.filter(({ iso }) => likelyOn(iso));
 /* class days since the session opened that you never touched — the onboarding backlog */
 function untouchedDays() {
   return classDays(SEM_START, dayBefore(nowISO())).filter(({ iso, di }) =>
-    DAYS[di].items.some(it => resolve(it)) &&
+    DAYS[di].items.some(it => tracked(resolve(it))) &&
     !DAYS[di].items.some((it, ii) => att[iso + "|" + ii]));
 }
 
@@ -4074,7 +4082,7 @@ function untouchedDays() {
 function markDay(iso, di, mk) {
   DAYS[di].items.forEach((it, ii) => {
     const k = resolve(it);
-    if (!k) return;
+    if (!tracked(k)) return;
     const id = iso + "|" + ii;
     if (mk === null) delete att[id]; else att[id] = { m:mk, s:k, t:Date.now() };
   });
@@ -4090,7 +4098,7 @@ function fillable(iso) {
   const today = iso === nowISO(), now = nowMin();
   return DAYS[di].items
     .map((it, ii) => ({ it, id: iso + "|" + ii, k: resolve(it) }))
-    .filter(x => x.k && !att[x.id] && !isCancelled(iso, x.it.i) && (!today || startMin(x.it.i) <= now));
+    .filter(x => tracked(x.k) && !att[x.id] && !isCancelled(iso, x.it.i) && (!today || startMin(x.it.i) <= now));
 }
 
 function markAllDay(iso, mk = "P") {
@@ -4214,7 +4222,7 @@ function markRow(s, key, iso, ii) {
     m.appendChild(el("div", "f", "Choose F1 or F2 at the top to mark this one"));
   }
   row.appendChild(m);
-  if (!key) return row;
+  if (!tracked(key)) return row;
 
   const preview = el("div", "preview");
   row.appendChild(markStrip(key, iso, ii, label(s.i, s.span), preview));
@@ -4540,7 +4548,7 @@ function openCatchup() {
       days.forEach(({ iso, di }) => {
         const classes = DAYS[di].items
           .map((it, ii) => ({ it, ii, k: resolve(it) }))
-          .filter(x => x.k);
+          .filter(x => tracked(x.k));
         if (!classes.length) return;
 
         const card = el("div", "d cu-card");
@@ -4863,7 +4871,7 @@ function renderEODNotice() {
     if (sessionStorage.getItem("bunkr-eod-dismissed-" + iso) === "1") return;
   } catch (e) {}
 
-  const unmarked = DAYS[di].items.some((it, ii) => resolve(it) && !att[iso + "|" + ii]);
+  const unmarked = DAYS[di].items.some((it, ii) => tracked(resolve(it)) && !att[iso + "|" + ii]);
   if (!unmarked) return;
 
   const card = el("div", "eod-card");
@@ -6315,7 +6323,7 @@ async function syncAlerts() {
 
         /* the honest moment to mark it, and only while it is still unmarked — marking
            it anywhere is what makes the next sync stop asking */
-        if (!att[iso + "|" + ii]) soon(clockAt(iso, endMin(it.i, span)), {
+        if (tracked(key) && !att[iso + "|" + ii]) soon(clockAt(iso, endMin(it.i, span)), {
           id: nid(iso, 2, ii), group: "secf-mark", autoCancel: true,
           actionTypeId: MARK_ACTIONS,
           extra: { mark: iso + "|" + ii, key },
@@ -7712,7 +7720,17 @@ try {
       showApkFront();
     }, 420);
   };
-  const timer = setTimeout(dismiss, 700);
+  /* Leave when the animation has actually played out, not on a guessed timer: a short
+     timer cut the wordmark off mid-slide, a long one kept students waiting. Each animation
+     reports how long it has left on its own clock (0 if it already finished while the
+     script loaded, or under reduced motion); the pause after lets the full logo register. */
+  const HOLD = 250;
+  let left = 1340;                                  /* the CSS: wordmark ends at .62s + .72s */
+  try {
+    left = Math.max(0, ...splash.getAnimations({ subtree: true })
+      .map(a => a.effect.getComputedTiming().endTime - (a.currentTime || 0)));
+  } catch (e) {}
+  const timer = setTimeout(dismiss, left + HOLD);
   splash.addEventListener("click", () => { clearTimeout(timer); dismiss(); });
   splash.addEventListener("touchstart", () => { clearTimeout(timer); dismiss(); }, { passive: true });
 })();
