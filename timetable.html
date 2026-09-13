@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+3a1e43f-->
+<!--secf-app--><!--build:1.0.1+66815ba-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -174,7 +174,31 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 .seg button[aria-pressed="true"],
 .atabs button[aria-pressed="true"] { background:var(--ink); color:var(--bg); }
 .atabs { width:max-content; margin:16px 0 2px; }
-.apane[hidden] { display:none; }
+.subnav { margin:14px 0 4px; }
+.fold { scroll-margin-top:calc(var(--top-h, 57px) + 12px); margin-top:12px; background:var(--plate); border:1px solid var(--rule-soft); border-radius:12px; }
+.fold:first-of-type { margin-top:28px; }
+.fold > summary {
+  display:flex; align-items:center; gap:8px; min-height:52px; padding:0 16px; cursor:pointer; list-style:none;
+  font-size:15px; font-weight:600; color:var(--ink);
+}
+.fold > summary::-webkit-details-marker { display:none; }
+.fold > summary::after {
+  content:""; margin-left:auto; width:8px; height:8px; flex:none;
+  border-right:2px solid var(--ink-3); border-bottom:2px solid var(--ink-3);
+  transform:rotate(45deg) translateY(-2px); transition:transform .2s var(--ease);
+}
+.fold[open] > summary::after { transform:rotate(-135deg) translateY(-2px); }
+.fold > summary:focus-visible { outline:2px solid var(--focus); outline-offset:-2px; border-radius:12px; }
+.fold[open] { padding-bottom:14px; }
+.fold[open] > :not(summary) { margin-left:14px; margin-right:14px; }
+.fold .key { margin-top:0; }
+.fold-count { font-size:13px; font-weight:600; color:var(--ink-3); }
+.fold-link { display:block; margin-top:12px; }
+.fold-acts { display:flex; gap:10px; flex-wrap:wrap; }
+.btn.bad { color:var(--bad); }
+.subnav button { padding-left:18px; padding-right:18px; }
+/* the switch sits above the page it switches; its own heading needs less air */
+.subnav + .h2row, .subnav + .net + .h2row { margin-top:20px; }
 .iconbtn {
   width:36px; height:36px; min-width:36px; min-height:36px; flex:none;
   display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
@@ -925,7 +949,8 @@ dialog.sheet .d-in { max-height:92vh; overflow-y:auto; }
 }
 .grab { width:40px; height:4px; border-radius:2px; background:var(--rule); margin:0 auto 16px; }
 
-.pcard { margin-bottom:16px; }
+.tcard.pcard { margin-bottom:16px; aspect-ratio:auto; gap:22px; }
+#dlgIn > .btn, .psave .btn { width:100%; }
 .pstats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 4px; }
 .pstats div { padding:11px 12px; background:var(--plate-2); border:1px solid var(--rule); border-radius:12px; }
 .pstats b { display:block; font-family:'Blinker', sans-serif; font-weight:700;
@@ -1346,7 +1371,7 @@ dialog .btn { margin-top:8px; }
    DIRECTORY / ATTENDANCE / HOLIDAYS ran together. The icons carry the meaning
    at this size, so the label steps down rather than the icon. */
 @media (max-width:400px) {
-  .nav a { font-size:9px; letter-spacing:0; gap:4px; }
+  .nav a { font-size:10px; letter-spacing:.01em; gap:4px; }
   .nav a svg { width:24px; height:24px; }
 }
 
@@ -2079,22 +2104,13 @@ input[type="date"] { padding:12px 14px; }
     Today</a>
   <a href="#week" data-p="week">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.2 8.2h6.3l3.4 3.4h8"/><path d="M3.2 17.4h9.7"/><circle cx="9.5" cy="8.2" r="1.9" fill="currentColor" stroke="none"/><circle cx="20.3" cy="11.6" r="1.9" fill="currentColor" stroke="none"/><circle cx="12.9" cy="17.4" r="1.9" fill="currentColor" stroke="none"/></svg>
-    Week</a>
-  <a href="#ranks" data-p="ranks">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 20.5v-6M12 20.5V3.5M18.5 20.5v-9"/><circle cx="5.5" cy="11.6" r="1.9" fill="currentColor" stroke="none"/><circle cx="12" cy="3.5" r="1.9" fill="currentColor" stroke="none"/><circle cx="18.5" cy="8.6" r="1.9" fill="currentColor" stroke="none"/></svg>
-    Ranks</a>
-  <a href="#directory" data-p="directory">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.4" r="3.1"/><path d="M3.6 19.2c.6-3 2.8-4.6 5.4-4.6s4.8 1.6 5.4 4.6"/><path d="M16.4 6.2a2.6 2.6 0 0 1 0 5.2M18.2 14.8c1.6.6 2.6 2.2 2.9 4.4"/></svg>
-    Directory</a>
+    Timetable</a>
   <a href="#attendance" data-p="attendance">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.4"/><path d="M8.4 12.2l2.6 2.6 4.8-5"/></svg>
     Attendance</a>
-  <a href="#holidays" data-p="holidays">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="3.4" y="5.4" width="17.2" height="15.2" rx="2.4"/><path d="M8 3.2v4M16 3.2v4M3.4 10.4h17.2"/><circle cx="12" cy="15" r="1.9" fill="currentColor" stroke="none"/></svg>
-    Holidays</a>
-  <a href="#cr" data-p="cr" hidden>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.2l7.4 2.9v5.4c0 4.6-3.1 8.1-7.4 9.3-4.3-1.2-7.4-4.7-7.4-9.3V6.1z"/><path d="M8.8 12.1l2.2 2.2 4.2-4.4"/></svg>
-    CR</a>
+  <a href="#directory" data-p="directory">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.4" r="3.1"/><path d="M3.6 19.2c.6-3 2.8-4.6 5.4-4.6s4.8 1.6 5.4 4.6"/><path d="M16.4 6.2a2.6 2.6 0 0 1 0 5.2M18.2 14.8c1.6.6 2.6 2.2 2.9 4.4"/></svg>
+    Section</a>
 </nav>
 
 
@@ -2136,6 +2152,10 @@ input[type="date"] { padding:12px 14px; }
           </div>
         </div>
         <div class="sep"></div>
+        <button type="button" id="dropCR" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.2l7.4 2.9v5.4c0 4.6-3.1 8.1-7.4 9.3-4.3-1.2-7.4-4.7-7.4-9.3V6.1z"/><path d="M8.8 12.1l2.2 2.2 4.2-4.4"/></svg>
+          CR controls
+        </button>
         <button type="button" id="dropProfile">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.4" r="3.6"/><path d="M4.2 20.4c.8-3.8 3.6-5.8 7.8-5.8s7 2 7.8 5.8"/></svg>
           Your profile
@@ -2166,6 +2186,10 @@ input[type="date"] { padding:12px 14px; }
   </section>
 
   <section id="week" hidden>
+    <div class="atabs subnav" role="group" aria-label="Timetable view">
+      <button type="button" data-p="week">Week</button>
+      <button type="button" data-p="holidays">Holidays</button>
+    </div>
     <div class="net">
       <div class="netscroll">
         <div class="nethead" id="netHead"></div>
@@ -2184,81 +2208,42 @@ input[type="date"] { padding:12px 14px; }
       <div class="railwrap" id="weekRail"></div>
     </div>
 
-    <div class="h2row">
-      <h2>Line key</h2>
-      <button class="link" id="icsBtn" type="button">Export to calendar</button>
-    </div>
-    <div class="key" id="lineKey"></div>
+    <details class="fold">
+      <summary>Subjects and teachers</summary>
+      <div class="key" id="lineKey"></div>
+      <button class="link fold-link" id="icsBtn" type="button">Export the timetable to your calendar</button>
+    </details>
   </section>
 
+  <!-- One screen: where you stand per subject, then marking another day, then the
+       planning tools folded away until asked for. Every tool the four tabs had is here. -->
   <section id="attendance" hidden>
     <div id="catchup"></div>
 
-    <!-- three views on one set of records: what happened, where it leaves you, and
-         what the rest of the term costs. Not .seg — that class is claimed by the
-         batch switcher, whose handler selects every .seg button on the page. -->
-    <div class="atabs" role="group" aria-label="Attendance view">
-      <button type="button" data-at="mark" aria-pressed="true">Mark</button>
-      <button type="button" data-at="board" aria-pressed="false">Board</button>
-      <button type="button" data-at="bunk" aria-pressed="false">Bunk</button>
-      <button type="button" data-at="tasks" aria-pressed="false">Submissions</button>
+    <div class="h2row" style="margin-top:18px">
+      <h2>Subjects</h2>
+      <span class="syncnote" id="syncNote" role="status" aria-live="polite"></span>
     </div>
+    <div id="board"></div>
 
-    <div class="apane" data-at="mark">
+    <div class="h2row">
+      <h2>Mark a day</h2>
+    </div>
       <div class="bar-tools">
         <input type="date" id="attDate" aria-label="Date to mark">
         <button class="bulk-btn" id="markAllAttBtn" type="button" title="Mark all classes on this date present">Mark all present</button>
         <span class="daynote" id="attNote"></span>
       </div>
       <div class="railwrap" id="attRail"></div>
-    </div>
 
-    <div class="apane" data-at="board" hidden>
-      <div class="h2row">
-        <h2>Service board</h2>
-        <span class="syncnote" id="syncNote" role="status" aria-live="polite"></span>
-        <button class="link" id="attClear" type="button">Clear records</button>
-      </div>
-      <div class="target-wrap" id="targetWrap">
-        <span>Goal</span>
-        <div class="target-chips" id="targetChips" role="group" aria-label="Target attendance percentage">
-          <button type="button" data-pct="70">70%</button>
-          <button type="button" data-pct="75" aria-pressed="true">75%</button>
-          <button type="button" data-pct="80">80%</button>
-          <button type="button" data-pct="85">85%</button>
-        </div>
-      </div>
-      <div id="summary"></div>
-      <div id="board"></div>
-    </div>
-
-    <div class="apane" data-at="bunk" hidden>
+    <details class="fold" id="foldPlan">
+      <summary>Plan a bunk</summary>
       <div id="bunkBox"></div>
+    </details>
 
-      <div class="h2row">
-        <h2>The term</h2>
-        <span class="daynote">Term ends</span>
-        <input type="date" id="semEndInput" aria-label="Last teaching day of the term">
-        <span class="daynote" id="termNote"></span>
-      </div>
-      <div id="budget"></div>
-
-      <div class="h2row">
-        <h2>Leave planner</h2>
-        <span class="daynote">What a stretch of days off actually costs.</span>
-      </div>
-      <div class="lv">
-        <input type="date" id="lvFrom" aria-label="Away from">
-        <span>to</span>
-        <input type="date" id="lvTo" aria-label="Away until">
-        <button class="link" id="lvClear" type="button">Clear</button>
-      </div>
-      <div id="lvOut"></div>
-    </div>
-
-    <div class="apane" data-at="tasks" hidden>
+    <details class="fold" id="foldTasks">
+      <summary>Submissions <span class="fold-count" id="tasksSummary"></span></summary>
       <div class="tasks-header">
-        <div class="tasks-title" id="tasksSummary">Submissions & Files</div>
         <div class="tasks-controls">
           <button class="bulk-btn" id="toggleTaskFormBtn" type="button">+ New submission</button>
         </div>
@@ -2299,10 +2284,54 @@ input[type="date"] { padding:12px 14px; }
         <button type="button" data-filter="completed" aria-pressed="false">Completed</button>
       </div>
       <div class="task-list" id="taskList"></div>
-    </div>
+    </details>
+
+    <details class="fold">
+      <summary>Goal, term and leave</summary>
+      <div class="target-wrap" id="targetWrap">
+        <span>Goal</span>
+        <div class="target-chips" id="targetChips" role="group" aria-label="Target attendance percentage">
+          <button type="button" data-pct="70">70%</button>
+          <button type="button" data-pct="75" aria-pressed="true">75%</button>
+          <button type="button" data-pct="80">80%</button>
+          <button type="button" data-pct="85">85%</button>
+        </div>
+      </div>
+      <div class="h2row">
+        <h2>The term</h2>
+        <span class="daynote">Term ends</span>
+        <input type="date" id="semEndInput" aria-label="Last teaching day of the term">
+        <span class="daynote" id="termNote"></span>
+      </div>
+      <div id="budget"></div>
+
+      <div class="h2row">
+        <h2>Leave planner</h2>
+        <span class="daynote">What a stretch of days off actually costs.</span>
+      </div>
+      <div class="lv">
+        <input type="date" id="lvFrom" aria-label="Away from">
+        <span>to</span>
+        <input type="date" id="lvTo" aria-label="Away until">
+        <button class="link" id="lvClear" type="button">Clear</button>
+      </div>
+      <div id="lvOut"></div>
+    </details>
+
+    <details class="fold">
+      <summary>Records</summary>
+      <div class="fold-acts">
+        <button class="btn" id="redoCatchup" type="button">Redo catch-up</button>
+        <button class="btn bad" id="attClear" type="button">Clear all records</button>
+      </div>
+    </details>
   </section>
 
   <section id="ranks" hidden>
+    <div class="atabs subnav" role="group" aria-label="Section view">
+      <button type="button" data-p="directory">Classmates</button>
+      <button type="button" data-p="ranks">Ranks</button>
+    </div>
     <div class="h2row">
       <h2>Section ranks</h2>
       <button class="link" id="cardEdit" type="button">Your card</button>
@@ -2312,6 +2341,10 @@ input[type="date"] { padding:12px 14px; }
   </section>
 
   <section id="directory" hidden>
+    <div class="atabs subnav" role="group" aria-label="Section view">
+      <button type="button" data-p="directory">Classmates</button>
+      <button type="button" data-p="ranks">Ranks</button>
+    </div>
     <div class="h2row">
       <h2>Sec F IT-I</h2>
       <span class="pcount" id="dirCount" role="status" aria-live="polite" style="margin:0">Loading…</span>
@@ -2332,6 +2365,10 @@ input[type="date"] { padding:12px 14px; }
   <!-- One question: when is the next day off, and does it cost a class. The list
        answers it; the calendar is the same data laid out by week, one tap away. -->
   <section id="holidays" hidden>
+    <div class="atabs subnav" role="group" aria-label="Timetable view">
+      <button type="button" data-p="week">Week</button>
+      <button type="button" data-p="holidays">Holidays</button>
+    </div>
     <div class="h2row">
       <h2>Closures</h2>
       <div class="seg" id="holView" role="group" aria-label="How to show closures">
@@ -2915,6 +2952,17 @@ function renderToday() {
   renderNotices();
 }
 
+/* Attendance, optionally with one of its folds opened and brought into view */
+function openAttendance(fold) {
+  show("attendance");
+  try { history.pushState(null, "", "#attendance"); } catch (err) {}
+  if (!fold) return;
+  const d = document.getElementById(fold);
+  d.open = true;
+  /* after show()'s own scroll-to-top frame, or that one wins */
+  requestAnimationFrame(() => requestAnimationFrame(() => d.scrollIntoView({ block:"start" })));
+}
+
 function renderPlate() {
   const box = document.getElementById("plateBox");
   if (!box) return;
@@ -3019,12 +3067,12 @@ function renderPlate() {
     c.type = "button";
     c.appendChild(el("b", null, val));
     c.appendChild(el("span", null, lbl));
-    c.addEventListener("click", () => { show("attendance"); showATab(tab); });
+    c.addEventListener("click", () => openAttendance(tab));
     strip.appendChild(c);
   };
-  stat(H ? pctOf(P, H) + "%" : "—", "Overall", H ? (clear(P, H) ? "ok" : "bad") : "", "board");
-  stat(String(bp.left), bp.left === 1 ? "Bunk left" : "Bunks left", bp.lost.length ? "bad" : bp.left ? "" : "warn", "bunk");
-  stat(String(below), "Below " + targetPct + "%", below ? "bad" : "", "board");
+  stat(H ? pctOf(P, H) + "%" : "—", "Overall", H ? (clear(P, H) ? "ok" : "bad") : "", null);
+  stat(String(bp.left), bp.left === 1 ? "Bunk left" : "Bunks left", bp.lost.length ? "bad" : bp.left ? "" : "warn", "foldPlan");
+  stat(String(below), "Below " + targetPct + "%", below ? "bad" : "", null);
   box.appendChild(strip);
 }
 
@@ -3127,7 +3175,9 @@ let openDay = Math.min(Math.max(new Date().getDay() - 1, 0), 5);
 function renderWeekRail() {
   const chips = document.getElementById("dayChips");
   chips.textContent = "";
+  if (!DAYS[openDay].items.length) openDay = 0;   /* Saturday has no line to show */
   DAYS.forEach((day, di) => {
+    if (!day.items.length) return;
     const b = el("button", null, day.short);
     b.type = "button";
     b.setAttribute("aria-pressed", di === openDay);
@@ -4251,8 +4301,6 @@ function renderBoard() {
   const totalP = keys.reduce((n, k) => n + t[k].p, 0);
   const totalH = keys.reduce((n, k) => n + t[k].h, 0);
 
-  const sum = document.getElementById("summary");
-  sum.textContent = "";
   const board = document.getElementById("board");
   board.textContent = "";
 
@@ -4264,22 +4312,8 @@ function renderBoard() {
     return;
   }
 
-  const overall = pctOf(totalP, totalH);
-  const canMiss = Math.max(0, tb.overall.canBunk);
-  const box = el("div", "summary");
-  const big = el("div", "big " + (clear(totalP, totalH) ? "ok" : "bad"));
-  big.appendChild(el("b", null, overall + "%"));
-  big.appendChild(document.createTextNode("Overall"));
-  box.appendChild(big);
-  [["Attended", totalP + " / " + totalH], ["Classes left", String(tb.overall.r)],
-   ["Can still miss", canMiss + ""]].forEach(([k, v]) => {
-    const d = el("div");
-    d.appendChild(el("b", null, v));
-    d.appendChild(document.createTextNode(k));
-    box.appendChild(d);
-  });
-  sum.appendChild(box);
-
+  /* No summary here: Today's strip already says overall, and this one's "can still
+     miss" was the overall average, which disagreed with every other bunk number. */
   const list = el("div", "board");
   keys.sort((a, b) => (t[a].p / t[a].h) - (t[b].p / t[b].h)).forEach(k => {
     const { p, h } = t[k], pct = pctOf(p, h);
@@ -4471,15 +4505,7 @@ function renderCatchup() {
     return;
   }
   const days = untouchedDays();
-  if (!days.length) {
-    /* Nothing outstanding, but the sheet is still the only door to "redo from
-       scratch" — leave it open or a bad bulk mark is unfixable. */
-    const q = el("button", "link cu-reopen", "Redo catch-up");
-    q.type = "button";
-    q.addEventListener("click", openCatchup);
-    box.appendChild(q);
-    return;
-  }
+  if (!days.length) return;              /* Redo catch-up lives under Records now */
   const b = el("div", "cu");
   b.appendChild(el("b", null, days.length + (days.length === 1 ? " class day" : " class days")));
   b.appendChild(document.createTextNode(
@@ -4772,8 +4798,7 @@ function renderDueBanner() {
   banner.appendChild(el("b", null, msg));
   banner.appendChild(el("span", "link", "View"));
   banner.addEventListener("click", () => {
-    show("attendance");
-    showATab("tasks");
+    openAttendance("foldTasks");
   });
   box.appendChild(banner);
 }
@@ -5228,7 +5253,7 @@ function renderSyncNote() {
     n.textContent = "On this device only";
     return;
   }
-  if (!syncState) { n.textContent = "Syncing…"; return; }
+  if (!syncState) { n.textContent = navigator.onLine === false ? "Offline · saved on this phone" : "Syncing…"; return; }
   n.appendChild(el("i"));
   if (syncState.ok) {
     n.classList.add("ok");
@@ -5263,7 +5288,11 @@ async function pushMark(id, rec) {
 async function syncAttendance() {
   if (!profile) return;
   const t = await token();
-  if (!t) return;
+  if (!t) {                                        /* a dead session is not a sync in progress */
+    syncState = { ok:false, msg:"Saved on this phone · sign in again to back it up" };
+    renderSyncNote();
+    return;
+  }
   try {
     const out = await runSync(t);
     syncState = { ok:true, pulled:out.pulled, pushed:out.pushed, dropped:out.dropped };
@@ -5926,7 +5955,7 @@ function renderBunk() {
   }
 
   /* per subject: the ledger, tightest first, with the plan editable in place */
-  box.appendChild(el("div", "h2row")).appendChild(el("h2", null, "How many you can skip"));
+  box.appendChild(el("div", "h2row")).appendChild(el("h2", null, "Per subject"));
   box.appendChild(el("div", "bk-hint",
     "Tap + to pencil in a skip you're planning and watch the numbers move. Nothing here is "
     + "marked as absent — it's only a what-if until the class actually happens."));
@@ -5938,7 +5967,7 @@ function renderBunk() {
     row.appendChild(ln);
 
     const w = el("div", "w");
-    w.appendChild(el("b", null, SUB[s.k].name));
+    w.appendChild(el("b", null, SUB[s.k].short));
     w.appendChild(el("span", null,
       "Been to " + s.v.p + " of " + s.v.h + " · " + s.v.r + " still to come · you'd finish at " + s.end + "%"));
     /* the count column already says "3"; the tag only speaks when it knows something
@@ -6128,6 +6157,7 @@ document.getElementById("semEndInput").addEventListener("change", e => {
   semEnd = v; saveSemEnd(); renderAll();
 });
 document.getElementById("icsBtn").addEventListener("click", openICS);
+document.getElementById("redoCatchup").addEventListener("click", openCatchup);
 document.getElementById("attClear").addEventListener("click", async () => {
   if (!confirm(profile
     ? "Delete every attendance record, on this device and in your account? This cannot be undone."
@@ -6613,7 +6643,7 @@ function obCatchup() {
   let asked = null;
   try { asked = localStorage.getItem(nsKey("adgips-caught")); } catch (e) {}
   if (asked) return Promise.resolve("skip");
-  show("attendance"); showATab("mark");
+  show("attendance");
   return new Promise(resolve => {
     const d = document.getElementById("dlg");
     const quit = () => {
@@ -6732,6 +6762,8 @@ document.addEventListener("click", e => {
 /* pages — clicks drive them; the hash is a bonus for back/forward and
    deep links, and is unavailable from a data: URL */
 const PAGES = ["today", "week", "ranks", "directory", "attendance", "holidays", "cr"];
+/* four tabs, seven pages: a sub-page lights its parent tab and its own switch */
+const TAB_OF = { holidays:"week", ranks:"directory", cr:null };
 function show(id) {
   if (!PAGES.includes(id) || (id === "cr" && !isCR())) id = "today";
   if (id === "cr") { renderCR(); refreshSection(); }
@@ -6742,15 +6774,18 @@ function show(id) {
     sec.hidden = p !== id;
     if (p === id) { sec.classList.remove("enter"); void sec.offsetWidth; sec.classList.add("enter"); }
   });
+  const tab = id in TAB_OF ? TAB_OF[id] : id;
   document.querySelectorAll(".nav a").forEach(a =>
-    a.setAttribute("aria-current", a.dataset.p === id ? "page" : "false"));
+    a.setAttribute("aria-current", a.dataset.p === tab ? "page" : "false"));
+  document.querySelectorAll(".subnav button").forEach(b => b.setAttribute("aria-pressed", b.dataset.p === id));
   requestAnimationFrame(() => window.scrollTo(0, 0));   // beats the browser's own fragment jump
 }
+const go = id => { show(id); try { history.pushState(null, "", "#" + id); } catch (err) {} };
 document.querySelectorAll(".nav a").forEach(a => a.addEventListener("click", e => {
   e.preventDefault();
-  show(a.dataset.p);
-  try { history.pushState(null, "", "#" + a.dataset.p); } catch (err) {}
+  go(a.dataset.p);
 }));
+document.querySelectorAll(".subnav button").forEach(b => b.addEventListener("click", () => go(b.dataset.p)));
 window.addEventListener("popstate", () => show(location.hash.slice(1)));
 window.addEventListener("hashchange", () => show(location.hash.slice(1)));
 
@@ -6758,19 +6793,6 @@ document.getElementById("lockGo").addEventListener("click", tryUnlock);
 document.getElementById("lockOut").addEventListener("click", () => {
   if (confirm("Sign out on this device?")) { showLock(false); signOut(); }
 });
-
-/* the three panes are all built on every render — they are cheap DOM and it keeps
-   the tab a pure visibility switch, with nothing to forget to refresh */
-function showATab(which) {
-  document.querySelectorAll("#attendance .apane").forEach(p => p.hidden = p.dataset.at !== which);
-  document.querySelectorAll(".atabs button").forEach(b =>
-    b.setAttribute("aria-pressed", b.dataset.at === which));
-  try { localStorage.setItem("adgips-atab", which); } catch (e) {}
-  if (which === "tasks") renderSubmissions();
-}
-document.querySelectorAll(".atabs button").forEach(b =>
-  b.addEventListener("click", () => showATab(b.dataset.at)));
-(() => { let t = "mark"; try { t = localStorage.getItem("adgips-atab") || "mark"; } catch (e) {} showATab(t); })();
 
 /* Bulk marking & feature wiring */
 const markTodayBtn = document.getElementById("markAllTodayBtn");
@@ -7159,10 +7181,10 @@ function openProfile() {
   }
 
   if (isCR()) {
-    const cr = el("button", "btn", "CR tools");
+    const cr = el("button", "btn", "CR controls");
     cr.type = "button";
     cr.style.marginTop = "8px";
-    cr.addEventListener("click", openCR);
+    cr.addEventListener("click", () => { document.getElementById("dlg").close(); go("cr"); });
     box.appendChild(cr);
   }
   const out = el("button", "btn", "Sign out");
@@ -7453,7 +7475,7 @@ const userPill = document.getElementById("userPill");
 const userDrop = document.getElementById("userDrop");
 
 function updateUserPill() {
-  document.querySelector('.nav a[data-p="cr"]').hidden = !isCR();
+  document.getElementById("dropCR").hidden = !isCR();
   if (!profile) { userPill.hidden = true; return; }
   userPill.hidden = false;
   document.getElementById("userAvatar").textContent = initials(profile.name);
@@ -7473,6 +7495,10 @@ userPill.addEventListener("click", e => {
 });
 document.addEventListener("click", e => {
   if (!userPill.contains(e.target)) userDrop.classList.remove("open");
+});
+document.getElementById("dropCR").addEventListener("click", () => {
+  userDrop.classList.remove("open");
+  go("cr");
 });
 document.getElementById("dropProfile").addEventListener("click", () => {
   userDrop.classList.remove("open");
@@ -7586,6 +7612,8 @@ setInterval(() => {
   heartbeatDevice();
 }, 30000);
 
+window.addEventListener("offline", renderSyncNote);
+window.addEventListener("online", () => { if (profile) syncAttendance().catch(() => {}); });
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) { heartbeatDevice(); refreshSection(); }
 });
