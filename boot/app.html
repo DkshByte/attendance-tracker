@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.0+1c1e6df-->
+<!--secf-app--><!--build:1.1.1+3fab1c2-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -7480,11 +7480,42 @@ async function googleFinish(g) {
     say("liHint", what + " — " + fix, true);
   }
 }
-if (GOOGLE_CLIENT_ID && !NATIVE) {                  /* the app's webview can't host Google's page: web only */
+/* In the Android app Google's page can't load inside the webview, so the phone's own
+   account picker (Credential Manager, through @capgo/capacitor-social-login) issues the
+   id_token instead. Same exchange, same nonce binding: Google signs the SHA-256, Supabase
+   gets the raw value. An older APK that fetched this page without the plugin simply
+   shows no button. */
+/* isPluginAvailable asks the native side; Capacitor.Plugins alone can hand back a proxy for
+   a plugin the APK doesn't contain */
+const nativeGoogle = () => NATIVE && typeof Capacitor.isPluginAvailable === "function" && Capacitor.isPluginAvailable("SocialLogin");
+let nativeGoogleReady = false;
+async function googleNative() {
+  const SL = Capacitor.Plugins.SocialLogin;
+  const raw = hex(crypto.getRandomValues(new Uint8Array(32)));
+  const nonce = hex(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(raw))));
+  if (!nativeGoogleReady) { await SL.initialize({ google: { webClientId: GOOGLE_CLIENT_ID, mode: "online" } }); nativeGoogleReady = true; }
+  const res = await SL.login({ provider: "google", options: { nonce } });
+  const idToken = res && res.result && res.result.idToken;
+  if (!idToken) throw new Error("Google returned no ID token");
+  return googleFinish({ idToken, raw });
+}
+const nativeGoogleError = err => {
+  const m = String((err && (err.message || err.errorMessage)) || err || "").toLowerCase();
+  if (m.includes("cancel")) return "Google sign-in was cancelled.";
+  if (m.includes("no credential") || m.includes("no account")) return "Add a Google account to this phone first, or sign in with email.";
+  if (m.includes("28444") || m.includes("developer console")) return "Google sign-in isn't set up for this app build yet. Use email for now.";
+  return "Google sign-in didn't work on this phone. Use email for now.";
+};
+if (GOOGLE_CLIENT_ID && (!NATIVE || nativeGoogle())) {
   document.querySelectorAll(".gsign").forEach(n => { n.hidden = false; });
   document.querySelectorAll("[data-google]").forEach(b => b.addEventListener("click", () => {
     b.disabled = true;
-    googleStart().catch(() => { b.disabled = false; say("liHint", "Couldn't start Google sign-in on this browser.", true); });
+    if (NATIVE) {
+      say("liHint", "");
+      googleNative().catch(err => say("liHint", nativeGoogleError(err), true)).finally(() => { b.disabled = false; });
+    } else {
+      googleStart().catch(() => { b.disabled = false; say("liHint", "Couldn't start Google sign-in on this browser.", true); });
+    }
   }));
 }
 

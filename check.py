@@ -236,8 +236,10 @@ check("Google return checks the saved state", "saved.state !== h.get(\"state\")"
 check("Google nonce is hashed for Google and sent raw to Supabase",
       'crypto.subtle.digest("SHA-256"' in html and "nonce: g.raw" in html,
       "without the nonce binding a lifted id_token could be replayed")
-check("Google sign-in is web only", "GOOGLE_CLIENT_ID && !NATIVE" in html,
-      "Google refuses its sign-in page inside embedded webviews")
+check("Google never loads its web page inside the app", "GOOGLE_CLIENT_ID && (!NATIVE || nativeGoogle())" in html and "if (NATIVE) {" in html,
+      "Google refuses its sign-in page inside embedded webviews; the app must use the native picker")
+check("native Google sign-in binds the nonce too", "SL.login({ provider: \"google\", options: { nonce } })" in html and "googleFinish({ idToken, raw })" in html,
+      "a native id_token without the nonce could be replayed")
 check("privacy policy discloses Google sign-in", "Continue with Google" in (root / "deploy/privacy.html").read_text(),
       "a new data flow the policy doesn't mention")
 router = (root / "deploy/index.html").read_text()
