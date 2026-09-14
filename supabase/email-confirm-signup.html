@@ -1,29 +1,103 @@
-<!-- Supabase → Authentication → Emails → Templates → Confirm signup. Only sent if
-     "Confirm email" is on. Paste everything below this comment. Subject: Confirm your Bunkr account
+<!-- Supabase → Authentication → Emails → Templates → Confirm signup (only sent when Confirm email is on).
+     Subject: Confirm your Bunkr account
+     Paste this whole file into the message body; this comment is invisible in the email.
 
-     Same reason as email-reset-password.html: the link goes through www.bunkr.website,
-     because supabase.co is blocked by Indian ISPs. -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#000000;padding:32px 16px;font-family:Blinker,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
-  <tr><td align="center">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#0D0D11;border:1px solid #26272F;border-radius:14px;">
-      <tr><td style="height:4px;background:#FF4D40;border-radius:14px 14px 0 0;font-size:0;line-height:0;">&nbsp;</td></tr>
-      <tr><td style="padding:28px 28px 8px;">
-        <p style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.01em;color:#FFFFFF;">bunkr</p>
-      </td></tr>
-      <tr><td style="padding:12px 28px 0;">
-        <h1 style="margin:0;font-size:28px;line-height:1.1;font-weight:800;color:#FFFFFF;">Confirm your account</h1>
-        <p style="margin:14px 0 0;font-size:16px;line-height:1.5;color:#A0A4B0;">You claimed a name on Bunkr with {{ .Email }}. Confirm it's your address to finish:</p>
-      </td></tr>
-      <tr><td style="padding:24px 28px;">
-        <a href="https://www.bunkr.website/auth/v1/verify?token={{ .TokenHash }}&amp;type=signup&amp;redirect_to={{ .RedirectTo }}"
-           style="display:inline-block;padding:14px 22px;border-radius:10px;background:#FFFFFF;color:#000000;font-size:16px;font-weight:800;text-decoration:none;">Confirm my email</a>
-      </td></tr>
-      <tr><td style="padding:0 28px 26px;">
-        <p style="margin:0;font-size:14px;line-height:1.5;color:#8A8F9E;">Didn't sign up? Ignore this email and nothing happens.</p>
-      </td></tr>
-      <tr><td style="padding:16px 28px;border-top:1px solid #26272F;">
-        <p style="margin:0;font-size:12px;line-height:1.5;color:#8A8F9E;">Bunkr · <a href="https://www.bunkr.website" style="color:#A0A4B0;">bunkr.website</a> · <a href="mailto:support@bunkr.website" style="color:#A0A4B0;">support@bunkr.website</a></p>
-      </td></tr>
-    </table>
-  </td></tr>
-</table>
+     Why it looks like this:
+     - Images are PNGs on www.bunkr.website/m-9e070d23c114/ because Gmail and Outlook show neither SVG nor data: images.
+       Every image has alt text and the layout still reads with images blocked.
+     - The button goes through www.bunkr.website/auth/v1/verify, not supabase.co: Indian ISPs block supabase.co
+       and deploy/vercel.json proxies /auth/v1 to the project.
+     - Tables and inline styles only; the button is a filled table cell so Outlook draws it too.
+     The token, redirect and email placeholders further down are filled in by Supabase. -->
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
+<title>Confirm your Bunkr account</title>
+<style>
+  body { margin:0; padding:0; background:#000000; }
+  a { color:#FFFFFF; }
+  @media (max-width:600px) {
+    .pad { padding-left:22px !important; padding-right:22px !important; }
+    .h1 { font-size:28px !important; }
+    .btn a { display:block !important; text-align:center !important; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#000000;">
+  <!-- inbox preview line -->
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#000000;">One tap to confirm your email and finish claiming your name on Bunkr.&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#000000" style="background:#000000;">
+    <tr><td align="center" style="padding:28px 12px 40px;">
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;font-family:Blinker,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+        <!-- logo -->
+        <tr><td class="pad" style="padding:0 4px 20px;">
+          <a href="https://www.bunkr.website" style="text-decoration:none;">
+            <img src="https://www.bunkr.website/m-9e070d23c114/logo.png" width="120" height="28" alt="Bunkr" style="display:block;border:0;outline:none;color:#FFFFFF;font-size:22px;font-weight:800;">
+          </a>
+        </td></tr>
+
+        <!-- card -->
+        <tr><td bgcolor="#0D0D11" style="background:#0D0D11;border:1px solid #26272F;border-radius:16px;overflow:hidden;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr><td style="font-size:0;line-height:0;">
+              <img src="https://www.bunkr.website/m-9e070d23c114/confirm.png" width="560" alt="" style="display:block;width:100%;max-width:560px;height:auto;border:0;border-radius:16px 16px 0 0;">
+            </td></tr>
+
+            <tr><td class="pad" style="padding:30px 36px 0;">
+              <p style="margin:0 0 10px;font-size:12px;line-height:1;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#35D07F;">Almost there</p>
+              <h1 class="h1" style="margin:0;font-size:32px;line-height:1.08;font-weight:800;letter-spacing:-0.01em;color:#FFFFFF;">Confirm your email</h1>
+              <p style="margin:16px 0 0;font-size:16px;line-height:1.55;color:#A0A4B0;">You claimed a name on Bunkr with {{ .Email }}. Confirm it's your address and your travelcard is ready.</p>
+            </td></tr>
+
+            <!-- button -->
+            <tr><td class="pad" style="padding:26px 36px 8px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="btn">
+                <tr><td bgcolor="#FFFFFF" style="background:#FFFFFF;border-radius:12px;">
+                  <a href="https://www.bunkr.website/auth/v1/verify?token={{ .TokenHash }}&amp;type=signup&amp;redirect_to={{ .RedirectTo }}" target="_blank"
+                     style="display:inline-block;padding:16px 26px;font-size:17px;line-height:1;font-weight:800;color:#000000;text-decoration:none;border-radius:12px;">Confirm my email&nbsp;&rarr;</a>
+                </td></tr>
+              </table>
+            </td></tr>
+
+            <tr><td class="pad" style="padding:14px 36px 0;">
+              <p style="margin:0;font-size:13px;line-height:1.5;color:#8A8F9E;">Button not working? Copy this into your browser:</p>
+              <p style="margin:4px 0 0;font-size:12px;line-height:1.5;word-break:break-all;"><a href="https://www.bunkr.website/auth/v1/verify?token={{ .TokenHash }}&amp;type=signup&amp;redirect_to={{ .RedirectTo }}" style="color:#A0A4B0;text-decoration:underline;">https://www.bunkr.website/auth/v1/verify?token={{ .TokenHash }}&amp;type=signup&amp;redirect_to={{ .RedirectTo }}</a></p>
+            </td></tr>
+
+            <!-- notes -->
+            <tr><td class="pad" style="padding:26px 36px 32px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #26272F;">
+                <tr><td valign="top" width="22" style="padding:18px 0 0;"><div style="width:10px;height:10px;border-radius:5px;background:#4E96FF;margin-top:5px;font-size:0;line-height:0;">&nbsp;</div></td>
+                <td valign="top" style="padding:14px 0 0;font-size:14px;line-height:1.5;color:#A0A4B0;"><strong style="color:#FFFFFF;font-weight:700;">Why confirm?</strong> It's how you get back in if you ever forget your password.</td></tr><tr><td valign="top" width="22" style="padding:18px 0 0;"><div style="width:10px;height:10px;border-radius:5px;background:#FF4D40;margin-top:5px;font-size:0;line-height:0;">&nbsp;</div></td>
+                <td valign="top" style="padding:14px 0 0;font-size:14px;line-height:1.5;color:#A0A4B0;"><strong style="color:#FFFFFF;font-weight:700;">Didn't sign up?</strong> Ignore this email and the account won't be activated.</td></tr>
+              </table>
+            </td></tr>
+          </table>
+        </td></tr>
+
+        <!-- footer -->
+        <tr><td class="pad" style="padding:24px 4px 0;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td valign="top" style="padding-right:12px;"><img src="https://www.bunkr.website/m-9e070d23c114/icon.png" width="32" height="32" alt="" style="display:block;border:0;border-radius:8px;"></td>
+              <td valign="top" style="font-size:12px;line-height:1.6;color:#8A8F9E;">
+                Sent to {{ .Email }} because this address was used to create a Bunkr account.<br>
+                <a href="https://www.bunkr.website" style="color:#A0A4B0;">bunkr.website</a> &middot;
+                <a href="mailto:support@bunkr.website" style="color:#A0A4B0;">support@bunkr.website</a> &middot;
+                <a href="https://www.bunkr.website/privacy.html" style="color:#A0A4B0;">Privacy</a>
+              </td>
+            </tr>
+          </table>
+        </td></tr>
+      </table>
+
+    </td></tr>
+  </table>
+</body>
+</html>
