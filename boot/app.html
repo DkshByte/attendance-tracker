@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+f5fd085-->
+<!--secf-app--><!--build:1.0.1+b5e0bb3-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1153,6 +1153,22 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 .go[disabled] { opacity:.35; cursor:not-allowed; }
 .gate .fine { font-size:12px; color:var(--ink-3); margin-top:16px; line-height:1.5; }
 .authlinks { display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:16px; }
+/* Sign in with Google, in Google's own button spec for each theme: the four-colour G,
+   the words "Continue with Google", a 1px outline, never recoloured */
+.gsign { margin:22px 0 4px; }
+.gbtn { display:flex; align-items:center; justify-content:center; gap:12px; width:100%; min-height:50px; padding:0 16px;
+        border-radius:10px; border:1px solid #8E918F; background:#131314; color:#E3E3E3; cursor:pointer;
+        font:500 15px/1 Roboto, "Blinker", system-ui, sans-serif; letter-spacing:.01em;
+        transition:background .18s var(--ease), transform .18s var(--ease); }
+.gbtn:hover { background:#1E1F20; }
+.gbtn:active { transform:scale(.985); }
+.gbtn:disabled { opacity:.6; cursor:progress; }
+.gbtn .g-logo { width:20px; height:20px; flex:none; }
+.gor { display:flex; align-items:center; gap:12px; margin:18px 0 2px; font-size:11.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); }
+.gor::before, .gor::after { content:""; flex:1; height:1px; background:var(--rule-soft); }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .gbtn { background:#FFFFFF; color:#1F1F1F; border-color:#747775; } :root:not([data-theme="dark"]) .gbtn:hover { background:#F2F2F2; } }
+:root[data-theme="light"] .gbtn { background:#FFFFFF; color:#1F1F1F; border-color:#747775; }
+:root[data-theme="light"] .gbtn:hover { background:#F2F2F2; }
 /* the legal line under the gate: quiet, but a real link a thumb can hit */
 .gate .legal { margin:14px 0 0; font-size:13px; color:var(--ink-3); line-height:1.5; }
 .gate .legal a { color:var(--ink-2); text-decoration:underline; text-decoration-color:var(--rail); text-underline-offset:3px; display:inline-block; padding:12px 0; line-height:20px; }
@@ -2516,6 +2532,10 @@ input[type="date"] { padding:12px 14px; }
     <div id="vLogin" class="gate-view">
       <h1>Sign in</h1>
       <div class="sub">Your timetable, your 75%, and where the section stands.</div>
+      <div class="gsign" hidden>
+        <button class="gbtn" type="button" data-google><svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continue with Google</span></button>
+        <div class="gor"><span>or with email</span></div>
+      </div>
       <div class="field">
         <label for="liEmail">Email</label>
         <input id="liEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com">
@@ -2565,16 +2585,17 @@ input[type="date"] { padding:12px 14px; }
         <input id="clUser" type="text" maxlength="16" autocapitalize="off" spellcheck="false" placeholder="daksh">
         <div class="hint" id="clUserHint">3–16 characters: lowercase letters, numbers, underscore.</div>
       </div>
-      <div class="field">
+      <div class="field" data-account>
         <label for="clEmail">Email</label>
         <input id="clEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com">
         <div class="hint">Only used to reset your password. Never shown to your section.</div>
       </div>
-      <div class="field">
+      <div class="field" data-account>
         <label for="clPass">Password</label>
         <input id="clPass" type="password" autocomplete="new-password" placeholder="at least 8 characters">
         <div class="hint" id="clHint" role="status" aria-live="polite"></div>
       </div>
+      <div class="hint" id="clHint2" role="status" aria-live="polite" hidden></div>
       <p class="legal">By claiming a name you agree to the <a href="https://www.bunkr.website/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="https://www.bunkr.website/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>
       <button class="go" id="clGo" type="button" disabled>Claim this name</button>
       <div class="authlinks">
@@ -5046,7 +5067,11 @@ const CLOUD = {
     ? "https://www.bunkr.website" : "",
   key: "sb_publishable_8v8hGsWlqZOPRWcnGIZo8A_TnmaXQe-",
 };
-const RESET_TO = "https://www.bunkr.website/app.html";   /* must be in Supabase → Auth → URL Configuration → Redirect URLs */
+const RESET_TO = "https://www.bunkr.website/app.html";
+/* Google sign-in (web only). The Web client ID from Google Cloud Console → Credentials.
+   Empty keeps the button hidden. It is public by design, like the publishable key. */
+const GOOGLE_CLIENT_ID = "125987508654-p19k6v1jkukeg1l38228ikb181dcn4tf.apps.googleusercontent.com";
+const GOOGLE_RETURN = "https://www.bunkr.website/app.html";   /* an Authorized redirect URI on that client, exactly */   /* must be in Supabase → Auth → URL Configuration → Redirect URLs */
 const USERNAME_RE = /^[a-z0-9_]{3,16}$/;
 const MIN_PASS = 8;
 
@@ -5591,6 +5616,10 @@ function explain(err) {
   if (c === "user_already_exists" || c === "email_exists")
     return ["That email already has an account", "Sign in instead, or reset the password."];
   if (c === "email_address_invalid") return ["That email address was rejected", "Use a real address you can open."];
+  if (c === "provider_disabled" || m.includes("provider is not enabled") || m.includes("unsupported provider"))
+    return ["Google sign-in isn't switched on yet", "Use email and password for now."];
+  if (c === "bad_jwt" || m.includes("nonce") || m.includes("id token"))
+    return ["Google sign-in didn't go through", "Tap Continue with Google again."];
   if (c === "weak_password") return ["Password too short", "Use at least " + MIN_PASS + " characters."];
   if (c === "23505" && m.includes("already claimed a name"))
     return ["This account already has a name", "Sign in — you don't need to claim again."];
@@ -7007,17 +7036,7 @@ liGo.addEventListener("click", async () => {
   try {
     await signIn(email, pass);
     passed("in");
-    if (!profile) { gateShow("pick"); say("liHint", ""); return; }   // account with no name yet
-    const myDev = getDeviceId();
-    if (profile.active_device_id && profile.active_device_id !== myDev) {
-      document.getElementById("cfDeviceName").textContent = profile.active_device_name || "Another device";
-      document.getElementById("cfDeviceTime").textContent = "Last active " + timeAgo(profile.active_device_at);
-      say("cfHint", "");
-      gateShow("conflict");
-      return;
-    }
-    await claimThisDevice();
-    gateClose(); afterSignIn();
+    await enterAccount();
   } catch (err) {
     /* only a real answer counts against you — no signal is not a wrong password */
     if (err.status) failed("in");
@@ -7025,7 +7044,80 @@ liGo.addEventListener("click", async () => {
     say("liHint", what + " — " + fix, true);
   } finally { idle(liGo); holdOff(liGo, "in"); }
 });
+
+/* After any sign-in, password or Google: no name yet → pick one; the account is live on
+   another device → ask; otherwise take this device and open the app. */
+async function enterAccount() {
+  if (!profile) { gateShow("pick"); say("liHint", ""); return; }   // account with no name yet
+  const myDev = getDeviceId();
+  if (profile.active_device_id && profile.active_device_id !== myDev) {
+    document.getElementById("cfDeviceName").textContent = profile.active_device_name || "Another device";
+    document.getElementById("cfDeviceTime").textContent = "Last active " + timeAgo(profile.active_device_at);
+    say("cfHint", "");
+    gateShow("conflict");
+    return;
+  }
+  await claimThisDevice();
+  gateClose(); afterSignIn();
+}
 document.getElementById("liPass").addEventListener("keydown", e => { if (e.key === "Enter") liGo.click(); });
+
+/* ---------- Sign in with Google ----------
+   A plain redirect to Google's own page, not Google's embedded script: nothing loads
+   from Google until the student taps, and nothing ever touches supabase.co (blocked
+   here). Google returns an OpenID id_token in the URL fragment; Supabase checks it
+   through the bunkr.website proxy and hands back a normal session.
+   The nonce Google signs is the SHA-256 of a random value only this tab knows, and
+   Supabase is given that raw value, so a token lifted from anywhere else fails. The
+   state guards the return against a link someone else crafted. */
+const GKEY = "bunkr-google";
+const hex = bytes => Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+async function googleStart() {
+  const raw = hex(crypto.getRandomValues(new Uint8Array(32)));
+  const state = hex(crypto.getRandomValues(new Uint8Array(16)));
+  const nonce = hex(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(raw))));
+  try { sessionStorage.setItem(GKEY, JSON.stringify({ raw, state, at: Date.now() })); } catch (e) {}
+  location.assign("https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID, redirect_uri: GOOGLE_RETURN, response_type: "id_token",
+    scope: "openid email profile", nonce, state, prompt: "select_account",
+  }));
+}
+/* a Google return in the fragment, consumed once; null when this load is not one */
+function googleFromHash() {
+  let h, saved = null;
+  try { h = new URLSearchParams(location.hash.slice(1)); } catch (e) { return null; }
+  if (!h.get("state") || !(h.get("id_token") || h.get("error"))) return null;
+  try { saved = JSON.parse(sessionStorage.getItem(GKEY) || "null"); sessionStorage.removeItem(GKEY); } catch (e) {}
+  try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+  if (!saved || saved.state !== h.get("state") || Date.now() - saved.at > 10 * 60000)
+    return { err: "That Google sign-in didn't start on this page, or took too long. Try again." };
+  if (h.get("error")) return { err: h.get("error") === "access_denied" ? "Google sign-in was cancelled." : "Google couldn't sign you in. Try again." };
+  return { idToken: h.get("id_token"), raw: saved.raw };
+}
+async function googleFinish(g) {
+  gateShow("login");
+  if (g.err) return say("liHint", g.err, true);
+  say("liHint", "Signing in with Google…");
+  try {
+    sess = await auth("/auth/v1/token?grant_type=id_token", { provider: "google", id_token: g.idToken, nonce: g.raw });
+    saveSess();
+    passed("in");
+    await loadProfile();
+    say("liHint", "");
+    await enterAccount();
+  } catch (err) {
+    sess = null; saveSess();
+    const [what, fix] = explain(err);
+    say("liHint", what + " — " + fix, true);
+  }
+}
+if (GOOGLE_CLIENT_ID && !NATIVE) {                  /* the app's webview can't host Google's page: web only */
+  document.querySelectorAll(".gsign").forEach(n => { n.hidden = false; });
+  document.querySelectorAll("[data-google]").forEach(b => b.addEventListener("click", () => {
+    b.disabled = true;
+    googleStart().catch(() => { b.disabled = false; say("liHint", "Couldn't start Google sign-in on this browser.", true); });
+  }));
+}
 
 document.getElementById("pkSearch").addEventListener("input", drawRoster);
 
@@ -7049,8 +7141,10 @@ function claimCheck() {
   const u = clUser.value.trim().toLowerCase();
   clUser.value = u;
   paintCard();
-  const okU = USERNAME_RE.test(u), okE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clEmail.value.trim());
-  const okP = clPass.value.length >= MIN_PASS;
+  const signedIn = !!(sess && sess.access_token);          /* the account already exists: only a name is missing */
+  document.querySelectorAll("#vClaim [data-account]").forEach(f => { f.hidden = signedIn; });
+  const okU = USERNAME_RE.test(u), okE = signedIn || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clEmail.value.trim());
+  const okP = signedIn || clPass.value.length >= MIN_PASS;
   say("clUserHint", !u ? "3–16 characters: lowercase letters, numbers, underscore."
       : okU ? "Looks good." : "3–16 characters: lowercase letters, numbers, underscore only.", !!u && !okU);
   say("clHint", clPass.value && !okP ? "At least " + MIN_PASS + " characters." : "", !!clPass.value && !okP);
@@ -7063,12 +7157,19 @@ clGo.addEventListener("click", async () => {
   if (!ok) return;
   busy(clGo, "Claiming…");
   try {
-    await claimName(picked.sno, u, e, p);
+    if (sess && sess.access_token) {
+      await call("/rest/v1/rpc/claim_student", { method: "POST", body: JSON.stringify({ p_sno: picked.sno, p_username: u }) }, await token());
+      await loadProfile();
+    } else {
+      await claimName(picked.sno, u, e, p);
+    }
     await claimThisDevice();
     gateClose(); afterSignIn();
   } catch (err) {
     const [what, fix] = explain(err);
-    say("clHint", what + " — " + fix, true);
+    const hint = sess && sess.access_token ? "clHint2" : "clHint";
+    document.getElementById("clHint2").hidden = hint !== "clHint2";
+    say(hint, what + " — " + fix, true);
   } finally { idle(clGo); }
 });
 
@@ -7677,6 +7778,7 @@ renderLineKey();
 renderAlertBtn();
 paintHero();
 paintStatusBar();
+const googleReturn = googleFromHash();           /* before recovery and show() read the hash */
 recovery = recoveryFromHash();                   /* before show() reads the hash */
 show(location.hash.slice(1));
 obBackfill();
@@ -7688,6 +7790,7 @@ if (profile && obDone()) syncAlerts();
 (async () => {
   /* an expired link is the common failure, and it has to say so rather than dump
      the student back on a sign-in form with no explanation */
+  if (googleReturn) { renderAll(); return googleFinish(googleReturn); }
   if (recovery) {
     renderAll();
     if (!recovery.err) return gateShow("reset");

@@ -229,6 +229,17 @@ for tbl in ("attendance", "students", "cancellations", "notices", "class_overrid
           "a script or a stuck loop could write without limit")
 check("rate limits raise PT429 (HTTP 429)", "errcode = 'PT429'" in rl, "any other code reaches the app as a 400/500")
 check("the app explains a rate limit", 'c === "PT429"' in html, "a limited write would fail with a raw database message")
+# 9d. Google sign-in: a return is only trusted if this tab started it, the token is bound
+#     to a nonce only this tab knows, and the flow never runs inside the Android webview.
+check("Google return checks the saved state", "saved.state !== h.get(\"state\")" in html,
+      "a crafted link could sign a student into someone else's Google account")
+check("Google nonce is hashed for Google and sent raw to Supabase",
+      'crypto.subtle.digest("SHA-256"' in html and "nonce: g.raw" in html,
+      "without the nonce binding a lifted id_token could be replayed")
+check("Google sign-in is web only", "GOOGLE_CLIENT_ID && !NATIVE" in html,
+      "Google refuses its sign-in page inside embedded webviews")
+check("privacy policy discloses Google sign-in", "Continue with Google" in (root / "deploy/privacy.html").read_text(),
+      "a new data flow the policy doesn't mention")
 router = (root / "deploy/index.html").read_text()
 check("the root router forwards reset links to the app with their token",
       "access_token" in router and 'app.html" + window.location.hash' in router,

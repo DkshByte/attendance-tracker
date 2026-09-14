@@ -64,6 +64,7 @@
       <ul>
         <li>No ads, no analytics, no tracking cookies. We never sell your data.</li>
         <li>Your attendance marks are private to your account.</li>
+        <li>Signing in with Google is optional; Google only shares your email, name and picture.</li>
         <li>Your name, username, batch and rank appear on your section's leaderboard.</li>
         <li>Contact details you choose to add are visible to signed-in classmates.</li>
         <li>You can clear your marks in the app, and ask us to delete your account at any time.</li>
@@ -79,7 +80,8 @@
       <table>
         <thead><tr><th>Data</th><th>Why</th><th>Required?</th></tr></thead>
         <tbody>
-          <tr><td>Email and password</td><td>To create your account and sign you in. Passwords are stored hashed by our authentication provider; we never see them.</td><td>Yes</td></tr>
+          <tr><td>Email and password</td><td>To create your account and sign you in. Passwords are stored hashed by our authentication provider; we never see them.</td><td>Yes, unless you use Google</td></tr>
+          <tr><td>Google account details</td><td>If you choose Continue with Google, Google tells us your email address, name and profile picture, and confirms the email is yours. We use the email to sign you in; your name on Bunkr still comes from the roster name you claim. We never receive your Google password.</td><td>Only if you use Google</td></tr>
           <tr><td>Your name on the class roster, batch and username</td><td>To link your account to your place on the section roster and to show you on the leaderboard.</td><td>Yes</td></tr>
           <tr><td>Attendance marks</td><td>Present, absent or off for each class, with the date, period, subject and when you marked it. Kept as a backup so a lost phone does not lose your term.</td><td>Only if you mark classes</td></tr>
           <tr><td>Attendance totals</td><td>How many classes you attended out of those held, used for your percentage and your leaderboard rank.</td><td>Only if you mark classes</td></tr>
@@ -111,12 +113,13 @@
           <tr><td>Supabase</td><td>Database and sign-in</td><td>Account, roster, attendance, directory and device data; connection logs</td></tr>
           <tr><td>Vercel</td><td>Hosting bunkr.website and passing app requests to the database</td><td>IP address and request logs</td></tr>
           <tr><td>GitHub</td><td>Hosting the Android APK download</td><td>IP address and download request</td></tr>
+          <tr><td>Google</td><td>Sign in with Google, only when you tap Continue with Google</td><td>What you enter on Google's sign-in page; Google's own <a href="https://policies.google.com/privacy">privacy policy</a> applies there</td></tr>
         </tbody>
       </table>
     </div>
 
     <h2 id="cookies">5. Cookies and on-device storage</h2>
-    <p><strong>Bunkr sets no cookies at all: no advertising, analytics or tracking cookies, and no third-party trackers.</strong> Our fonts and files are served from bunkr.website itself, so opening a page does not send your details to anyone else. Because nothing non-essential is stored and nothing is shared for tracking, there is nothing to ask your permission for, and so no cookie banner.</p>
+    <p><strong>Bunkr sets no cookies at all: no advertising, analytics or tracking cookies, and no third-party trackers.</strong> Our fonts and files are served from bunkr.website itself, so opening a page does not send your details to anyone else. The one exception is your choice: tapping Continue with Google takes you to Google's own sign-in page, where Google's cookies and policy apply. Because nothing non-essential is stored and nothing is shared for tracking, there is nothing to ask your permission for, and so no cookie banner.</p>
     <p>To work, and to keep working with no signal, Bunkr stores these in your browser's local storage or the app's storage on your device:</p>
     <div class="table">
       <table>
