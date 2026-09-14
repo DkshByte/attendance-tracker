@@ -39,6 +39,20 @@ check("#lockScreen is outside #gate", gate_close and lock_line > gate_close,
 check("<dialog> is outside #gate", gate_close and dlg_line > gate_close,
       "showModal() cannot render inside a display:none ancestor")
 
+# 1b. The whole app is one inline script: a single duplicate `const` is a SyntaxError that
+#     leaves the splash on screen forever. That nearly shipped once; parse it before deploying.
+import shutil, subprocess, tempfile
+scripts = re.findall(r"<script>([\s\S]*?)</script>", html)
+if shutil.which("node"):
+    bad = []
+    for i, src in enumerate(scripts):
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as f:
+            f.write(src)
+        r = subprocess.run(["node", "--check", f.name], capture_output=True, text=True)
+        if r.returncode:
+            bad.append(f"script {i}: " + (r.stderr.strip().splitlines() or ["?"])[-1])
+    check("every inline app script parses", not bad, "; ".join(bad))
+
 # 2. Nothing may be pulled from a third origin: the app is one self-contained file.
 check("no external <script src>", not re.search(r'<script[^>]+src=', html),
       "an off-origin script would defeat the CSP and the single-file design")

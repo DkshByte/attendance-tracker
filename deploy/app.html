@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+2fd66fd-->
+<!--secf-app--><!--build:1.0.1+b579e49-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -8,6 +8,20 @@
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#EEF1F7" media="(prefers-color-scheme: light)">
 <title>Bunkr · Sec F IT-I</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bunkr">
+<meta property="og:title" content="Bunkr · Sec F IT-I">
+<meta property="og:description" content="Claim your name on the Sec F IT-I roster: live timetable, and exactly how many classes you can still skip and stay above 75%.">
+<meta property="og:url" content="https://www.bunkr.website/app.html">
+<meta property="og:image" content="https://www.bunkr.website/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bunkr: What's next? Can I skip it? A card shows 10 classes you can still skip in Mechanics.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bunkr · Sec F IT-I">
+<meta name="twitter:description" content="Claim your name on the Sec F IT-I roster: live timetable, and exactly how many classes you can still skip and stay above 75%.">
+<meta name="twitter:image" content="https://www.bunkr.website/og.png">
+<link rel="canonical" href="https://www.bunkr.website/app.html">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="https://www.bunkr.website/fonts/fonts.css">
 <style>
@@ -1184,6 +1198,14 @@ button.drow:hover { background:var(--glass-plate-hover); }
 .dicons { display:flex; gap:7px; flex:none; color:var(--ink-3); }
 .dicons svg { width:15px; height:15px; }
 .dnone { font-size:11.5px; color:var(--ink-3); letter-spacing:.06em; text-transform:uppercase; font-weight:600; }
+/* invites: a quiet pill on rows of people who haven't joined, and one for the class group */
+.dinvite { position:relative; flex:none; display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px;
+           border-radius:999px; border:1px solid var(--rule); background:var(--plate-2); color:var(--ink-2);
+           font-size:12.5px; font-weight:700; text-decoration:none; transition:background .18s var(--ease), color .18s var(--ease), border-color .18s var(--ease); }
+.dinvite::after { content:""; position:absolute; inset:-6px -2px; }                      /* 44px tap area, 32px pill */
+.dinvite:hover { background:var(--plate-3); color:var(--ink); border-color:var(--rail); }
+.dinvite svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round; }
+.h2row .dinvite { margin-left:auto; }
 .crtag { font-size:9.5px; font-weight:700; letter-spacing:.11em; color:var(--l-pps); flex:none; }
 .d-idrow { display:flex; align-items:center; gap:13px; }
 .d-idrow .dot2 { width:44px; height:44px; font-size:17px; }
@@ -2378,6 +2400,8 @@ input[type="date"] { padding:12px 14px; }
     <div class="h2row">
       <h2>Sec F IT-I</h2>
       <span class="pcount" id="dirCount" role="status" aria-live="polite" style="margin:0">Loading…</span>
+      <a class="dinvite" id="dirInvite" href="https://www.bunkr.website" target="_blank" rel="noopener noreferrer" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5 10.6 13.4M20.5 3.5l-6.3 17-3.6-7.1-7.1-3.6z"/></svg>Invite the class</a>
     </div>
     <div class="field" style="margin-top:0">
       <input id="dirSearch" aria-label="Search the section" type="search" autocapitalize="off" spellcheck="false"
@@ -5608,6 +5632,9 @@ async function renderDirectory() {
     people = all.map(r => Object.assign({}, r, byNo[r.sno] || {}));
     const joined = people.filter(p => p.claimed).length;
     count.textContent = joined + " of " + people.length + " joined";
+    const classInvite = document.getElementById("dirInvite");
+    inviteLink(classInvite, inviteAll(joined, people.length));
+    classInvite.hidden = joined >= people.length;
     drawDirectory();
   } catch (err) {
     const [what, fix] = explain(err);
@@ -5677,6 +5704,25 @@ const initials = name => name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).joi
 
 let dirFilter = "all";
 
+/* Invites open WhatsApp with the message filled in (wa.me works in the app, the phone
+   browser and WhatsApp Web). A phone browser with a share sheet offers every app instead.
+   Only a name that is still unclaimed is ever put into a message. */
+const SHARE_URL = "https://www.bunkr.website";
+const waLink = text => "https://wa.me/?text=" + encodeURIComponent(text);
+function inviteLink(a, text) {
+  a.href = waLink(text);
+  a.onclick = e => {
+    if (NATIVE || !navigator.share) return;                 /* let the wa.me link open */
+    e.preventDefault();
+    navigator.share({ text }).catch(() => {});
+  };
+}
+const inviteOne = name => "Hey " + name.trim().split(/\s+/)[0] + "! Your name's still unclaimed on Bunkr, our section's timetable " +
+  "and 75% attendance app. It tells you what's next and exactly how many classes you can still skip. " +
+  "Claim it before someone else does: " + SHARE_URL;
+const inviteAll = (joined, total) => "Sec F IT-I is on Bunkr: live timetable, and it tells you exactly how many classes " +
+  "you can still skip and stay above 75%. " + joined + " of " + total + " of us have joined. Claim your name: " + SHARE_URL;
+
 function drawDirectory() {
   const q = document.getElementById("dirSearch").value.trim().toLowerCase();
   const box = document.getElementById("dirList");
@@ -5725,6 +5771,14 @@ function drawDirectory() {
           row.appendChild(el("span", "dnone", "no details"));
         }
         row.addEventListener("click", () => openContact(d.username));
+      } else {
+        const inv = el("a", "dinvite");
+        inv.target = "_blank"; inv.rel = "noopener noreferrer";
+        inv.setAttribute("aria-label", "Invite " + d.name + " to Bunkr");
+        inv.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5 10.6 13.4M20.5 3.5l-6.3 17-3.6-7.1-7.1-3.6z"/></svg>';
+        inv.appendChild(document.createTextNode("Invite"));
+        inviteLink(inv, inviteOne(d.name));
+        row.appendChild(inv);
       }
       list.appendChild(row);
     });
