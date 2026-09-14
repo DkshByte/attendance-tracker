@@ -205,6 +205,9 @@ check("signed-out boot shows the sign-in gate",
 check("no way past the gate without signing in",
       "liSkip" not in html,
       "a skip link on the sign-in form lets anyone read the app")
+check("no tap overlay covers the profile button",
+      ".user-pill::after" not in html,
+      "a ::after on .user-pill sits over #pillBtn and swallows taps, so the menu never opens")
 loader = (root / "boot/index.html").read_text()
 check("the APK loader fetches www, not the apex",
       '"https://www.bunkr.website/app.html"' in loader,

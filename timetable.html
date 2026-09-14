@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+18b98a5-->
+<!--secf-app--><!--build:1.0.1+64cf4b6-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1671,7 +1671,8 @@ dialog .btn { margin-top:8px; }
 }
 .bulk-btn { min-height:44px; }
 .iconbtn, .user-pill { position:relative; }
-.iconbtn::after, .user-pill::after {
+/* on .pill-btn, not .user-pill: an overlay on the div sits over the button and eats every tap */
+.iconbtn::after, .pill-btn::after {
   content:""; position:absolute; inset:-4px; border-radius:999px; pointer-events:auto;
 }
 input[type="date"] { padding:12px 14px; }
