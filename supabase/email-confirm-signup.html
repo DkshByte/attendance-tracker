@@ -1,0 +1,29 @@
+<!-- Supabase → Authentication → Emails → Templates → Confirm signup. Only sent if
+     "Confirm email" is on. Paste everything below this comment. Subject: Confirm your Bunkr account
+
+     Same reason as email-reset-password.html: the link goes through www.bunkr.website,
+     because supabase.co is blocked by Indian ISPs. -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#000000;padding:32px 16px;font-family:Blinker,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+  <tr><td align="center">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#0D0D11;border:1px solid #26272F;border-radius:14px;">
+      <tr><td style="height:4px;background:#FF4D40;border-radius:14px 14px 0 0;font-size:0;line-height:0;">&nbsp;</td></tr>
+      <tr><td style="padding:28px 28px 8px;">
+        <p style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.01em;color:#FFFFFF;">bunkr</p>
+      </td></tr>
+      <tr><td style="padding:12px 28px 0;">
+        <h1 style="margin:0;font-size:28px;line-height:1.1;font-weight:800;color:#FFFFFF;">Confirm your account</h1>
+        <p style="margin:14px 0 0;font-size:16px;line-height:1.5;color:#A0A4B0;">You claimed a name on Bunkr with {{ .Email }}. Confirm it's your address to finish:</p>
+      </td></tr>
+      <tr><td style="padding:24px 28px;">
+        <a href="https://www.bunkr.website/auth/v1/verify?token={{ .TokenHash }}&amp;type=signup&amp;redirect_to={{ .RedirectTo }}"
+           style="display:inline-block;padding:14px 22px;border-radius:10px;background:#FFFFFF;color:#000000;font-size:16px;font-weight:800;text-decoration:none;">Confirm my email</a>
+      </td></tr>
+      <tr><td style="padding:0 28px 26px;">
+        <p style="margin:0;font-size:14px;line-height:1.5;color:#8A8F9E;">Didn't sign up? Ignore this email and nothing happens.</p>
+      </td></tr>
+      <tr><td style="padding:16px 28px;border-top:1px solid #26272F;">
+        <p style="margin:0;font-size:12px;line-height:1.5;color:#8A8F9E;">Bunkr · <a href="https://www.bunkr.website" style="color:#A0A4B0;">bunkr.website</a> · <a href="mailto:support@bunkr.website" style="color:#A0A4B0;">support@bunkr.website</a></p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>

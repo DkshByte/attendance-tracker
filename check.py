@@ -208,6 +208,13 @@ check("no way past the gate without signing in",
 check("no tap overlay covers the profile button",
       ".user-pill::after" not in html,
       "a ::after on .user-pill sits over #pillBtn and swallows taps, so the menu never opens")
+router = (root / "deploy/index.html").read_text()
+check("the root router forwards reset links to the app with their token",
+      "access_token" in router and 'app.html" + window.location.hash' in router,
+      "Supabase sends reset links to the Site URL; a router that drops the # loses the token")
+check("password reset always returns to the live web app",
+      'RESET_TO = "https://www.bunkr.website/app.html"' in html and "redirect_to=\" + encodeURIComponent(RESET_TO)" in html,
+      "a reset from the APK or a preview domain lands off Supabase's redirect allow-list")
 loader = (root / "boot/index.html").read_text()
 check("the APK loader fetches www, not the apex",
       '"https://www.bunkr.website/app.html"' in loader,

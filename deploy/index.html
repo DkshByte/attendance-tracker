@@ -11,10 +11,17 @@
 /* ============================================================
    Bunkr — Entry Router
    bunkr.website       → landing.html (always for new visitors)
+   bunkr.website#access_token=… → app.html#… (reset and sign-in links)
    bunkr.website?app=1 → app.html    (boot loader / force bypass)
    ============================================================ */
 (function () {
   "use strict";
+  /* A password-reset or sign-in link lands here with its token after the #. The landing
+     page would throw that away, so anything auth-shaped goes straight to the app, hash and all. */
+  if (/(^|[#&])(access_token|error_description|error_code)=/.test(window.location.hash)) {
+    window.location.replace("app.html" + window.location.hash);
+    return;
+  }
   if (new URLSearchParams(window.location.search).get("app") === "1") {
     window.location.replace("app.html");
     return;

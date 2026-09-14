@@ -4,144 +4,247 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Bunkr — Know Your Bunk Budget</title>
-<meta name="description" content="Real-time timetable, 75% bunk budget engine, and section leaderboard. Offline-first. Zero install. Built for students.">
-
-<!-- Inter -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-
-<!-- Font Awesome 6.5.2 -->
-<link rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-  integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-  crossorigin="anonymous" referrerpolicy="no-referrer"/>
-
-<!-- BubbledotICG-FinePos -->
-<link href="https://db.onlinewebfonts.com/c/8cb707a9b8a73f8a7403336b861c3074?family=BubbledotICG-FinePos" rel="stylesheet"/>
-
+<meta name="theme-color" content="#000000">
+<title>Bunkr · What's next, and can you skip it</title>
+<meta name="description" content="Bunkr shows the class you're in, what's next, and does the 75% attendance maths per subject, so you know exactly how many classes you can still miss. On the web and Android.">
+<link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="landing-styles.css">
+<script>document.documentElement.classList.add("js")</script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
 
-<!-- Background video -->
-<div class="bg">
-  <video class="bg-video" autoplay muted loop playsinline>
-    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4" type="video/mp4"/>
-  </video>
-  <!-- Overlay for legibility -->
-  <div class="bg-overlay"></div>
-</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="695 770 1040 245"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/><path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/><path fill-rule="evenodd" d="M1025.47 792.342L1051.02 792.273L1050.99 858.999C1120.74 807.461 1202.53 885.964 1155.28 954.022C1128.47 987.525 1076.38 994.23 1045.47 963.425C1036.58 954.479 1030.33 943.245 1027.43 930.967C1024.1 917.108 1025.41 886.141 1025.47 870.814C1025.3 844.657 1025.3 818.499 1025.47 792.342Z M1092.19 867.65C1116.92 865.119 1139.03 883.076 1141.63 907.798C1144.23 932.521 1126.34 954.686 1101.62 957.355C1076.81 960.036 1054.54 942.054 1051.93 917.234C1049.32 892.413 1067.36 870.191 1092.19 867.65Z"/><path d="M1294.84 844.521L1315.74 844.383L1315.85 891.106C1315.94 919.635 1318.81 942.075 1296.87 964.367C1284.28 977.153 1267.47 983.361 1249.6 983.341C1232.21 983.473 1215.49 976.63 1203.18 964.343C1181.53 942.508 1184.87 918.807 1185.05 890.499L1185.03 844.866L1210.77 844.731C1210.69 870.192 1209.05 902.522 1212.11 927.343C1216.04 959.216 1263.11 967.388 1281.86 942.914C1292.77 928.67 1290.76 913.463 1290.7 896.55L1290.61 858.678C1290.63 855.456 1290.19 847.38 1291.6 844.961L1294.84 844.521Z"/><path d="M1390.23 843.283C1411.5 840.883 1431.44 845.708 1446.94 861.243C1468.1 882.449 1465.03 908.078 1464.99 935.594L1464.92 983.054L1438.97 983.301L1439.21 930.297C1439.24 923.036 1439.69 907.013 1438.64 900.36C1437.93 895.638 1436.42 891.071 1434.17 886.859C1428.32 876.091 1421.01 872.318 1409.98 869.113C1363.59 861.781 1358.4 899.847 1360.46 933.963C1361.37 949.043 1360.57 967.432 1360.64 982.828L1335.04 982.929C1335.13 965.848 1333.6 908.989 1336.06 895.651C1337.61 886.798 1340.96 878.357 1345.9 870.85C1356.86 854.523 1371.46 847.028 1390.23 843.283Z"/><path d="M1485.12 792.397C1493.56 792.298 1502.59 792.5 1511.08 792.556L1511.01 901.933C1513.76 901.299 1520.08 899.709 1522.08 898.031C1538.4 884.318 1557.52 860.999 1571.45 844.824L1604.67 844.81C1589 861.751 1564.88 890.074 1550.22 907.945C1560.38 922.446 1575.91 940.912 1587.28 955.054C1594.72 964.513 1602.28 973.871 1609.97 983.126C1599.13 982.949 1588.29 982.966 1577.46 983.179C1570.58 974.664 1535.85 927.159 1528.52 926.65C1523.91 926.33 1517.38 928.335 1513.97 931.488C1508.59 936.469 1510.94 974.698 1510.98 982.849L1484.99 982.91L1485.12 792.397Z"/><path d="M1680.43 843.32C1697.26 841.762 1709.2 847.838 1722.33 857.244C1717.09 864.044 1712.14 871.774 1707.34 878.941C1682.76 862.584 1651.88 869.172 1646.85 898.965C1643.32 919.945 1645.03 952.045 1645.07 973.867C1645.2 976.921 1645.49 978.315 1644.41 981.209C1639.6 985.099 1627.27 983.243 1619.76 983.246L1619.92 844.992L1645.07 844.749L1645.02 861.189C1656.47 850.124 1664.75 845.917 1680.43 843.32Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4.5 12h14.2M13.4 6.4 19 12l-5.6 5.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12.6M6.6 11.4 12 16.8l5.4-5.4M5 20.2h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M6 12h12M12 6v12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="9.5" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.6 10.5V8a3.4 3.4 0 0 1 6.8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <!-- the app's own nav glyphs -->
+  <symbol id="n-today" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v6M12 15v6"/><circle cx="12" cy="12" r="3.2" fill="currentColor" stroke="none"/></g></symbol>
+  <symbol id="n-week" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 8.2h6.3l3.4 3.4h8"/><path d="M3.2 17.4h9.7"/><circle cx="9.5" cy="8.2" r="1.9" fill="currentColor" stroke="none"/><circle cx="20.3" cy="11.6" r="1.9" fill="currentColor" stroke="none"/><circle cx="12.9" cy="17.4" r="1.9" fill="currentColor" stroke="none"/></g></symbol>
+  <symbol id="n-att" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"/><path d="M8.4 12.2l2.6 2.6 4.8-5"/></g></symbol>
+  <symbol id="n-sec" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.4" r="3.1"/><path d="M3.6 19.2c.6-3 2.8-4.6 5.4-4.6s4.8 1.6 5.4 4.6"/><path d="M16.4 6.2a2.6 2.6 0 0 1 0 5.2M18.2 14.8c1.6.6 2.6 2.2 2.9 4.4"/></g></symbol>
+  <symbol id="n-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+</svg>
 
-<!-- Mobile overlay menu -->
-<div id="mobile-overlay" class="mobile-overlay" hidden>
-  <nav class="mobile-menu" role="dialog" aria-label="Navigation menu">
-    <ul class="mobile-nav-links">
-      <li><a href="landing.html" class="active">Home</a></li>
-      <li><a href="app.html">Timetable</a></li>
-      <li><a href="app.html">Roster</a></li>
-      <li><a href="app.html">Bunk Planner</a></li>
-    </ul>
-    <div class="mobile-menu-actions">
-      <a href="app.html" class="mobile-open-btn">Open App</a>
-      <a href="https://github.com/DkshByte/attendance-tracker/releases/latest/download/bunkr.apk" class="mobile-dl-btn" download>
-        <i class="fa-brands fa-android"></i> Download APK
-      </a>
-    </div>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <a class="nav-logo" href="landing.html" aria-label="Bunkr home"><svg><use href="#logo"/></svg></a>
+  <nav class="nav-links" aria-label="Sections">
+    <a href="#corridor">How it works</a>
+    <a href="#maths">The maths</a>
   </nav>
-</div>
+  <a class="nav-get" href="#get">Get Bunkr</a>
+</header>
 
-<!-- Page -->
-<div class="page">
+<main id="main" class="line">
+  <div class="rail" aria-hidden="true">
+    <div class="rail-track"></div>
+    <div class="rail-travelled" id="travelled"></div>
+    <div class="rail-marker" id="marker"></div>
+  </div>
 
-  <!-- HEADER -->
-  <header class="header">
-    <a href="landing.html" class="logo-btn" aria-label="Bunkr home">
-      <img src="bunkr-icon.svg" alt="" width="52" height="52">
-    </a>
+  <!-- ============ NOW ============ -->
+  <section class="hero stop" id="hero" aria-labelledby="h-hero">
+    <div class="net" aria-hidden="true" id="net"></div>
+    <span class="node" aria-hidden="true"></span>
+    <span class="stamp" aria-hidden="true">10:05</span>
 
-    <nav class="nav-pill" aria-label="Main navigation">
-      <a href="landing.html" class="active">Home</a>
-      <a href="app.html">Timetable</a>
-      <a href="app.html">Roster</a>
-      <a href="app.html">Bunk Planner</a>
-    </nav>
+    <div class="hero-copy">
+      <h1 id="h-hero" class="display">
+        <span class="ln"><span>What's next?</span></span>
+        <span class="ln"><span>Can I skip&nbsp;it?</span></span>
+      </h1>
+      <p class="lede">Bunkr turns your timetable into a live line and does the 75% attendance maths for every subject, so you always know the class you're in and how many you can still miss.</p>
 
-    <a href="app.html" class="open-btn">Open App</a>
-
-    <button id="burger" class="burger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-overlay">
-      <span class="bar"></span>
-      <span class="bar"></span>
-      <span class="bar"></span>
-    </button>
-  </header>
-
-  <!-- HERO -->
-  <main class="hero">
-
-    <!-- Badge -->
-    <div class="badge anim" style="--d:0.05s">
-      <span class="badge-dot"></span>
-      Built for college students
+      <div class="doors">
+        <a class="btn btn-ink" href="app.html">
+          <span class="btn-main">Open the web app <svg aria-hidden="true"><use href="#i-arrow"/></svg></span>
+          <span class="btn-note">Sign in · any browser</span>
+        </a>
+        <a class="btn btn-red" href="https://github.com/DkshByte/attendance-tracker/releases/latest/download/bunkr.apk">
+          <span class="btn-main">Download for Android <svg aria-hidden="true"><use href="#i-down"/></svg></span>
+          <span class="btn-note">APK · 7.4 MB</span>
+        </a>
+      </div>
     </div>
 
-    <!-- Headline -->
-    <h1 class="headline">
-      <span class="hl-line" style="--d:0.12s">Track Bunks.</span>
-      <span class="hl-line" style="--d:0.28s">Beat 75%.</span>
-    </h1>
-
-    <!-- Subhead -->
-    <p class="subhead anim" style="--d:0.36s">
-      Real-time class radar, precise bunk budget engine,<br class="br-desktop">
-      and section leaderboard — offline-first, any device.
-    </p>
-
-    <!-- CTAs -->
-    <div class="cta-row anim" style="--d:0.48s">
-      <a href="app.html" class="btn btn-primary">
-        Open App
-        <i class="fa-solid fa-arrow-right btn-arrow"></i>
-      </a>
-      <a href="https://github.com/DkshByte/attendance-tracker/releases/latest/download/bunkr.apk"
-         class="btn btn-ghost" download aria-label="Download Android APK">
-        <i class="fa-brands fa-android"></i>
-        Download APK
-      </a>
+    <div class="stage hero-stage" data-w="1120" data-h="900" data-nw="440" data-nh="900">
+      <div class="space" id="heroSpace">
+        <div class="enter-laptop">
+          <div class="laptop" id="heroLaptop" role="img" aria-label="Bunkr's week view on a laptop: five days of classes laid out as coloured stations."></div>
+        </div>
+        <div class="enter-phone">
+          <div class="phone3d" id="heroPhone">
+            <div class="floor" aria-hidden="true"></div>
+            <div class="shell"></div>
+            <div class="screen" data-screen="today"></div>
+            <div class="layer layer-plate" data-z="90"></div>
+            <div class="layer layer-stats" data-z="54"></div>
+          </div>
+        </div>
+      </div>
+      <p class="stage-note">Live demo · tap Absent on the class in session</p>
     </div>
+  </section>
 
-  </main>
+  <!-- ============ SCENE ONE ============ -->
+  <section class="scene stop" id="corridor" aria-labelledby="h-corridor">
+    <span class="node" aria-hidden="true"></span>
+    <span class="stamp" aria-hidden="true">10:58</span>
 
-  <!-- STATS -->
-  <footer class="stats-bar">
-    <div class="stat anim" style="--d:0.55s">
-      <i class="fa-solid fa-bolt stat-ico"></i>
-      <span class="stat-val" id="sv0">1s</span>
-      <span class="stat-lbl">Cold Start</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat anim" style="--d:0.62s">
-      <i class="fa-solid fa-percent stat-ico"></i>
-      <span class="stat-val" id="sv1">75%</span>
-      <span class="stat-lbl">Bunk Threshold</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat anim" style="--d:0.69s">
-      <i class="fa-solid fa-wifi stat-ico"></i>
-      <span class="stat-val" id="sv2">24/7</span>
-      <span class="stat-lbl">Offline Access</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat anim" style="--d:0.76s">
-      <i class="fa-solid fa-mobile-screen stat-ico"></i>
-      <span class="stat-val" id="sv3">100%</span>
-      <span class="stat-lbl">Works Offline</span>
-    </div>
-  </footer>
+    <header class="scene-head">
+      <h2 id="h-corridor" class="headline">Ten seconds in a corridor.</h2>
+      <p class="lede">Between classes you have one hand and no time. Open Bunkr and the answer is already on screen.</p>
+    </header>
 
-</div>
+    <div class="tour" id="tour">
+      <div class="tabs" role="tablist" aria-label="Screens">
+        <button type="button" role="tab" data-go="0" aria-selected="true">Today</button>
+        <button type="button" role="tab" data-go="1" aria-selected="false">Week</button>
+        <button type="button" role="tab" data-go="2" aria-selected="false">Holidays</button>
+      </div>
+
+      <ol class="steps">
+        <li class="step is-on" data-shot="0">
+          <h3 class="title">The class you're in, and when it ends.</h3>
+          <p>A plate at the top counts down the period. Under it, what's next, who takes it, and when.</p>
+        </li>
+        <li class="step" data-shot="1">
+          <h3 class="title">Your whole week as one line.</h3>
+          <p>Every day drawn as stations: lectures, labs, lunch and free periods at their real length. Tap a day to ride its line.</p>
+        </li>
+        <li class="step" data-shot="2">
+          <h3 class="title">Which days it shuts, and what that costs.</h3>
+          <p>Holidays come with the classes they take out, so a long weekend never surprises your percentage.</p>
+        </li>
+      </ol>
+
+      <div class="pin">
+        <div class="stage tour-stage" data-w="560" data-h="920" data-nw="440" data-nh="900">
+          <div class="space" id="tourSpace">
+            <div class="phone3d" id="tourPhone">
+              <div class="floor" aria-hidden="true"></div>
+              <div class="shell"></div>
+              <div class="screen screens">
+                <div class="scr is-on" data-screen="today" aria-hidden="true"></div>
+                <div class="scr" data-screen="week"></div>
+                <div class="scr" data-screen="holidays"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCENE TWO ============ -->
+  <section class="scene stop maths" id="maths" aria-labelledby="h-maths">
+    <span class="node" aria-hidden="true"></span>
+    <span class="stamp" aria-hidden="true">13:20</span>
+
+    <header class="scene-head">
+      <h2 id="h-maths" class="headline">Then you sit down and decide.</h2>
+      <p class="lede">You need 75% in every subject, not 75% overall. A spare class in one subject can't cover a missed one in another. Bunkr counts each subject against every class left in the term, and tells you the consequence, not just the number.</p>
+    </header>
+
+    <div class="calc-wrap">
+      <form class="calc" id="calc" aria-labelledby="calc-h" onsubmit="return false">
+        <h3 id="calc-h" class="title">Try it on <span id="c-sub">BEE</span></h3>
+
+        <div class="fields">
+          <div class="field">
+            <label for="c-att">Attended</label>
+            <div class="stepper">
+              <button type="button" data-for="c-att" data-d="-1" aria-label="One fewer attended"><svg aria-hidden="true"><use href="#i-minus"/></svg></button>
+              <input id="c-att" type="number" inputmode="numeric" min="0" max="200" value="8">
+              <button type="button" data-for="c-att" data-d="1" aria-label="One more attended"><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="c-held">Held so far</label>
+            <div class="stepper">
+              <button type="button" data-for="c-held" data-d="-1" aria-label="One fewer held"><svg aria-hidden="true"><use href="#i-minus"/></svg></button>
+              <input id="c-held" type="number" inputmode="numeric" min="0" max="200" value="11">
+              <button type="button" data-for="c-held" data-d="1" aria-label="One more held"><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="c-left">Still to come</label>
+            <div class="stepper">
+              <button type="button" data-for="c-left" data-d="-1" aria-label="One fewer to come"><svg aria-hidden="true"><use href="#i-minus"/></svg></button>
+              <input id="c-left" type="number" inputmode="numeric" min="0" max="200" value="37">
+              <button type="button" data-for="c-left" data-d="1" aria-label="One more to come"><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <output class="verdict" for="c-att c-held c-left" aria-live="polite">
+          <span class="figure" id="c-fig">9</span>
+          <span class="verdict-text" id="c-text">classes you can still miss and finish on 75%.</span>
+        </output>
+
+        <div class="gauge" aria-hidden="true">
+          <div class="gauge-track"><div class="gauge-fill" id="c-fill"></div><i class="gauge-tick"></i></div>
+          <div class="gauge-cap"><span>Now <b id="c-now">72%</b></span><span><span id="c-endlbl">If you miss 9</span> <b id="c-end">75%</b></span></div>
+        </div>
+        <p class="calc-note">Same maths as the app. Pick a subject on the laptop to load its numbers.</p>
+      </form>
+
+      <div class="stage maths-stage" data-w="1080" data-h="900" data-nw="440" data-nh="900">
+        <div class="space" id="mathsSpace">
+          <div class="laptop" id="boardLaptop"></div>
+          <div class="phone3d" id="planPhone">
+            <div class="floor" aria-hidden="true"></div>
+            <div class="shell"></div>
+            <div class="screen" data-screen="plan"></div>
+            <div class="layer layer-big" data-z="80"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GET ON ============ -->
+  <section class="scene stop get" id="get" aria-labelledby="h-get">
+    <span class="node node-end" aria-hidden="true"></span>
+    <span class="stamp" aria-hidden="true">15:10</span>
+
+    <header class="scene-head">
+      <h2 id="h-get" class="headline">Two ways in. One account.</h2>
+    </header>
+
+    <div class="ways">
+      <div class="way" data-line="phy" data-tilt>
+        <h3 class="title">In your browser</h3>
+        <p>Open it on a laptop or a phone and sign in. Nothing to install.</p>
+        <a class="btn btn-ink" href="app.html">
+          <span class="btn-main">Open the web app <svg aria-hidden="true"><use href="#i-arrow"/></svg></span>
+          <span class="btn-note">bunkr.website</span>
+        </a>
+        <p class="way-note">Same account on both, so your marks follow you.</p>
+      </div>
+      <div class="way" data-line="pps" data-tilt>
+        <h3 class="title">On Android</h3>
+        <p>Install once. It updates itself when a new version ships, keeps working with no signal, and reminds you to mark the day.</p>
+        <a class="btn btn-red" href="https://github.com/DkshByte/attendance-tracker/releases/latest/download/bunkr.apk">
+          <span class="btn-main">Download for Android <svg aria-hidden="true"><use href="#i-down"/></svg></span>
+          <span class="btn-note">APK · 7.4 MB</span>
+        </a>
+        <p class="way-note">The first time, Android asks you to allow installs from your browser.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <a class="foot-logo" href="landing.html" aria-label="Bunkr home"><svg><use href="#logo"/></svg></a>
+  <nav class="foot-links" aria-label="Legal"><a href="privacy.html">Privacy</a><a href="privacy.html#cookies">Cookies</a><a href="terms.html">Terms</a><a href="privacy.html#delete">Delete account</a></nav>
+  <p>Made by <a href="https://github.com/DkshByte">Daksh Sharma</a> · <a href="https://github.com/DkshByte/attendance-tracker">Source on GitHub</a> · Demo data on this page</p>
+</footer>
 
 <script src="landing-main.js"></script>
 </body>

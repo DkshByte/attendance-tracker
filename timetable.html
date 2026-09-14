@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+64cf4b6-->
+<!--secf-app--><!--build:1.0.1+2fd66fd-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -9,9 +9,7 @@
 <meta name="theme-color" content="#EEF1F7" media="(prefers-color-scheme: light)">
 <title>Bunkr · Sec F IT-I</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Blinker:wght@200;300;400;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://www.bunkr.website/fonts/fonts.css">
 <style>
 /* ============================================================
    RED LINE — Sec F IT-I
@@ -1141,6 +1139,9 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 .go[disabled] { opacity:.35; cursor:not-allowed; }
 .gate .fine { font-size:12px; color:var(--ink-3); margin-top:16px; line-height:1.5; }
 .authlinks { display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:16px; }
+/* the legal line under the gate: quiet, but a real link a thumb can hit */
+.gate .legal { margin:14px 0 0; font-size:13px; color:var(--ink-3); line-height:1.5; }
+.gate .legal a { color:var(--ink-2); text-decoration:underline; text-decoration-color:var(--rail); text-underline-offset:3px; display:inline-block; padding:12px 0; line-height:20px; }
 .pcount { font-size:11.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
           color:var(--ink-3); margin:14px 0 8px; }
 .picker { max-height:46vh; overflow:auto; display:grid; gap:1px; background:var(--rule-soft);
@@ -1252,6 +1253,25 @@ dialog .field input { font-size:14px; padding:9px 11px; }
 dialog .btn { margin-top:8px; }
 
 /* ============ ranks ============ */
+/* ---- skeleton: the list's own shape, drawn before its rows arrive ----
+   The shimmer is a gradient sliding by transform, so it never repaints the rows it
+   crosses. Under reduced motion the global rule collapses it to one instant pass,
+   which leaves a still skeleton. */
+.sk-list { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; }
+.sk-row { position:relative; overflow:hidden; display:flex; align-items:center; gap:12px; min-height:58px; padding:12px 15px; background:var(--plate); }
+.sk-row::after { content:""; position:absolute; inset:0; transform:translateX(-100%);
+                 background:linear-gradient(90deg, transparent, color-mix(in srgb, var(--ink) 7%, transparent), transparent);
+                 animation:skShine 1.5s cubic-bezier(.4,0,.2,1) infinite; animation-delay:calc(var(--i, 0) * 70ms); }
+.sk { display:block; border-radius:6px; background:var(--plate-3); }
+.sk-disc { flex:none; width:34px; height:34px; border-radius:50%; }
+.sk-num { flex:none; width:22px; height:14px; }
+.sk-m { flex:1; min-width:0; }
+.sk-l1 { width:var(--w, 55%); height:14px; }
+.sk-l2 { width:30%; height:10px; margin-top:8px; }
+.sk-tag { flex:none; width:28px; height:18px; border-radius:4px; }
+.sk-row { animation:skIn .4s var(--ease) both; animation-delay:calc(var(--i, 0) * 40ms); }
+@keyframes skShine { to { transform:translateX(100%); } }
+@keyframes skIn { from { opacity:0; } }
 .lb { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft);
       border-radius:12px; overflow:hidden; }
 .lbrow { display:grid; grid-template-columns:34px 1fr auto; gap:14px; align-items:center;
@@ -2486,6 +2506,7 @@ input[type="date"] { padding:12px 14px; }
         <button class="link" type="button" data-goto="pick">First time? Claim your name</button>
         <button class="link" type="button" data-goto="forgot">Forgot password</button>
       </div>
+      <p class="legal"><a href="https://www.bunkr.website/privacy.html" target="_blank" rel="noopener">Privacy</a> · <a href="https://www.bunkr.website/terms.html" target="_blank" rel="noopener">Terms</a></p>
     </div>
 
     <!-- ---------- claim: pick your name ---------- -->
@@ -2530,6 +2551,7 @@ input[type="date"] { padding:12px 14px; }
         <input id="clPass" type="password" autocomplete="new-password" placeholder="at least 8 characters">
         <div class="hint" id="clHint" role="status" aria-live="polite"></div>
       </div>
+      <p class="legal">By claiming a name you agree to the <a href="https://www.bunkr.website/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="https://www.bunkr.website/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>
       <button class="go" id="clGo" type="button" disabled>Claim this name</button>
       <div class="authlinks">
         <button class="link" type="button" data-goto="pick">Pick a different name</button>
@@ -5000,6 +5022,7 @@ const CLOUD = {
     ? "https://www.bunkr.website" : "",
   key: "sb_publishable_8v8hGsWlqZOPRWcnGIZo8A_TnmaXQe-",
 };
+const RESET_TO = "https://www.bunkr.website/app.html";   /* must be in Supabase → Auth → URL Configuration → Redirect URLs */
 const USERNAME_RE = /^[a-z0-9_]{3,16}$/;
 const MIN_PASS = 8;
 
@@ -5575,6 +5598,7 @@ async function renderDirectory() {
   const box = document.getElementById("dirList");
   if (people) { drawDirectory(); return; }
   count.textContent = "Loading…";
+  skeleton(box, 9, "person");
   try {
     const all = await fetchAllRoster();
     let contacts = [];
@@ -5588,7 +5612,7 @@ async function renderDirectory() {
   } catch (err) {
     const [what, fix] = explain(err);
     count.textContent = what;
-    box.textContent = "";
+    box.textContent = ""; unbusy(box);
     box.appendChild(el("div", "none", fix));
     document.getElementById("dirSearch").parentElement.hidden = true;
     document.getElementById("dirFilter").hidden = true;
@@ -5624,6 +5648,31 @@ function cicon(kind, title) {
   svg.innerHTML = '<title>' + title + '</title>' + c.p;
   return svg;
 }
+/* Placeholder rows shaped like the list that is loading: a disc for people, a number
+   for roster rows, a tag slot where the real row has one. aria-busy on the box, so a
+   screen reader hears the live count in the status line instead of fake rows. */
+function skeleton(box, n, shape) {
+  box.textContent = "";
+  box.setAttribute("aria-busy", "true");
+  const list = el("div", "sk-list");
+  list.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < n; i++) {
+    const row = el("div", "sk-row");
+    row.style.setProperty("--i", i);
+    if (shape === "person") row.appendChild(el("span", "sk sk-disc"));
+    if (shape === "roster") row.appendChild(el("span", "sk sk-num"));
+    const m = el("div", "sk-m");
+    const l1 = el("span", "sk sk-l1");
+    l1.style.setProperty("--w", (40 + (i * 29) % 38) + "%");
+    m.appendChild(l1);
+    if (shape !== "roster") m.appendChild(el("span", "sk sk-l2"));
+    row.appendChild(m);
+    if (shape === "roster") row.appendChild(el("span", "sk sk-tag"));
+    list.appendChild(row);
+  }
+  box.appendChild(list);
+}
+const unbusy = box => box.removeAttribute("aria-busy");
 const initials = name => name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase();
 
 let dirFilter = "all";
@@ -5631,7 +5680,7 @@ let dirFilter = "all";
 function drawDirectory() {
   const q = document.getElementById("dirSearch").value.trim().toLowerCase();
   const box = document.getElementById("dirList");
-  box.textContent = "";
+  box.textContent = ""; unbusy(box);
   const hits = (people || []).filter(d => {
     if (dirFilter === "joined" && !d.claimed) return false;
     if (dirFilter === "F1" || dirFilter === "F2") { if (d.batch !== dirFilter) return false; }
@@ -5796,6 +5845,8 @@ const say = (id, msg, bad) => {
 let roster = [];
 async function loadRoster() {
   const count = document.getElementById("pkCount");
+  const box = document.getElementById("pkList");
+  if (!roster.length) { count.textContent = "Loading the roster…"; skeleton(box, 7, "roster"); }
   try {
     roster = await fetchRoster();
     count.textContent = roster.length + " of 60 names left";
@@ -5803,12 +5854,13 @@ async function loadRoster() {
   } catch (err) {
     const [what, fix] = explain(err);
     count.textContent = what + " — " + fix;
+    box.textContent = ""; unbusy(box);
   }
 }
 function drawRoster() {
   const q = document.getElementById("pkSearch").value.trim().toLowerCase();
   const box = document.getElementById("pkList");
-  box.textContent = "";
+  box.textContent = ""; unbusy(box);
   const hits = roster.filter(r => !q || r.name.toLowerCase().includes(q));
   if (!hits.length) {
     box.appendChild(el("div", "none", roster.length ? "No name matches that." : "Every name has been claimed."));
@@ -6047,6 +6099,7 @@ async function renderRanks() {
   if (ranksBusy) return;
   ranksBusy = true;
   setState("", "Connecting…");
+  if (!box.firstChild || box.getAttribute("aria-busy")) skeleton(box, 6, "person");
   try {
     if (profile) await pushScore();
     const rows = await fetchRanks();
@@ -6088,7 +6141,7 @@ async function renderRanks() {
     d.appendChild(el("b", null, what));
     d.appendChild(document.createTextNode(fix));
     box.appendChild(d);
-  } finally { ranksBusy = false; }
+  } finally { ranksBusy = false; unbusy(box); }
 }
 
 /* ============================================================
@@ -6970,10 +7023,10 @@ fgGo.addEventListener("click", async () => {
   if (!email) return say("fgHint", "Enter the email you signed up with.", true);
   busy(fgGo, "Sending…");
   try {
-    /* on the web the link should land on the page it was asked from; in the wrapped
-       app it cannot, so it goes to the project's Site URL and you sign in here after */
-    await auth("/auth/v1/recover" + (NATIVE ? ""
-      : "?redirect_to=" + encodeURIComponent(location.origin + location.pathname)), { email });
+    /* The link always lands on the live web app: the email is opened in a browser even
+       when the reset was asked from the Android app, and a page opened from disk or a
+       preview domain would not be on Supabase's allowed redirect list anyway. */
+    await auth("/auth/v1/recover?redirect_to=" + encodeURIComponent(RESET_TO), { email });
     say("fgHint", "Link sent. Check your inbox, and your spam folder.");
     failed("mail");        /* a sent mail is the cost here, so it counts like a miss */
   } catch (err) {
@@ -7243,14 +7296,14 @@ async function openCR() {
   box.appendChild(add);
 
   const list = el("div", "d-rows");
-  list.appendChild(el("div", "d-note", "Loading claimed names…"));
+  skeleton(list, 4, "person");
   box.appendChild(list);
   box.appendChild(actions());
   openDlg();
 
   try {
     const dir = await fetchDirectory();
-    list.textContent = "";
+    list.textContent = ""; unbusy(list);
     list.appendChild(el("div", "d-note", "Release a wrong claim — the name goes back on the list. Make someone CR to share the controls or hand them on."));
     dir.forEach(d => {
       const r = el("div", "d-row");
@@ -7281,7 +7334,7 @@ async function openCR() {
       r.appendChild(b);
       list.appendChild(r);
     });
-  } catch (err) { list.textContent = explain(err).join(" — "); }
+  } catch (err) { list.textContent = explain(err).join(" — "); unbusy(list); }
 }
 
 /* ---------- the CR page ----------
