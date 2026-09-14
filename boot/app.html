@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+b579e49-->
+<!--secf-app--><!--build:1.0.1+f5fd085-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -5605,6 +5605,8 @@ function explain(err) {
   }
   if (err.status === 401 || c === "PGRST301") return ["Your session expired", "Sign in again."];
   if (c === "over_email_send_rate_limit") return ["Too many emails just now", "Wait an hour and try again."];
+  /* the database's own per-account limit (supabase/10-rate-limits.sql), not the network's */
+  if (c === "PT429") return ["Slow down a little", "That was a lot of changes at once. Wait a few minutes; your marks are saved on this phone."];
   if (err.status === 429 || c === "over_request_rate_limit")
     return ["Too many attempts from this network", "The whole section shares one connection here — wait a few minutes."];
   if (err.name === "TypeError") return ["Can't reach the server", "Check your connection — the timetable still works offline."];

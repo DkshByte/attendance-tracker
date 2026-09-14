@@ -222,6 +222,13 @@ check("no way past the gate without signing in",
 check("no tap overlay covers the profile button",
       ".user-pill::after" not in html,
       "a ::after on .user-pill sits over #pillBtn and swallows taps, so the menu never opens")
+# 9c. Every table the app writes carries a per-account limit, and the app names it.
+rl = (root / "supabase/10-rate-limits.sql").read_text() if (root / "supabase/10-rate-limits.sql").exists() else ""
+for tbl in ("attendance", "students", "cancellations", "notices", "class_overrides", "cr_holidays", "term"):
+    check(f"{tbl} writes are rate limited", f"('{tbl}'," in rl,
+          "a script or a stuck loop could write without limit")
+check("rate limits raise PT429 (HTTP 429)", "errcode = 'PT429'" in rl, "any other code reaches the app as a 400/500")
+check("the app explains a rate limit", 'c === "PT429"' in html, "a limited write would fail with a raw database message")
 router = (root / "deploy/index.html").read_text()
 check("the root router forwards reset links to the app with their token",
       "access_token" in router and 'app.html" + window.location.hash' in router,

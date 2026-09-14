@@ -15,6 +15,7 @@ When setting up a new Supabase project, execute these scripts in **Supabase SQL 
 | **03** | [`03-devices-setup.sql`](./03-devices-setup.sql) | Single-device session & eviction | `claim_device()` function, device columns |
 | **04** | [`04-leaderboard-setup.sql`](./04-leaderboard-setup.sql) | Section attendance leaderboard | `public.leaderboard`, aggregated stats |
 | **05** | [`05-features-setup.sql`](./05-features-setup.sql) | CR role, contacts & cancelled classes | CR authorization, class cancellations |
+| **10** | [`10-rate-limits.sql`](./10-rate-limits.sql) | Per-account write limits (429 when exceeded) | `public.rate_limits`, `rate_hit()`, `rate_limit` triggers |
 | **Reset** | [`production-reset.sql`](./production-reset.sql) | Clean production launch reset | Truncates marks and resets roster claims |
 
 ---
