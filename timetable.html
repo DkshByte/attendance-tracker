@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.0.1+b082cd7-->
+<!--secf-app--><!--build:1.0.1+18b98a5-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -2483,7 +2483,6 @@ input[type="date"] { padding:12px 14px; }
       <button class="go" id="liGo" type="button">Sign in</button>
       <div class="authlinks">
         <button class="link" type="button" data-goto="pick">First time? Claim your name</button>
-        <button class="link" type="button" id="liSkip">Just see the timetable</button>
         <button class="link" type="button" data-goto="forgot">Forgot password</button>
       </div>
     </div>
@@ -6832,8 +6831,8 @@ if (NATIVE && Capacitor.Plugins.App) {
     if (dlg.open) return dlg.close();
     if (userDrop.classList.contains("open")) return userDrop.classList.remove("open");
     /* back at the sign-in screen used to do nothing at all, which reads as a hang */
-    /* sign-in is a door now, not a wall: back closes it, and only a signed-out app exits */
-    if (!document.getElementById("gate").hidden) { gateClose(); renderAll(); return; }
+    /* sign-in is a wall: back at it leaves the app, it never reveals the timetable */
+    if (!document.getElementById("gate").hidden) return App.exitApp();
     const open = PAGES.find(id => !document.getElementById(id).hidden);
     if (open && open !== "today") return show("today");
     App.exitApp();
@@ -6917,7 +6916,6 @@ liGo.addEventListener("click", async () => {
   } finally { idle(liGo); holdOff(liGo, "in"); }
 });
 document.getElementById("liPass").addEventListener("keydown", e => { if (e.key === "Enter") liGo.click(); });
-document.getElementById("liSkip").addEventListener("click", () => { gateClose(); renderAll(); updateUserPill(); });
 
 document.getElementById("pkSearch").addEventListener("input", drawRoster);
 
@@ -7589,9 +7587,8 @@ if (profile && obDone()) syncAlerts();
   const t = await token();
   /* Signed in but unreachable: the cached account is still yours, so open on it. */
   if (!t && sess && profile) { gateClose(); return afterSignIn(); }
-  /* Signed out: the timetable is the same for the whole section, so show it. Sign in
-     is one tap away in the top bar, and marks made meanwhile move into the account. */
-  if (!t) { renderAll(); updateUserPill(); return; }
+  /* Signed out: nothing past the sign-in wall. */
+  if (!t) { renderAll(); return gateShow("login"); }
   try {
     await loadProfile();
   } catch (e) { /* offline: fall back to the cached profile */ }

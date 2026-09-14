@@ -197,6 +197,19 @@ check("every APK link uses releases/latest/download/bunkr.apk",
       apk_links == {"https://github.com/DkshByte/attendance-tracker/releases/latest/download/bunkr.apk"},
       f"a pinned or misnamed asset 404s: {sorted(apk_links)}")
 
+# 10. Nobody sees the app signed out. A "just see the timetable" link and a signed-out
+#     boot that skipped the gate once opened it to anyone with the URL.
+check("signed-out boot shows the sign-in gate",
+      'if (!t) { renderAll(); return gateShow("login"); }' in html,
+      "a signed-out start must land on the sign-in wall")
+check("no way past the gate without signing in",
+      "liSkip" not in html,
+      "a skip link on the sign-in form lets anyone read the app")
+loader = (root / "boot/index.html").read_text()
+check("the APK loader fetches www, not the apex",
+      '"https://www.bunkr.website/app.html"' in loader,
+      "bunkr.website 308s to www with no CORS header, so OTA fails and phones stay old")
+
 print()
 if fail:
     print(f"{len(fail)} check(s) failed.")
