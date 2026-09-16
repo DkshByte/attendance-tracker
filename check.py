@@ -242,6 +242,28 @@ check("native Google sign-in binds the nonce too", "SL.login({ provider: \"googl
       "a native id_token without the nonce could be replayed")
 check("privacy policy discloses Google sign-in", "Continue with Google" in (root / "deploy/privacy.html").read_text(),
       "a new data flow the policy doesn't mention")
+# The leaderboard is opt-in, and this project has already shipped the bug where
+# a later-numbered file redefines leaderboard_ranks and quietly wins: 04 beat 01,
+# then 06 had to beat 04. A third one without the filter would put every hidden
+# student back on the board with no UI showing it. So: whoever defines it last
+# has to carry the filter.
+lb_defs = sorted(f for f in (root / "supabase").glob("*.sql")
+                 if "create view public.leaderboard_ranks" in f.read_text())
+last_lb = lb_defs[-1].read_text() if lb_defs else ""
+check("the last word on leaderboard_ranks filters on on_leaderboard",
+      "and on_leaderboard" in last_lb,
+      "the highest-numbered definition wins, and one without the filter shows every hidden student")
+check("a student may write their own on_leaderboard",
+      "grant update (on_leaderboard)" in (root / "supabase/11-leaderboard-optin.sql").read_text(),
+      "06 revoked the table-wide update grant, so the switch silently fails without a column grant")
+check("the app reads on_leaderboard onto the profile",
+      "held,on_leaderboard,github" in html and "profile.on_leaderboard" in html,
+      "the switch would always render Show me, whatever the row actually says")
+check("a released roster row goes back to hidden",
+      "on_leaderboard = false" in (root / "supabase/11-leaderboard-optin.sql").read_text()
+      and "on_leaderboard        = false" in reset,
+      "the next student to claim that name inherits a visible board row they never asked for")
+
 router = (root / "deploy/index.html").read_text()
 check("the root router forwards reset links to the app with their token",
       "access_token" in router and 'app.html" + window.location.hash' in router,

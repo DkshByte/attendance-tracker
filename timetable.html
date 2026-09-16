@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.1+3fab1c2-->
+<!--secf-app--><!--build:1.1.1+c406849-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -5418,7 +5418,7 @@ async function signOut() {
 async function loadProfile() {
   const t = await token();
   if (!t) { profile = null; saveProfile(); return null; }
-  const rows = await call("/rest/v1/students?select=sno,name,batch,username,role,present,held,github,linkedin,instagram,mobile,email,active_device_id,active_device_name,active_device_at", {}, t);
+  const rows = await call("/rest/v1/students?select=sno,name,batch,username,role,present,held,on_leaderboard,github,linkedin,instagram,mobile,email,active_device_id,active_device_name,active_device_at", {}, t);
   profile = rows && rows.length ? rows[0] : null;
   saveProfile();
   return profile;
@@ -6579,7 +6579,11 @@ async function renderRanks() {
     }
     const note = el("div", "setup");
     note.style.marginTop = "12px";
-    note.textContent = profile && !rows.some(r => r.username === profile.username)
+    /* absence from the board reads as a bug unless it says which it is:
+       nothing marked yet, or you asked to be left off */
+    note.textContent = profile && !profile.on_leaderboard
+      ? "You are hidden from the board. Profile › Section leaderboard › Show me puts you on it."
+      : profile && !rows.some(r => r.username === profile.username)
       ? "You join the board once you mark your first class. Percentages are never shared — only positions."
       : "Ranked by attendance. Percentages are never shared — only positions.";
     box.appendChild(note);
@@ -7724,6 +7728,46 @@ function openProfile() {
   });
   bRow.appendChild(seg);
   box.appendChild(bRow);
+
+  /* The board is opt-in (supabase/11-leaderboard-optin.sql). A percentage is
+     the most socially loaded number in the app — it is why someone uninstalls
+     rather than be seen bunking — so nobody's rank goes up beside their name
+     until they say so, and one tap takes it back down. */
+  const lbRow = el("div", "pbatch-row");
+  const lbLbl = el("div", "pbatch-lbl");
+  lbLbl.appendChild(el("span", null, "Section leaderboard"));
+  const lbNote = el("small", null, "");
+  lbLbl.appendChild(lbNote);
+  lbRow.appendChild(lbLbl);
+  const lbSeg = el("div", "seg");
+  lbSeg.setAttribute("role", "group");
+  lbSeg.setAttribute("aria-label", "Section leaderboard");
+  const lbSay = on => { lbNote.textContent = on
+    ? "Your name and rank are visible to the section"
+    : "You are hidden — nobody sees your rank"; };
+  [[true, "Show me"], [false, "Hide me"]].forEach(([val, lbl]) => {
+    const btn = el("button", null, lbl);
+    btn.type = "button";
+    btn.setAttribute("aria-pressed", val === !!profile.on_leaderboard);
+    btn.addEventListener("click", async () => {
+      if (val === !!profile.on_leaderboard) return;
+      const all = lbSeg.querySelectorAll("button");
+      all.forEach(x => { x.disabled = true; });
+      try {
+        await saveContacts({ on_leaderboard: val });   /* patches the row, updates profile */
+        all.forEach(x => x.setAttribute("aria-pressed", x === btn));
+        lbSay(val);
+      } catch (err) {
+        const [what, fix] = explain(err);
+        lbNote.textContent = what + " — " + fix;
+      }
+      all.forEach(x => { x.disabled = false; });
+    });
+    lbSeg.appendChild(btn);
+  });
+  lbSay(!!profile.on_leaderboard);
+  lbRow.appendChild(lbSeg);
+  box.appendChild(lbRow);
 
   /* where you actually stand, so the profile is worth opening */
   const t = tally();

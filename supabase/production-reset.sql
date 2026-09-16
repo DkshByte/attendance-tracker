@@ -47,6 +47,7 @@ update public.students
        active_device_name    = null,
        active_device_at      = null,
        attendance_cleared_at = null,
+       on_leaderboard        = false,
        updated_at            = now();
 
 -- ---------- 4. Ensure all 60 official student names & batches ----------
