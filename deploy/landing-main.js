@@ -15,6 +15,16 @@
   /* ============================================================
      The model. Demo student, Tuesday 10:05, a month into term.
      ============================================================ */
+  /* Every verdict the page says out loud, in one place. Slang dates faster than code:
+     when "cooked" stops landing, retune here, not across the file. */
+  var VOICE = {
+    cooked: function (end) { return "you're cooked. Every class left still only gets you to " + end + "%."; },
+    locked: "locked in. Every class left, no exceptions.",
+    free:   "free. Miss every single one, still 75%.",
+    spare:  function (n) { return (n === 1 ? "class" : "classes") + " you can miss and still be chilling."; },
+    chip:   { ok: "Safe", warn: "Locked in", bad: "Cooked" }
+  };
+
   var SUB = {
     BEE:   { n: "Chemistry",       line: "bee", fac: "Prof. A", p: 8,  h: 11, r: 37 },
     SMT:   { n: "Statistics",      line: "smt", fac: "Prof. B", p: 8,  h: 9,  r: 36 },
@@ -219,7 +229,7 @@
     });
     return '<div class="ui-h">Subjects</div><div class="lap-board">' + keys.map(function (k) {
       var c = counts(k), b = bunks(c.p, c.h, c.r), v = pct(c.p, c.h);
-      var st = b < 0 ? ["bad", "Below 75%"] : b ? ["ok", "On track"] : ["warn", "At the limit"];
+      var st = b < 0 ? ["bad", VOICE.chip.bad] : b ? ["ok", VOICE.chip.ok] : ["warn", VOICE.chip.warn];
       return '<button type="button" class="ui-srow" data-line="' + SUB[k].line + '" data-pick="' + k + '" aria-label="Load ' + esc(SUB[k].n) + ' into the calculator">' +
         '<span class="bar"></span><span class="m"><b>' + esc(SUB[k].n) + '</b><i class="' + st[0] + '">' + st[1] + "</i>" +
         "<em>" + (b < 0 ? "Attend every class left" : "Miss up to " + b + " of the " + c.r + " left") + "</em>" +
@@ -315,13 +325,11 @@
     now.textContent = v + "%";
     if (m < 0) {
       out.dataset.state = "under"; fig.textContent = "0";
-      text.textContent = "to spare. Even at every class left, you finish on " + pct(p + r, h + r) + "%.";
+      text.textContent = VOICE.cooked(pct(p + r, h + r));
       endl.textContent = "At every class"; end.textContent = pct(p + r, h + r) + "%";
     } else {
       out.dataset.state = m === 0 ? "none" : "ok"; fig.textContent = String(m);
-      text.textContent = m === 0 ? "to spare. Attend every class left to finish on 75%."
-        : m === r ? "left, and you can miss every one and still finish on 75%."
-        : (m === 1 ? "class you can still miss and finish on 75%." : "classes you can still miss and finish on 75%.");
+      text.textContent = m === 0 ? VOICE.locked : m === r ? VOICE.free : VOICE.spare(m);
       endl.textContent = m ? "If you miss " + m : "At every class"; end.textContent = pct(p + r - m, h + r) + "%";
     }
     if (changed && changed !== "pick") { subName.textContent = "one subject"; picked = null; markPicked(); }
@@ -350,6 +358,9 @@
   eq(bunks(9, 10, 36), 10, "Mechanics 9 of 10, 36 left");
   eq(bunks(2, 2, 12), 3, "Environment Lab 2 of 2, 12 left");
   eq(bunks(3, 10, 2), -1, "cannot recover");
+  eq(VOICE.spare(1), "class you can miss and still be chilling.", "one spare reads singular");
+  eq(VOICE.spare(2), "classes you can miss and still be chilling.", "two spare reads plural");
+  eq(VOICE.cooked(71), "you're cooked. Every class left still only gets you to 71%.", "cooked names the ceiling");
   eq(summary().overall, 92, "demo overall");
   today.PHP = "A"; eq(summary().overall + ":" + summary().tb + SUB[summary().tight].n, "91:2Physics Lab", "absent in the lab"); today.PHP = "P";
 
