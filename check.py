@@ -271,6 +271,18 @@ check("the root router forwards reset links to the app with their token",
 check("password reset always returns to the live web app",
       'RESET_TO = "https://www.bunkr.website/app.html"' in html and "redirect_to=\" + encodeURIComponent(RESET_TO)" in html,
       "a reset from the APK or a preview domain lands off Supabase's redirect allow-list")
+# 20. A rename of the landing page's demo subjects once replaced the SUB keys too, not
+#     just the display names, so board(), planRows() and the calculator all looked up
+#     subjects that did not exist and the whole page died on load with a blank screen.
+lmain = (root / "deploy/landing-main.js").read_text()
+sub_keys = set(re.findall(r"^\s{4}(\w+):\s*\{ n:", lmain, re.M))
+used = set(re.findall(r'pick\("(\w+)"\)', lmain)) | set(re.findall(r'picked = "(\w+)"', lmain))
+for arr in re.findall(r'(?:var keys = |return )\[((?:"\w+", ?)+"\w+")\]\.', lmain):
+    used |= set(re.findall(r'"(\w+)"', arr))
+check("every subject the landing page looks up actually exists",
+      bool(sub_keys) and bool(used) and used <= sub_keys,
+      f"{sorted(used - sub_keys)} is not a key in SUB — the page throws on load and renders nothing")
+
 loader = (root / "boot/index.html").read_text()
 check("the APK loader fetches www, not the apex",
       '"https://www.bunkr.website/app.html"' in loader,

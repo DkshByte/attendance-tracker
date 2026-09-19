@@ -167,7 +167,7 @@
   }
 
   function planRows() {
-    return ["EVSP", "EGL", "PHP", "PPSL", "Chemistry"].map(function (k) {
+    return ["EVSP", "EGL", "PHP", "PPSL", "BEE"].map(function (k) {
       var c = counts(k), used = plan[k] || 0, left = bunks(c.p, c.h, c.r) - used;
       var fin = pct(c.p + c.r - used, c.h + c.r);
       return '<div class="ui-prow2" data-line="' + SUB[k].line + '"><span class="ui-pbar"></span>' +
@@ -214,7 +214,7 @@
     return '<div class="ui-seg lap-seg"><span class="on">Week</span><span>Holidays</span></div><div class="net-grid">' + head + rows + "</div>";
   }
   function board() {
-    var keys = ["Chemistry", "Statistics", "EM", "Environment", "CSL", "Programming", "PHP", "PHL"].sort(function (a, b) {
+    var keys = ["BEE", "SMT", "EM", "EVS", "CSL", "PPS", "PHP", "PHL"].sort(function (a, b) {
       var A = counts(a), B = counts(b); return A.p / A.h - B.p / B.h;
     });
     return '<div class="ui-h">Subjects</div><div class="lap-board">' + keys.map(function (k) {
@@ -302,7 +302,7 @@
      ============================================================ */
   var att = $("#c-att"), held = $("#c-held"), left = $("#c-left");
   var fig = $("#c-fig"), text = $("#c-text"), fill = $("#c-fill"), now = $("#c-now"), end = $("#c-end"), endl = $("#c-endlbl");
-  var out = $(".verdict"), subName = $("#c-sub"), picked = "Chemistry";
+  var out = $(".verdict"), subName = $("#c-sub"), picked = "BEE";
   var num = function (el) { var v = parseInt(el.value, 10); return isNaN(v) ? 0 : clamp(v, 0, 200); };
 
   function calc(changed) {
@@ -341,7 +341,7 @@
 
   var booted = false;
   paint();
-  pick("Chemistry");
+  pick("BEE");
   booted = true;
 
   /* the maths must stay the app's */
