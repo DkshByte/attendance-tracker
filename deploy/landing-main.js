@@ -16,20 +16,19 @@
      The model. Demo student, Tuesday 10:05, a month into term.
      ============================================================ */
   var SUB = {
-    BEE:   { n: "BEE",          line: "bee", fac: "Mr. Kumar Gaurav",  p: 8,  h: 11, r: 37 },
-    SMT:   { n: "SMT",          line: "smt", fac: "Dr. Suryya Farhad", p: 8,  h: 9,  r: 36 },
-    EM:    { n: "Mechanics",    line: "em",  fac: "Mr. Naman Bajpai",  p: 9,  h: 10, r: 36 },
-    EVS:   { n: "EVS",          line: "evs", fac: "Dr. Kavita Gupta",  p: 9,  h: 10, r: 36 },
-    CSL:   { n: "Comm Skills",  line: "csl", fac: "Ms. Isha",          p: 12, h: 13, r: 34 },
-    PPS:   { n: "PPS",          line: "pps", fac: "Ms. Alka",          p: 11, h: 11, r: 37 },
-    EVSP:  { n: "EVS Lab",      line: "evs", fac: "Dr. Kavita Gupta",  p: 2,  h: 2,  r: 12 },
-    EGL:   { n: "Graphics Lab", line: "eg",  fac: "Mr. Naman Bajpai",  p: 2,  h: 2,  r: 12 },
-    PHP:   { n: "Physics Lab",  line: "phy", fac: "Dr. Mamta Gupta",   p: 5,  h: 5,  r: 10 },
-    PPSL:  { n: "PPS Lab",      line: "pps", fac: "Mr. Sharat Srivastava", p: 4, h: 4, r: 11 },
-    BEEL:  { n: "BEE Lab",      line: "bee", fac: "Mr. Kumar Gaurav",  p: 2,  h: 2,  r: 12 },
-    PHL:   { n: "Physics",      line: "phy", fac: "Dr. Mamta Gupta",   p: 10, h: 10, r: 37 }
-  };
-  /* today's two marks are already inside the counts above as Present */
+    BEE:   { n: "Chemistry",       line: "bee", fac: "Prof. A", p: 8,  h: 11, r: 37 },
+    SMT:   { n: "Statistics",      line: "smt", fac: "Prof. B", p: 8,  h: 9,  r: 36 },
+    EM:    { n: "Mechanics",       line: "em",  fac: "Prof. C", p: 9,  h: 10, r: 36 },
+    EVS:   { n: "Environment",     line: "evs", fac: "Prof. D", p: 9,  h: 10, r: 36 },
+    CSL:   { n: "Communication",   line: "csl", fac: "Prof. E", p: 12, h: 13, r: 34 },
+    PPS:   { n: "Programming",     line: "pps", fac: "Prof. F", p: 11, h: 11, r: 37 },
+    EVSP:  { n: "Environment Lab", line: "evs", fac: "Prof. D", p: 2,  h: 2,  r: 12 },
+    EGL:   { n: "Design Lab",      line: "eg",  fac: "Prof. C", p: 2,  h: 2,  r: 12 },
+    PHP:   { n: "Physics Lab",     line: "phy", fac: "Prof. H", p: 5,  h: 5,  r: 10 },
+    PPSL:  { n: "Programming Lab", line: "pps", fac: "Prof. G", p: 4,  h: 4,  r: 11 },
+    BEEL:  { n: "Chemistry Lab",   line: "bee", fac: "Prof. A", p: 2,  h: 2,  r: 12 },
+    PHL:   { n: "Physics",         line: "phy", fac: "Prof. H", p: 10, h: 10, r: 37 }
+  };  /* today's two marks are already inside the counts above as Present */
   var today = { CSL: "P", PHP: "P" };
   var plan = {};                                   /* pencilled skips on the plan screen */
 
@@ -62,7 +61,7 @@
 
   function top() {
     return '<div class="ui-top"><svg class="ui-logo" aria-hidden="true"><use href="#logo"/></svg>' +
-      '<span class="ui-ib">' + icon("n-sun") + '</span><span class="ui-av">RK</span></div>';
+      '<span class="ui-ib">' + icon("n-sun") + '</span><span class="ui-av">S</span></div>';
   }
   function nav(on) {
     return '<div class="ui-nav">' + [["n-today", "Today"], ["n-week", "Timetable"], ["n-att", "Attendance"], ["n-sec", "Section"]]
@@ -72,11 +71,11 @@
   function plate() {
     return '<div class="ui-plate" data-line="phy">' +
       '<div class="ui-prow"><span class="ui-badge">In class</span><span class="ui-when"><b data-bind="left">55</b> min left</span></div>' +
-      '<div class="ui-h1">Engineering Physics Lab I</div>' +
-      '<div class="ui-who"><b>Dr. Mamta Gupta</b> · Lab</div>' +
+      '<div class="ui-h1">Physics Lab</div>' +
+      '<div class="ui-who"><b>Prof. H</b> · Lab</div>' +
       '<div class="ui-gauge"><span class="ui-track"><i data-bind="bar" style="width:50%"></i></span><span>till 11:00</span></div>' +
       '<div class="ui-next"><span class="ui-lbl">Next</span><span class="ui-val" data-line="phy">Physics</span>' +
-      '<span class="ui-nf">Dr. Mamta Gupta</span><span class="ui-at">11:30</span></div></div>';
+      '<span class="ui-nf">Prof. H</span><span class="ui-at">11:30</span></div></div>';
   }
   function stats() {
     var s = summary();
@@ -96,7 +95,7 @@
     return '<div class="ui-stop ' + (o.cls || "") + '" data-line="' + o.line + '">' +
       '<span class="ui-node"></span>' +
       '<div class="ui-card"><div class="ui-time">' + o.t + (o.lab ? ' <span class="ui-badge ghost">Lab</span>' : "") + "</div>" +
-      '<div class="ui-title">' + esc(o.n) + '</div><div class="ui-meta"><b>' + esc(o.f) + "</b> · " + (o.lab ? "Lab" : "Room 2311") + "</div>" +
+      '<div class="ui-title">' + esc(o.n) + '</div><div class="ui-meta"><b>' + esc(o.f) + "</b> · " + (o.lab ? "Lab" : "Room 12") + "</div>" +
       (o.k ? marks(o.k) : "") + "</div></div>";
   }
 
@@ -106,22 +105,22 @@
       '<div class="ui-slot" data-slot="stats">' + stats() + "</div>" +
       '<div class="ui-h">Today\'s classes</div>' +
       '<div class="ui-rail"><span class="ui-trav"></span><span class="ui-marker" data-line="phy"></span>' +
-      stop({ cls: "past", line: "csl", t: "8:15–9:10", n: "Comm Skills", f: "Ms. Isha", k: still ? null : "CSL" }) +
-      stop({ cls: "live", line: "phy", t: "9:10–11:00", n: "Physics Lab", f: "Dr. Mamta Gupta", lab: true, k: still ? null : "PHP" }) +
+      stop({ cls: "past", line: "csl", t: "8:15–9:10", n: "Communication", f: "Prof. E", k: still ? null : "CSL" }) +
+      stop({ cls: "live", line: "phy", t: "9:10–11:00", n: "Physics Lab", f: "Prof. H", lab: true, k: still ? null : "PHP" }) +
       '<div class="ui-lunch"><span class="ui-node big"></span>Lunch · 11:00–11:30</div>' +
-      stop({ line: "phy", t: "11:30–12:25", n: "Physics", f: "Dr. Mamta Gupta" }) +
-      stop({ line: "smt", t: "12:25–1:20", n: "SMT", f: "Dr. Suryya Farhad" }) +
+      stop({ line: "phy", t: "11:30–12:25", n: "Physics", f: "Prof. H" }) +
+      stop({ line: "smt", t: "12:25–1:20", n: "Statistics", f: "Prof. B" }) +
       "</div></div>" + nav(0);
   }
 
   var WEEK = {
-    Mon: [null, ["em", "Mechanics", "Mr. Naman Bajpai"], ["bee", "BEE", "Mr. Kumar Gaurav"], "L", ["pps", "PPS", "Ms. Alka"], ["csl", "Comm Skills", "Ms. Isha"], ["evs", "EVS", "Dr. Kavita Gupta"], null],
-    Tue: [["csl", "Comm Skills", "Ms. Isha"], ["phy", "Physics Lab", "Dr. Mamta Gupta", 2], "L", ["phy", "Physics", "Dr. Mamta Gupta"], ["smt", "SMT", "Dr. Suryya Farhad"], ["pps", "PPS Lab", "Mr. Sharat Srivastava", 2]],
-    Wed: [["phy", "Physics", "Dr. Mamta Gupta"], ["em", "Mechanics", "Mr. Naman Bajpai"], ["smt", "SMT", "Dr. Suryya Farhad"], "L", ["pps", "PPS", "Ms. Alka"], ["bee", "BEE", "Mr. Kumar Gaurav"], ["csl", "Comm Skills", "Ms. Isha"], null],
-    Thu: [["pps", "PPS", "Ms. Alka"], ["bee", "BEE Lab", "Mr. Kumar Gaurav", 2], "L", ["evs", "EVS", "Dr. Kavita Gupta"], ["bee", "BEE", "Mr. Kumar Gaurav"], ["phy", "Physics", "Dr. Mamta Gupta"], ["pd", "Personality Dev", "Ms. Isha"]],
-    Fri: [["smt", "SMT", "Dr. Suryya Farhad"], ["evs", "EVS Lab", "Dr. Kavita Gupta", 2], "L", ["em", "Mechanics", "Mr. Naman Bajpai"], ["evs", "EVS", "Dr. Kavita Gupta"], ["eg", "Graphics Lab", "Mr. Naman Bajpai", 2]]
+    Mon: [null, ["em", "Mechanics", "Prof. C"], ["bee", "Chemistry", "Prof. A"], "L", ["pps", "Programming", "Prof. F"], ["csl", "Communication", "Prof. E"], ["evs", "Environment", "Prof. D"], null],
+    Tue: [["csl", "Communication", "Prof. E"], ["phy", "Physics Lab", "Prof. H", 2], "L", ["phy", "Physics", "Prof. H"], ["smt", "Statistics", "Prof. B"], ["pps", "Programming Lab", "Prof. G", 2]],
+    Wed: [["phy", "Physics", "Prof. H"], ["em", "Mechanics", "Prof. C"], ["smt", "Statistics", "Prof. B"], "L", ["pps", "Programming", "Prof. F"], ["bee", "Chemistry", "Prof. A"], ["csl", "Communication", "Prof. E"], null],
+    Thu: [["pps", "Programming", "Prof. F"], ["bee", "Chemistry Lab", "Prof. A", 2], "L", ["evs", "Environment", "Prof. D"], ["bee", "Chemistry", "Prof. A"], ["phy", "Physics", "Prof. H"], ["pd", "Seminar", "Prof. E"]],
+    Fri: [["smt", "Statistics", "Prof. B"], ["evs", "Environment Lab", "Prof. D", 2], "L", ["em", "Mechanics", "Prof. C"], ["evs", "Environment", "Prof. D"], ["eg", "Design Lab", "Prof. C", 2]]
   };
-  var SHORT = { "Mechanics": "Mech", "Comm Skills": "Comms", "Personality Dev": "PD", "Physics Lab": "Phy Lab", "Graphics Lab": "Gfx Lab" };
+  var SHORT = { "Chemistry": "Chem", "Chemistry Lab": "Chem Lab", "Statistics": "Stats", "Mechanics": "Mech", "Environment": "Env", "Environment Lab": "Env Lab", "Communication": "Comms", "Programming": "Prog", "Programming Lab": "Prog Lab", "Physics Lab": "Phy Lab", "Design Lab": "Design" };
   var TIMES = ["8:15", "9:10", "10:05", "11:00", "11:30", "12:25", "1:20", "2:15", "3:10"];
   function dayStops(day) {
     var out = "", slot = 0;
@@ -145,14 +144,14 @@
   }
 
   var HOLS = [
-    ["October", [["2", "Fri", "Mahatma Gandhi's Birthday", "gaz", "Closed · in 17 days", "5 classes off"],
-                 ["19", "Mon", "Dussehra (Mahashtami)", "lik", "Usually closed", "5 at risk"],
-                 ["20", "Tue", "Dussehra", "gaz", "Closed", "5 classes off"],
-                 ["26", "Mon", "Maharishi Valmiki's Birthday", "gaz", "Closed", "5 classes off"]]],
-    ["November", [["8", "Sun", "Diwali (Deepavali)", "gaz", "Closed", "Weekend"],
-                  ["9", "Mon", "Govardhan Puja", "lik", "Usually closed", "5 at risk"],
-                  ["11", "Wed", "Bhai Duj", "lik", "Usually closed", "6 at risk"],
-                  ["24", "Tue", "Guru Nanak's Birthday", "gaz", "Closed", "5 classes off"]]]
+    ["October", [["2", "Fri", "Public holiday", "gaz", "Closed · in 17 days", "5 classes off"],
+                 ["19", "Mon", "Festival week", "lik", "Usually closed", "5 at risk"],
+                 ["20", "Tue", "Festival holiday", "gaz", "Closed", "5 classes off"],
+                 ["26", "Mon", "Founders' Day", "gaz", "Closed", "5 classes off"]]],
+    ["November", [["8", "Sun", "Autumn break", "gaz", "Closed", "Weekend"],
+                  ["9", "Mon", "Autumn break", "lik", "Usually closed", "5 at risk"],
+                  ["11", "Wed", "Mid-term break", "lik", "Usually closed", "6 at risk"],
+                  ["24", "Tue", "Public holiday", "gaz", "Closed", "5 classes off"]]]
   ];
   function holidayScreen() {
     return top() + '<div class="ui-body">' +
@@ -168,7 +167,7 @@
   }
 
   function planRows() {
-    return ["EVSP", "EGL", "PHP", "PPSL", "BEE"].map(function (k) {
+    return ["EVSP", "EGL", "PHP", "PPSL", "Chemistry"].map(function (k) {
       var c = counts(k), used = plan[k] || 0, left = bunks(c.p, c.h, c.r) - used;
       var fin = pct(c.p + c.r - used, c.h + c.r);
       return '<div class="ui-prow2" data-line="' + SUB[k].line + '"><span class="ui-pbar"></span>' +
@@ -215,7 +214,7 @@
     return '<div class="ui-seg lap-seg"><span class="on">Week</span><span>Holidays</span></div><div class="net-grid">' + head + rows + "</div>";
   }
   function board() {
-    var keys = ["BEE", "SMT", "EM", "EVS", "CSL", "PPS", "PHP", "PHL"].sort(function (a, b) {
+    var keys = ["Chemistry", "Statistics", "EM", "Environment", "CSL", "Programming", "PHP", "PHL"].sort(function (a, b) {
       var A = counts(a), B = counts(b); return A.p / A.h - B.p / B.h;
     });
     return '<div class="ui-h">Subjects</div><div class="lap-board">' + keys.map(function (k) {
@@ -303,7 +302,7 @@
      ============================================================ */
   var att = $("#c-att"), held = $("#c-held"), left = $("#c-left");
   var fig = $("#c-fig"), text = $("#c-text"), fill = $("#c-fill"), now = $("#c-now"), end = $("#c-end"), endl = $("#c-endlbl");
-  var out = $(".verdict"), subName = $("#c-sub"), picked = "BEE";
+  var out = $(".verdict"), subName = $("#c-sub"), picked = "Chemistry";
   var num = function (el) { var v = parseInt(el.value, 10); return isNaN(v) ? 0 : clamp(v, 0, 200); };
 
   function calc(changed) {
@@ -342,14 +341,14 @@
 
   var booted = false;
   paint();
-  pick("BEE");
+  pick("Chemistry");
   booted = true;
 
   /* the maths must stay the app's */
   var eq = function (a, b, m) { if (a !== b) throw new Error("bunk maths: " + m + " got " + a + ", want " + b); };
-  eq(bunks(8, 11, 37), 9, "BEE 8 of 11, 37 left");
+  eq(bunks(8, 11, 37), 9, "Chemistry 8 of 11, 37 left");
   eq(bunks(9, 10, 36), 10, "Mechanics 9 of 10, 36 left");
-  eq(bunks(2, 2, 12), 3, "EVS Lab 2 of 2, 12 left");
+  eq(bunks(2, 2, 12), 3, "Environment Lab 2 of 2, 12 left");
   eq(bunks(3, 10, 2), -1, "cannot recover");
   eq(summary().overall, 92, "demo overall");
   today.PHP = "A"; eq(summary().overall + ":" + summary().tb + SUB[summary().tight].n, "91:2Physics Lab", "absent in the lab"); today.PHP = "P";
