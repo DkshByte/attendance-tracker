@@ -28,5 +28,10 @@ if (require.main === module) {
   eq("", null);
   eq(null, null);
   eq(undefined, null);
-  console.log("PASS  cleanName handles every case");
+  /* a long name must shrink to stay out of the plan card, a short one must not shrink */
+  const { headSize } = require("./og.js");
+  assert.strictEqual(headSize(["Hi Aryan.", "Your seat's open."]), 76);
+  assert.ok(headSize(["Hi " + "a".repeat(24) + ".", "Your seat's open."]) < 62);
+  assert.ok(headSize(["Hi " + "a".repeat(99) + "."]) >= 46);
+  console.log("PASS  cleanName handles every case, and the headline fits");
 }
