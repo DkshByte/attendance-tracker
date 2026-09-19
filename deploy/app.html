@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.1+c406849-->
+<!--secf-app--><!--build:1.1.1+3df19f4-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -5927,9 +5927,15 @@ function inviteLink(a, text) {
     navigator.share({ text }).catch(() => {});
   };
 }
-const inviteOne = name => "Hey " + name.trim().split(/\s+/)[0] + "! Your name's still unclaimed on Bunkr, our section's timetable " +
-  "and 75% attendance app. It tells you what's next and exactly how many classes you can still skip. " +
-  "Claim it before someone else does: " + SHARE_URL;
+/* The link carries the first name so WhatsApp's own preview card greets them by it:
+   /i/<name> is a tiny function that serves the Open Graph tags a crawler needs, since
+   a static page cannot vary per recipient. One name per link, never a listing. */
+const inviteOne = name => {
+  const first = name.trim().split(/\s+/)[0];
+  return "Hey " + first + "! Your name's still unclaimed on Bunkr, our section's timetable " +
+    "and 75% attendance app. It tells you what's next and exactly how many classes you can still skip. " +
+    "Claim it before someone else does: " + SHARE_URL + "/i/" + encodeURIComponent(first.toLowerCase());
+};
 const inviteAll = (joined, total) => "Sec F IT-I is on Bunkr: live timetable, and it tells you exactly how many classes " +
   "you can still skip and stay above 75%. " + joined + " of " + total + " of us have joined. Claim your name: " + SHARE_URL;
 

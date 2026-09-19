@@ -283,6 +283,14 @@ check("every subject the landing page looks up actually exists",
       bool(sub_keys) and bool(used) and used <= sub_keys,
       f"{sorted(used - sub_keys)} is not a key in SUB — the page throws on load and renders nothing")
 
+# 21. The invite card takes a name straight from the URL and paints it into an image
+#     and into og: tags, so it is the one place a stranger controls what we render.
+import subprocess
+_n = subprocess.run([sys.executable and "node", str(root / "deploy/api/_name.js")],
+                    capture_output=True, text=True)
+check("the invite card only ever renders a plausible first name",
+      _n.returncode == 0, (_n.stderr or _n.stdout).strip().splitlines()[-1] if (_n.stderr or _n.stdout) else "node deploy/api/_name.js failed")
+
 loader = (root / "boot/index.html").read_text()
 check("the APK loader fetches www, not the apex",
       '"https://www.bunkr.website/app.html"' in loader,
