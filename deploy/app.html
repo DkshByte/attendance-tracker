@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.3+f04fb9c-->
+<!--secf-app--><!--build:1.1.3+c8deb01-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -4354,6 +4354,8 @@ function demo() {                                   // run demo() in the console
   ok(freeDay("2026-09-26"), true, "a Saturday holds no class");
   ok(bestDays("2026-10-05", 6).length, 0, "mid-sem week offers no day to bunk");
   ok(daysOffLeft({}, "2026-09-22", null), 0, "with no room in any subject, no day can be taken");
+  ok(SYL_OF.PHP, "PHL", "the Physics lab reads the Physics syllabus");
+  ok(Object.values(SYL_OF).every(k => SYL[k]), true, "every lab maps to a subject that has a syllabus");
   ok(Object.keys(SYL).every(k => SUB[k] && SYL[k].units.length === 4), true, "every syllabus is a real subject with four units");
   const keptSyl = covered;
   covered = { "EM.0.0": { d:1, t:1 }, "EM.0.1": { d:0, t:2 } };
@@ -7967,10 +7969,73 @@ function midPill() {
   return pill;
 }
 
+/* The class the timetable says is on now, or next — today, else the next day that runs.
+   Labs read their theory subject's syllabus; an arranged period is the subject that
+   actually runs; a cancelled one is passed over. null: nothing with a syllabus ahead. */
+const SYL_OF = { PPSLAB:"PPS", BEELAB:"BEE", PHP:"PHL", EVSP:"EVSL" };
+function classFocus() {
+  const now = nowMin(), today = nowISO();
+  const d = new Date();
+  for (let n = 0; n < 10; n++, d.setDate(d.getDate() + 1)) {
+    const iso = isoOf(d), di = d.getDay() - 1;
+    if (di < 0 || di > 5 || gazettedOn(iso)) continue;
+    for (const it of DAYS[di].items) {
+      const span = it.span || 1, from = startMin(it.i), to = endMin(it.i, span);
+      if (iso === today && to <= now) continue;             /* already over */
+      if (isCancelled(iso, it.i)) continue;
+      const cls = swapAt(iso, it.i) || resolve(it);
+      const k = cls && (SYL[cls] ? cls : SYL_OF[cls]);
+      if (!k) continue;                                     /* a split lab with no batch, Graphics, PD */
+      return { k, cls, iso, it, span,
+               state: iso !== today ? "later" : now >= from ? "now" : "today",
+               left: to - now };
+    }
+  }
+  return null;
+}
+
 function renderSylNext() {
   const box = document.getElementById("sylNext");
   box.textContent = "";
   const plate = el("div", "plate syl-plate");
+  const f = classFocus();
+  if (f) {
+    /* where the class is: the first unit the CR has not finished, and its next topic */
+    const syl = SYL[f.k];
+    let u = syl.units.findIndex((_, x) => { const y = sylUnit(f.k, x); return y.d < y.n; });
+    const done = u < 0;
+    if (done) u = 3;
+    const i = done ? 0 : syl.units[u].findIndex((_, x) => !isDone(sylId(f.k, u, x)));
+    const un = sylUnit(f.k, u), p = sylOf(f.k);
+    plate.dataset.line = SUB[f.cls].line;
+    const row = el("div", "plate-row");
+    row.appendChild(el("span", "badge", f.state === "now" ? "In class" : f.state === "today" ? "Next class"
+      : f.iso === tomorrowISO() ? "Tomorrow" : fromISO(f.iso).toLocaleDateString("en-IN", { weekday:"long" })));
+    const when = el("span", "plate-when");
+    if (f.state === "now") { when.appendChild(el("b", null, String(f.left))); when.appendChild(document.createTextNode(" min left")); }
+    else when.appendChild(el("b", null, label(f.it.i, f.span).split("–")[0]));
+    row.appendChild(when);
+    plate.appendChild(row);
+    plate.appendChild(el("h1", null, SUB[f.cls].short + (done ? "" : " · Unit " + ROMAN[u])));
+    plate.appendChild(el("p", "who", done ? "Every topic has been covered in class."
+      : !p.d ? "Nothing marked yet in " + SUB[f.k].short + " · starts at Unit I"
+      : un.d + " of " + un.n + " topics of this unit covered" + (syl.scheme === "std" ? " · 12 marks" : "")));
+    const g = el("div", "gauge");
+    const tr = el("div", "track"), fill = el("i");
+    fill.style.width = (p.d / p.n * 100).toFixed(1) + "%";
+    tr.appendChild(fill); g.appendChild(tr);
+    g.appendChild(el("span", null, p.d + " of " + p.n + " in " + SUB[f.k].short));
+    plate.appendChild(g);
+    const up = el("button", "upnext");
+    up.type = "button";
+    up.appendChild(el("span", "lbl", done ? "Syllabus" : "Next topic"));
+    up.appendChild(el("span", "fac syl-nt", done ? "See every unit" : syl.units[u][i]));
+    up.appendChild(el("span", "chev", "›"));
+    up.addEventListener("click", () => openSyllabus(f.k, u, done ? undefined : i));
+    plate.appendChild(up);
+    box.appendChild(plate);
+    return;
+  }
   const nx = sylNext();
   let all = 0, tot = 0;
   Object.keys(SYL).forEach(k => { const p = sylOf(k); all += p.d; tot += p.n; });
@@ -9316,6 +9381,7 @@ if (profile && obDone()) syncAlerts();
 /* the line keeps moving whether or not you are looking at it */
 setInterval(() => {
   renderToday(); renderNetwork();
+  if (!document.getElementById("syllabus").hidden && !reading() && !document.getElementById("sylSearch").value.trim()) renderSylNext();
   if (NATIVE) dropStaleCards(Capacitor.Plugins.LocalNotifications || {}).catch(() => {});
   heartbeatDevice();
 }, 30000);
