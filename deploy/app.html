@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+7977067-->
+<!--secf-app--><!--build:1.1.2+1757021-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1587,6 +1587,9 @@ dialog .btn { margin-top:8px; }
 .syl-mid { display:flex; align-items:center; gap:16px; margin-bottom:14px; padding:14px 16px;
            background:var(--plate); border:1px solid var(--rule); border-radius:14px; }
 .syl-mid.on { border-color:var(--warn); }
+#midBox .syl-mid { flex-wrap:wrap; margin:14px 0 0; }
+.syl-mid-go { flex:0 0 calc(100% + 32px); justify-content:space-between; margin:0 -16px -14px; border-radius:0 0 13px 13px; }
+.syl-mid-go .chev { font-size:20px; line-height:1; color:var(--ink-3); }
 .syl-mid .m { flex:1; min-width:0; }
 .syl-mid .m b { display:block; font-family:'Blinker', sans-serif; font-size:19px; font-weight:700; line-height:1.15; }
 .syl-mid .m > span { display:block; margin-top:2px; font-size:13px; color:var(--ink-2); }
@@ -2563,6 +2566,7 @@ input[type="date"] { padding:12px 14px; }
     <div id="plateBox"></div>
     <div id="eodNoticeBox"></div>
     <div id="taskDueBox"></div>
+    <div id="midBox"></div>
     <div class="h2row" style="margin-top:24px">
       <h2 id="todayHead">Today's classes</h2>
       <button class="bulk-btn" id="markAllTodayBtn" type="button" title="Mark all today's classes present">Mark all present</button>
@@ -3122,6 +3126,17 @@ const SYL = {
   ]},
 };
 
+/* Mid-semester exams, as announced for the section. ponytail: written in here, so the
+   end-sem needs a deploy; a CR-set exam row (like term.sem_end) if exams start moving. */
+const MIDSEM = { from:"2026-10-05", to:"2026-10-10", units:[0, 1] };
+const isMid = u => MIDSEM.units.includes(u);
+/* before (with days to go), on, or over — asked of a date so demo() can pin it */
+function midState(iso) {
+  if (iso > MIDSEM.to) return { s:"over" };
+  if (iso >= MIDSEM.from) return { s:"on" };
+  return { s:"before", days: Math.round((fromISO(MIDSEM.from) - fromISO(iso)) / 864e5) };
+}
+
 /* period index 0-6; lunch sits between period 2 and period 3 */
 const TIMES = ["8:15","9:10","10:05","11:00","11:30","12:25","1:20","2:15","3:10"];
 const MINS  = [495, 550, 605, 660, 690, 745, 800, 855, 910];
@@ -3418,6 +3433,7 @@ function renderToday() {
   const di = new Date().getDay() - 1;
   const live = di >= 0 && di < 6;                  /* Sunday: di is -1, and it owns no rail */
   renderPlate();
+  renderMidToday();
   const up = live ? null : nextRunningDay(isoOf(new Date()));
   const dayIdx = live ? di : (up ? up.di : 0);
   document.getElementById("todayHead").textContent =
@@ -7592,16 +7608,6 @@ document.addEventListener("click", e => {
    and each topic ticked is a stretch of that line travelled.
    ============================================================ */
 const ROMAN = ["I", "II", "III", "IV"];
-/* Mid-semester exams, as announced for the section. ponytail: written in here, so the
-   end-sem needs a deploy; a CR-set exam row (like term.sem_end) if exams start moving. */
-const MIDSEM = { from:"2026-10-05", to:"2026-10-10", units:[0, 1] };
-const isMid = u => MIDSEM.units.includes(u);
-/* before (with days to go), on, or over — asked of a date so demo() can pin it */
-function midState(iso) {
-  if (iso > MIDSEM.to) return { s:"over" };
-  if (iso >= MIDSEM.from) return { s:"on" };
-  return { s:"before", days: Math.round((fromISO(MIDSEM.from) - fromISO(iso)) / 864e5) };
-}
 /* Track ticks topics off; Read is the syllabus and nothing else. A device preference,
    like the theme: it is how this phone gets used, not a fact about the student. */
 let sylView = "track";
@@ -7708,11 +7714,11 @@ function sylStations(k) {
   return line;
 }
 
-function renderMidsem() {
-  const box = document.getElementById("sylMid");
-  box.textContent = "";
+/* The mid-sem card. On Today it carries a way into the syllabus; on the Syllabus tab it
+   is already there. null once the exams are over. */
+function midCard(withLink) {
   const st = midState(nowISO());
-  if (st.s === "over") return;
+  if (st.s === "over") return null;
   const card = el("div", "syl-mid" + (st.s === "on" ? " on" : ""));
   const m = el("div", "m");
   m.appendChild(el("b", null, st.s === "on" ? "Mid-sems are on" : "Mid-sems"));
@@ -7737,7 +7743,32 @@ function renderMidsem() {
     r.appendChild(el("span", null, "until Sat 10"));
   }
   card.appendChild(r);
-  box.appendChild(card);
+  if (withLink) {
+    const link = el("button", "upnext syl-mid-go");
+    link.type = "button";
+    link.appendChild(el("span", "t", "View syllabus"));
+    link.appendChild(el("span", "chev", "›"));
+    link.addEventListener("click", () => {
+      const s = document.getElementById("sylSearch");
+      if (s) s.value = "";
+      go("syllabus");
+    });
+    card.appendChild(link);
+  }
+  return card;
+}
+function renderMidsem() {
+  const box = document.getElementById("sylMid");
+  box.textContent = "";
+  const c = midCard(false);
+  if (c) box.appendChild(c);
+}
+function renderMidToday() {
+  const box = document.getElementById("midBox");
+  if (!box) return;
+  box.textContent = "";
+  const c = midCard(true);
+  if (c) box.appendChild(c);
 }
 
 function renderSylNext() {
