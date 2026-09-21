@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+4b27e85-->
+<!--secf-app--><!--build:1.1.2+3100d93-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1578,6 +1578,83 @@ dialog .btn { margin-top:8px; }
   .user-pill .uname { display:none !important; }
 }
 
+/* ============ syllabus: a line per subject, a station per unit ============ */
+@property --p { syntax:"<percentage>"; inherits:false; initial-value:0%; }
+.syl-find { margin-top:0; }
+.syl-board .syl-row { width:100%; border:0; font:inherit; color:inherit; text-align:left; cursor:pointer;
+                      transition:background-color .2s var(--ease); }
+.syl-board .syl-row:hover { background:var(--plate-2); }
+.syl-row .pct { font-size:23px; color:var(--ink); }
+.syl-line { position:relative; display:flex; justify-content:space-between; width:min(172px, 100%); height:12px; margin-top:10px; }
+.syl-line::before { content:""; position:absolute; left:6px; right:6px; top:5px; height:2px; background:var(--rule); }
+.syl-line i { position:relative; width:12px; height:12px; border-radius:50%;
+              background:radial-gradient(closest-side, var(--bg) 48%, transparent 54%), conic-gradient(var(--line) var(--p), var(--rail) 0);
+              transition:--p .6s var(--ease); }
+.syl-line i.full { background:var(--line); }
+
+.syl-count { font-size:13px; font-weight:600; color:var(--ink-3); margin:4px 0 10px; }
+.syl-hits { display:grid; gap:1px; background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; }
+.syl-hit { display:grid; grid-template-columns:4px 1fr auto; gap:12px; align-items:center; width:100%; padding:12px 14px;
+           border:0; background:var(--plate); color:var(--ink); font:inherit; text-align:left; cursor:pointer;
+           transition:background-color .2s var(--ease); }
+.syl-hit:hover { background:var(--plate-2); }
+.syl-hit .bar { align-self:stretch; border-radius:2px; background:var(--line); min-height:30px; }
+.syl-hit .m { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.syl-hit .t { font-size:15px; line-height:1.35; color:var(--ink-2); }
+.syl-hit mark { background:none; color:var(--ink); font-weight:700; text-decoration:underline 2px var(--line); text-underline-offset:3px; }
+.syl-hit .where { font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); }
+.syl-hit.done::after { content:"Done"; font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ok); }
+
+.syl-sum { margin-top:14px; font-size:14px; color:var(--ink-2); }
+.syl-sum b { font-family:'Blinker', sans-serif; font-weight:700; font-size:17px; color:var(--ink); }
+.syl-scheme { margin-top:3px; font-size:12.5px; color:var(--ink-3); }
+.syl-rail { position:relative; margin-top:20px; padding-left:28px; }
+.syl-rail::before { content:""; position:absolute; left:7px; top:9px; bottom:12px; width:2px; border-radius:1px; background:var(--rail); }
+.syl-unit + .syl-unit { margin-top:22px; }
+.syl-uhead { position:relative; display:flex; align-items:center; gap:10px; min-height:22px; }
+.syl-node { position:absolute; left:-28px; top:3px; width:16px; height:16px; border-radius:50%;
+            background:radial-gradient(closest-side, var(--plate) 50%, transparent 56%), conic-gradient(var(--line) var(--p), var(--rail) 0);
+            transition:--p .5s var(--ease); }
+.syl-node.full { background:var(--line); box-shadow:0 0 0 3px var(--plate); }
+.syl-uhead h3 { margin:0; font-family:'Blinker', sans-serif; font-size:15px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--line); }
+.syl-ucount { font-size:12.5px; font-weight:600; color:var(--ink-3); }
+.syl-all { margin-left:auto; font-size:12.5px; padding:6px 0; }
+.syl-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.syl-chip { display:inline-flex; align-items:flex-start; gap:8px; min-height:36px; padding:8px 12px 8px 9px; border-radius:10px;
+            border:1px solid transparent; background:var(--plate-2); color:var(--ink-2); font:inherit; font-size:13.5px; font-weight:500;
+            line-height:1.35; text-align:left; cursor:pointer; transition:background-color .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease); }
+.syl-chip:hover { background:var(--plate-3); }
+.syl-chip .tk { position:relative; flex:none; width:16px; height:16px; margin-top:1px; border-radius:50%; box-shadow:inset 0 0 0 1.5px var(--rail);
+                transition:background-color .2s var(--ease), box-shadow .2s var(--ease); }
+.syl-chip[aria-pressed="true"] { color:var(--ink); border-color:color-mix(in srgb, var(--line) 42%, transparent); }
+.syl-chip[aria-pressed="true"] .tk { background:var(--line); box-shadow:none; }
+.syl-chip[aria-pressed="true"] .tk::after { content:""; position:absolute; left:5.5px; top:3px; width:4px; height:7.5px;
+                                            border:solid var(--badge-ink); border-width:0 2px 2px 0; transform:rotate(45deg); }
+.syl-chip.found { border-color:var(--line); }
+.syl-open { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; margin-top:14px; padding:12px 14px;
+            border:1px solid var(--rule-soft); border-radius:10px; background:var(--plate-2); color:var(--ink); font:inherit; cursor:pointer; }
+.syl-open:hover { background:var(--plate-3); }
+.syl-open b { font-family:'Blinker', sans-serif; font-weight:700; font-size:15px; }
+.syl-open span { font-size:13px; color:var(--ink-2); }
+
+.paper { display:grid; grid-template-columns:1.2fr repeat(4, 1fr); gap:4px; }
+.pq { padding:11px 6px 9px; border-radius:9px; background:var(--plate-2); text-align:center; }
+.pq b { display:block; font-family:'Blinker', sans-serif; font-weight:700; font-size:23px; line-height:1; color:var(--ink); }
+.pq span { display:block; margin-top:5px; font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); white-space:nowrap; }
+.pq.q1 { background:var(--ink); }
+.pq.q1 b { color:var(--bg); }
+.pq.q1 span { color:color-mix(in srgb, var(--bg) 62%, var(--ink)); }
+.paper-notes { margin:14px 0 0; padding-left:18px; font-size:13.5px; line-height:1.5; color:var(--ink-2); }
+.paper-notes li + li { margin-top:6px; }
+.paper-notes li::marker { color:var(--ink-3); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .syl-chip[aria-pressed="true"] .tk::after { animation:tkIn .24s var(--ease) both; }
+  .syl-chip.found { animation:sylFound 1.4s var(--ease) .25s both; }
+}
+@keyframes tkIn { from { opacity:0; transform:rotate(45deg) scale(.4); } }
+@keyframes sylFound { 0%, 40% { box-shadow:0 0 0 4px color-mix(in srgb, var(--line) 30%, transparent); } }
+
 /* ============ welcome: entering the app ============
    One idea, in the network's own grammar: your line is drawn across the screen and
    your name rises out from behind it, like a platform board turning over. No
@@ -2336,6 +2413,9 @@ input[type="date"] { padding:12px 14px; }
   <a href="#attendance" data-p="attendance">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.4"/><path d="M8.4 12.2l2.6 2.6 4.8-5"/></svg>
     Attendance</a>
+  <a href="#syllabus" data-p="syllabus">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6.6C10 5.1 7.2 4.6 3.4 5v13.2c3.8-.4 6.6.1 8.6 1.6 2-1.5 4.8-2 8.6-1.6V5c-3.8-.4-6.6.1-8.6 1.6z"/><path d="M12 6.6v13.2"/></svg>
+    Syllabus</a>
   <a href="#directory" data-p="directory">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.4" r="3.1"/><path d="M3.6 19.2c.6-3 2.8-4.6 5.4-4.6s4.8 1.6 5.4 4.6"/><path d="M16.4 6.2a2.6 2.6 0 0 1 0 5.2M18.2 14.8c1.6.6 2.6 2.2 2.9 4.4"/></svg>
     Section</a>
@@ -2567,6 +2647,22 @@ input[type="date"] { padding:12px 14px; }
     </div>
     <div class="lbstate" id="lbState" role="status" aria-live="polite"><i></i><span>Connecting…</span></div>
     <div id="lbBox"></div>
+  </section>
+
+  <section id="syllabus" hidden>
+    <div class="h2row">
+      <h2>Syllabus</h2>
+    </div>
+    <div class="field syl-find">
+      <input id="sylSearch" aria-label="Find a topic in the syllabus" type="search" autocapitalize="off" spellcheck="false"
+             placeholder="Find a topic — Kepler, Thevenin, pointers" enterkeyhint="search">
+    </div>
+    <div id="sylFound" role="status" aria-live="polite"></div>
+    <div id="sylList"></div>
+    <details class="fold">
+      <summary>How the paper is set</summary>
+      <div id="sylPaper"></div>
+    </details>
   </section>
 
   <section id="directory" hidden>
@@ -2890,8 +2986,58 @@ const SUB = {
   EGL:   { line:"eg",  short:"Graphics Lab",   code:"ICT 123",   name:"Engineering Graphics I Lab", fac:"Mr. Naman Bajpai", lab:true },
   CSL:   { line:"csl", short:"Comm Skills",    code:"ICT 113",   name:"Communication Skills", fac:"Ms. Isha" },
   PD:    { line:"pd",  short:"Personality Dev", code:"PD",       name:"Personality Development", fac:"Ms. Isha", noAtt:true },
-  EVSL:  { line:"evs", short:"EVS",            code:"EM 117 T",  name:"Environment Studies (lecture)", fac:"Dr. Kavita Gupta" },
+  EVSL:  { line:"evs", short:"EVS",            code:"ICT 117 T",  name:"Environment Studies (lecture)", fac:"Dr. Kavita Gupta" },
   EVSP:  { line:"evs", short:"EVS Lab",        code:"ICT 117 P", name:"Environment Studies Lab", fac:"Dr. Kavita Gupta", lab:true },
+};
+
+/* The syllabus, as GGSIPU printed it for the 2026-27 batch (USICT affiliated B.Tech,
+   1st sem). Four units a subject; each topic is one tickable station. A topic's id is
+   its position (PHL.2.13), so reordering a list here moves people's ticks — append,
+   don't reshuffle. Labs and Graphics are not in the copy we have. scheme: "std" is the
+   40 internal / 60 end-term paper, "nues" is internal-only, null is not in our copy. */
+const SYL = {
+  PPS: { scheme:"std", book:null, units:[
+    ["Structure of a C program", "Basic data types (int, char, float, double, bool, fixed-width integers)", "Declarations and initializations", "Constants using const and #define", "Operators and expressions (arithmetic, relational, logical, bitwise, assignment, conditional, increment/decrement)", "Type conversions (implicit, explicit casting)", "Input/output (printf, scanf, format specifiers)", "Compound statements (blocks)", "Conditional statements (if, if-else, else-if, switch)", "Loops (while, do-while, for, infinite loops, early exit)", "break, continue, goto, return", "Algorithm development: flowcharts and pseudocode", "Tracing and dry run", "Structured programming", "C89, C99, C11 and C23 extensions"],
+    ["Function declaration, definition and invocation", "Argument passing (by value, recursion)", "Inline functions and macro functions", "Storage classes (auto, static, extern, register, thread_local)", "Scope and lifetime of variables", "Header files and modular program design", "One- and two-dimensional arrays (declaration, access, memory layout)", "Bubble, selection and insertion sort", "Linear and binary search", "String input/output (gets, puts, fgets, fputs)", "String manipulation (strlen, strcpy, strcat, strcmp)", "Arrays of strings", "Command-line arguments", "Root finding of a positive floating point number"],
+    ["Structures (nested, array of structures, pointer to structures)", "Unions (use-cases, memory layout)", "Enumerated types (enum, typedef enum)", "Bit fields", "Memory layout and alignment", "Pointers (dereferencing, pointer arithmetic, arrays vs pointers, pointer to pointer)", "Dynamic memory allocation (malloc, calloc, realloc, free)", "Memory leak prevention and null pointer checks", "Compound literals", "Polynomials with floating point coefficients", "Matrix addition, subtraction and multiplication", "File I/O (fopen, fclose, fprintf, fscanf, fread, fwrite; text and binary)", "Error handling using errno", "Command-line parameters"],
+    ["Abstract Data Types (ADTs)", "Singly and doubly linked lists", "Stack (array and linked list implementation)", "Infix-to-postfix conversion", "Parenthesis balancing", "Queue (linear, circular, priority)", "Traversal, insertion and deletion in lists", "Binary tree basics (creation, inorder, preorder, postorder)", "Function pointers", "Pointers to arrays and functions", "Generic code using macros and _Generic", "Assertions and diagnostics (assert, _Static_assert)", "Safer macros and expressions", "Forward declaration", "Program segmentation", "Header hygiene", "Recursion"],
+  ]},
+  BEE: { scheme:null, book:"D. P. Kothari & I. J. Nagrath, Basic Electrical Engineering", units:[
+    ["Active and passive elements", "Voltage and current sources (dependent, independent)", "Source conversion", "Ohm's law", "Kirchhoff's laws", "Superposition theorem", "Thevenin's theorem", "Norton's theorem", "Maximum power transfer theorem", "Series and parallel resistive circuits", "Power and energy in DC circuits", "Mesh and nodal analysis", "Star-delta transformation"],
+    ["Generation of sinusoidal AC voltage", "Average value, RMS value, form factor and peak factor", "Concept of phasor", "Concept of power factor", "Impedance and admittance", "Active, reactive and apparent power", "R-L, R-C and R-L-C series and parallel circuits", "Three-phase systems: necessity and advantages", "Line and phase values in balanced star and delta", "Power in balanced and unbalanced three-phase systems"],
+    ["Magnetic circuits: basic definitions", "Magnetization characteristics of ferromagnetic materials", "Self-inductance and mutual inductance", "Energy in linear magnetic systems", "Coils connected in series", "AC excitation in magnetic circuits", "Magnetic field of a current carrying conductor", "Force on a current carrying conductor", "Laws of electromagnetic induction, induced EMF", "Single phase transformer: construction and working", "Transformer EMF equation, equivalent circuit, phasor diagram", "Voltage regulation, losses and efficiency", "Open circuit and short circuit test"],
+    ["DC machine: construction, classification and working", "1-phase induction machine: working principle", "3-phase induction motor: working principle", "Concept of slip", "Torque-slip characteristics", "Losses in electrical machines", "Applications of DC and induction machines"],
+  ]},
+  PHL: { scheme:"std", book:"D. Kleppner & R. Kolenkow, An Introduction to Mechanics", units:[
+    ["Physical quantities", "Scalars, vectors and vector algebra", "Coordinate systems", "Reference frames", "Newton's laws of motion", "Equations of motion", "Motion in one and two dimensions", "Projectile motion", "Circular motion", "Applications of Newton's laws", "Forces in nature", "Frictional forces", "Constraints and constraint forces", "Motion in polar coordinates", "Cylindrical and spherical coordinate systems"],
+    ["Work done by a force", "Kinetic and potential energy", "Conservative and non-conservative forces", "Potential energy functions", "Relation between force and potential energy", "Equipotential surfaces", "Conservation of mechanical energy", "Linear momentum and impulse", "Conservation of momentum", "Angular momentum and torque", "Conservation of angular momentum", "Central forces", "Planetary motion and Kepler's laws", "Satellite motion and orbits"],
+    ["Simple harmonic motion", "Differential equation of a harmonic oscillator", "Energy of a harmonic oscillator", "Mechanical oscillators", "Damped oscillations (over-, critically and under-damped)", "Forced oscillations", "Resonance and quality factor", "Engineering applications of vibration and resonance", "Non-inertial reference frames", "Rotating frames", "Centripetal and Coriolis forces", "Applications of the Coriolis effect"],
+    ["Centre of mass", "Motion of rigid bodies", "Translational and rotational motion", "Moment of inertia and radius of gyration", "Parallel and perpendicular axis theorems", "Torque and angular momentum", "Rotational kinetic energy", "Rolling motion", "Gyroscopic effects", "Three-dimensional rigid body motion"],
+  ]},
+  SMT: { scheme:"std", book:"E. Kreyszig, Advanced Engineering Mathematics", units:[
+    ["Functions of several variables, partial derivatives", "Chain rule", "Differentiation of implicit functions", "Exact differentials", "Jacobians and transformation of coordinates", "Taylor's and Maclaurin's series", "Maxima, minima and saddle points", "Method of Lagrange multipliers", "Differentiation under the integral sign", "ODEs: basic concepts and geometric meaning", "Direction fields and Euler's method", "Separable ODEs", "Exact ODEs and integrating factors", "Linear differential equations", "Bernoulli equation", "Orthogonal trajectories"],
+    ["Higher-order linear ODEs with constant coefficients", "Differential operator method", "Euler-Cauchy equations", "Wronskian", "Variation of parameters", "Free oscillations of mass-spring systems", "Power series solution of ODEs", "Bessel's equation and Bessel functions", "Legendre's equation and Legendre polynomials", "Recurrence relations and properties", "Gamma and Beta functions"],
+    ["Matrices and determinants", "Gauss and Gauss-Jordan elimination", "Rank of a matrix", "Linear independence", "Vector spaces", "Systems of linear equations: existence and uniqueness", "Cramer's rule", "Eigenvalues and eigenvectors", "Symmetric, skew-symmetric and orthogonal matrices", "Eigenbases and diagonalization", "Quadratic forms", "Gram-Schmidt orthogonalization", "Cayley-Hamilton theorem", "LU and Cholesky decomposition"],
+    ["Vector and scalar point functions", "Space curves and arc length", "Curvature", "Gradient and directional derivative", "Divergence and curl", "Line integrals and path independence", "Double and triple integrals", "Surface integrals", "Green's theorem", "Gauss divergence theorem", "Stokes' theorem"],
+  ]},
+  EM: { scheme:"std", book:"A. K. Tayal, Engineering Mechanics", units:[
+    ["Force system: introduction", "Principle of transmissibility", "Resultant of a force system", "Resolution of a force", "Moment of a force about a line", "Varignon's theorem", "Couple, and resolving a force into a force and a couple", "Properties of a couple", "Free body diagram", "Equations of equilibrium", "Equilibrium of two- and three-force members"],
+    ["Plane truss: perfect and imperfect", "Assumptions in truss analysis", "Method of joints", "Method of sections", "Graphical method", "Static and kinetic friction", "Laws of dry friction", "Coefficient and angle of friction, angle of repose", "Cone of friction", "Frictional lock", "Friction in flat pivot and collar bearings", "Friction in flat belts"],
+    ["Rectilinear motion", "Plane curvilinear motion", "Rectangular coordinates", "Normal and tangential coordinates", "Equation of motion of a particle", "Work-energy equation", "Conservation of energy", "Impulse and momentum", "Conservation of momentum", "Impact and coefficient of restitution", "Loss of energy during impact"],
+    ["Rigid bodies and types of motion", "Absolute motion", "Relative velocity", "Relative acceleration (Coriolis component excluded)", "Instantaneous centre of zero velocity", "Equation of motion of a rigid body", "Translation and fixed axis rotation", "Work-energy principle for rigid bodies", "Conservation of energy for rigid bodies"],
+  ]},
+  CSL: { scheme:"std", book:"P. C. Wren & H. Martin, High English Grammar and Composition", units:[
+    ["Parts of speech", "Sentence structure and types of sentences", "Transformation of sentences", "Subject-verb agreement", "Articles and determiners", "Prepositions", "Tenses", "Active and passive voice", "Direct and indirect speech", "Word formation", "Synonyms and antonyms", "Prefixes and suffixes", "Commonly confused words", "Technical vocabulary", "Common errors in English usage"],
+    ["Principles of effective writing", "Types of writing", "Paragraph structure and development", "Topic sentences and supporting ideas", "Coherence and cohesion", "Paraphrasing", "Summarizing", "Précis writing", "Editing and proofreading", "Avoiding ambiguity and redundancy", "Clarity and precision in writing"],
+    ["Principles of formal communication", "Professional writing conventions", "Meetings: agenda and minutes", "Formal letters", "Applications", "Notices", "Memoranda", "Press releases", "E-mails", "Technical communication", "Writing for academic and professional contexts"],
+    ["Skimming, scanning, intensive and extensive reading", "Main ideas and supporting details", "Inference and interpretation", "Steven Spielberg's Harvard Commencement speech (2016)", "Johan Rockström: Let the Environment Guide Our Development", "Theme and central ideas", "Structure and organization", "Style and rhetorical techniques", "Vocabulary and expressions", "Critical response and discussion"],
+  ]},
+  EVSL: { scheme:"nues", book:"Erach Bharucha, Environmental Studies", units:[
+    ["Scope and importance of environmental studies", "Historical human-environment interactions", "Basic ecological principles", "Levels of organization in ecology", "Ecosystem components (biotic and abiotic)", "Energy flow in ecosystems", "Biogeochemical cycles", "Biodiversity and its conservation", "Threats to biodiversity", "Ecosystem services and their value"],
+    ["Renewable and non-renewable resources", "Sustainable resource use", "Water resources and management", "Water pollution and water management challenges", "Land resources and degradation", "Soil formation, types and degradation", "Land use patterns", "Mineral resources and extraction", "Energy resources and their impacts", "Forests and wildlife", "Deforestation: causes and effects", "Wildlife conservation and protected areas"],
+    ["Air, water and soil pollution", "Noise, marine and thermal pollution", "Hazardous waste management", "E-waste management", "Environmental toxicology", "Public health and environment", "Climate change and the greenhouse effect", "Global warming and its impacts", "Ozone layer depletion", "Acid rain and smog", "Environmental disasters"],
+    ["Environmental legislation and policies", "Role of government agencies", "Environmental Impact Assessment (EIA)", "Sustainable development", "Environmental ethics (anthropocentrism, biocentrism, ecocentrism, deep ecology)", "Population and environment", "Urbanization and its challenges", "Environmental movements and NGOs", "Public participation in decisions", "Case studies of environmental challenges", "Individual actions for sustainability"],
+  ]},
 };
 
 /* period index 0-6; lunch sits between period 2 and period 3 */
@@ -3497,6 +3643,14 @@ function openDetail(item, dayIdx, onIso) {
     box.appendChild(el("div", "d-name", s.short));
     box.appendChild(el("div", "d-full", s.name));
     rows.push(["Faculty", s.fac], ["Code", s.code], ["Room", s.lab ? "Lab" : "2311"]);
+    if (SYL[key]) {
+      const p = sylOf(key), b = el("button", "syl-open");
+      b.type = "button";
+      b.appendChild(el("b", null, "Syllabus"));
+      b.appendChild(el("span", null, p.d ? p.d + " of " + p.n + " topics done ›" : "4 units · " + p.n + " topics ›"));
+      b.addEventListener("click", () => openSyllabus(key));
+      rows.link = b;
+    }
   } else {
     top.appendChild(el("span", "badge ghost", "Batches split"));
     box.appendChild(top);
@@ -3517,6 +3671,7 @@ function openDetail(item, dayIdx, onIso) {
     list.appendChild(r);
   });
   box.appendChild(list);
+  if (rows.link) box.appendChild(rows.link);
 
   /* Both a verdict and a vote are pinned to a date. The sheet is reached from a
      weekday, so unless the caller knew better, resolve that weekday against the week
@@ -4058,6 +4213,19 @@ function demo() {                                   // run demo() in the console
   ok(classesIn("2026-09-10", "2026-09-10").per.PD, undefined, "...and it is never a class still to come");
 
   att = keptAtt; overrides = keptOvr;
+
+  /* the syllabus: search finds a topic in its unit, and progress counts what is ticked */
+  ok(sylFind("kepler").map(h => h.k + "." + h.u).join(), "PHL.1", "Kepler's laws are Physics, Unit II");
+  ok(sylFind("precis")[0].k, "CSL", "search ignores accents: precis finds Précis");
+  ok(sylFind("thevenin")[0].k, "BEE", "...and apostrophes do not get in the way");
+  ok(sylFind("zzzz").length, 0, "a word in no topic finds nothing");
+  ok(Object.keys(SYL).every(k => SUB[k] && SYL[k].units.length === 4), true, "every syllabus is a real subject with four units");
+  const keptSyl = sylDone;
+  sylDone = { "EM.0.0": { d:1, t:1 }, "EM.0.1": { d:0, t:2 } };
+  ok(sylOf("EM").d, 1, "an untick counts for nothing");
+  SYL.EM.units[0].forEach((_, i) => { sylDone["EM.0." + i] = { d:1, t:3 }; });
+  ok(sylOf("EM").units, 1, "a unit with every topic ticked is done");
+  sylDone = keptSyl;
 
   /* the sync merge: records are irreplaceable, so this only ever resolves a collision */
   ok(mergeMark(undefined, 5), "take", "a class only the cloud has comes down");
@@ -5399,7 +5567,7 @@ async function heartbeatDevice() {
     if (res && res.valid === false) {
       const other = res.other_device || "another device";
       sess = null; profile = null; saveSess(); saveProfile();
-      att = {}; plan = {}; uid = null;
+      att = {}; plan = {}; sylDone = {}; uid = null;
       gateShow("login");
       say("liHint", "You were signed out because your account was logged in on " + other + ".", true);
     }
@@ -5423,7 +5591,7 @@ async function signOut() {
   const t = sess && sess.access_token;
   if (t) await releaseThisDevice(t).catch(() => {});
   sess = null; profile = null; saveSess(); saveProfile();
-  att = {}; plan = {}; uid = null;                 /* the records stay in their own bucket */
+  att = {}; plan = {}; sylDone = {}; uid = null;                 /* the records stay in their own bucket */
   /* a shared phone is the normal case here: the refresh token has to die on the
      server too, or the next person can still be signed in as you */
   if (t) await call("/auth/v1/logout", { method:"POST" }, t).catch(() => {});
@@ -7334,7 +7502,291 @@ document.addEventListener("click", e => {
 
 /* pages — clicks drive them; the hash is a bonus for back/forward and
    deep links, and is unavailable from a data: URL */
-const PAGES = ["today", "week", "ranks", "directory", "attendance", "holidays", "cr"];
+/* ============================================================
+   Syllabus. Each subject is a line, each unit a station on it,
+   and each topic ticked is a stretch of that line travelled.
+   ============================================================ */
+const ROMAN = ["I", "II", "III", "IV"];
+/* { "PHL.2.13": { d:1|0, t:ms } } — an untick is kept as d:0 so it syncs like a tick */
+let sylDone = readMap(nsKey("bunkr-syl"));
+const saveSyl = () => { try { localStorage.setItem(nsKey("bunkr-syl"), JSON.stringify(sylDone)); } catch (e) {} };
+const sylId = (k, u, i) => k + "." + u + "." + i;
+const isDone = id => !!(sylDone[id] && sylDone[id].d);
+
+function sylUnit(k, u) {
+  const n = SYL[k].units[u].length;
+  let d = 0;
+  for (let i = 0; i < n; i++) if (isDone(sylId(k, u, i))) d++;
+  return { d, n };
+}
+function sylOf(k) {
+  let d = 0, n = 0, units = 0;
+  SYL[k].units.forEach((_, u) => { const x = sylUnit(k, u); d += x.d; n += x.n; if (x.d === x.n) units++; });
+  return { d, n, units };
+}
+
+/* lower-case, accents off, so "precis" finds "Précis" */
+const fold = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+function sylFind(q) {
+  const words = fold(q).split(/\s+/).filter(Boolean);
+  if (!words.length) return [];
+  const hits = [];
+  Object.keys(SYL).forEach(k => SYL[k].units.forEach((list, u) => list.forEach((t, i) => {
+    const f = fold(t);
+    if (words.every(w => f.includes(w))) hits.push({ k, u, i, t });
+  })));
+  return hits;
+}
+
+function toggleTopic(id, on) {
+  sylDone[id] = { d: on ? 1 : 0, t: Date.now() };
+  saveSyl();
+  pushSyl([id]).catch(() => {});                  /* the next sync retries anything that missed */
+}
+
+/* ---- sync: same rules as attendance — newest write wins, nothing local is dropped ---- */
+async function pushSyl(ids) {
+  if (!profile || !ids.length) return;
+  const t = await token();
+  if (!t) return;
+  return call("/rest/v1/syllabus_progress?on_conflict=user_id,topic", {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify(ids.map(id => ({ topic: id, done: !!sylDone[id].d,
+                                         updated_at: new Date(sylDone[id].t).toISOString() }))),
+  }, t);
+}
+async function syncSyllabus() {
+  if (!profile) return;
+  const t = await token();
+  if (!t) return;
+  const rows = await call("/rest/v1/syllabus_progress?select=topic,done,updated_at", {}, t);
+  const seen = {};
+  rows.forEach(r => {
+    const theirs = Date.parse(r.updated_at) || 0;
+    seen[r.topic] = theirs;
+    if (mergeMark(sylDone[r.topic], theirs) === "keep") return;
+    sylDone[r.topic] = { d: r.done ? 1 : 0, t: theirs };
+  });
+  saveSyl();
+  const up = Object.keys(sylDone).filter(id => !(id in seen) || (sylDone[id].t || 0) > seen[id]);
+  if (up.length) await pushSyl(up);
+  if (!document.getElementById("syllabus").hidden) renderSyllabus();
+}
+
+/* ---- the tab ---- */
+function sylStations(k) {
+  /* four stations on a short line; each ring fills with the share of its unit ticked */
+  const line = el("div", "syl-line");
+  line.setAttribute("aria-hidden", "true");
+  SYL[k].units.forEach((_, u) => {
+    const { d, n } = sylUnit(k, u);
+    const st = el("i", d === n ? "full" : null);
+    st.style.setProperty("--p", Math.round(d / n * 100) + "%");
+    line.appendChild(st);
+  });
+  return line;
+}
+
+function renderSyllabus() {
+  const q = document.getElementById("sylSearch").value.trim();
+  const list = document.getElementById("sylList"), found = document.getElementById("sylFound");
+  list.textContent = ""; found.textContent = "";
+  list.hidden = !!q;
+
+  if (q) {
+    const hits = sylFind(q);
+    found.appendChild(el("div", "syl-count", hits.length
+      ? hits.length + (hits.length === 1 ? " topic" : " topics")
+      : "Nothing in the syllabus matches “" + q + "”"));
+    if (!hits.length) return;
+    const box = el("div", "syl-hits");
+    const words = fold(q).split(/\s+/).filter(Boolean);
+    hits.slice(0, 60).forEach(h => {
+      const b = el("button", "syl-hit");
+      b.type = "button"; b.dataset.line = SUB[h.k].line;
+      if (isDone(sylId(h.k, h.u, h.i))) b.classList.add("done");
+      b.appendChild(el("span", "bar"));
+      const m = el("span", "m");
+      m.appendChild(markWords(h.t, words));
+      m.appendChild(el("span", "where", SUB[h.k].short + " · Unit " + ROMAN[h.u]));
+      b.appendChild(m);
+      b.addEventListener("click", () => openSyllabus(h.k, h.u, h.i));
+      box.appendChild(b);
+    });
+    found.appendChild(box);
+    return;
+  }
+
+  const rows = el("div", "board syl-board");
+  Object.keys(SYL).forEach(k => {
+    const s = SUB[k], p = sylOf(k);
+    const b = el("button", "srow syl-row");
+    b.type = "button"; b.dataset.line = s.line;
+    b.setAttribute("aria-label", s.name + ", " + p.d + " of " + p.n + " topics done");
+    b.appendChild(el("span", "bar"));
+    const m = el("div", "m");
+    m.appendChild(el("div", "n", s.short));
+    m.appendChild(el("div", "adv", s.code + " · " + (p.units ? p.units + " of 4 units done" : "4 units")));
+    m.appendChild(sylStations(k));
+    b.appendChild(m);
+    const r = el("div", "r");
+    r.appendChild(el("div", "pct", Math.round(p.d / p.n * 100) + "%"));
+    r.appendChild(el("div", "held", p.d + " of " + p.n));
+    b.appendChild(r);
+    b.addEventListener("click", () => openSyllabus(k));
+    rows.appendChild(b);
+  });
+  list.appendChild(rows);
+}
+
+/* the query's words, marked where they fall — text nodes only, never innerHTML */
+function markWords(text, words) {
+  const out = el("span", "t"), f = fold(text);
+  const hit = new Array(text.length).fill(false);
+  words.forEach(w => { let at = f.indexOf(w); while (at > -1) { for (let j = 0; j < w.length; j++) hit[at + j] = true; at = f.indexOf(w, at + 1); } });
+  let i = 0;
+  while (i < text.length) {
+    let j = i; while (j < text.length && hit[j] === hit[i]) j++;
+    out.appendChild(hit[i] ? el("mark", null, text.slice(i, j)) : document.createTextNode(text.slice(i, j)));
+    i = j;
+  }
+  return out;
+}
+
+/* ---- one subject's sheet: its four stations, and every topic on them ---- */
+function openSyllabus(k, focusU, focusI) {
+  const s = SUB[k], syl = SYL[k];
+  const box = document.getElementById("dlgIn");
+  box.textContent = ""; box.dataset.line = s.line;
+  box.appendChild(el("div", "grab"));
+
+  const top = el("div", "d-top");
+  top.appendChild(el("span", "badge", "Syllabus"));
+  top.appendChild(el("span", "plate-when", s.code));
+  box.appendChild(top);
+  box.appendChild(el("div", "d-name", s.short));
+  box.appendChild(el("div", "d-full", s.name));
+
+  const sum = el("div", "syl-sum");
+  const say = () => {
+    const p = sylOf(k);
+    sum.textContent = "";
+    sum.appendChild(el("b", null, p.d + " of " + p.n));
+    sum.appendChild(document.createTextNode(" topics done · " + p.units + " of 4 units"));
+  };
+  say();
+  box.appendChild(sum);
+  box.appendChild(el("div", "syl-scheme",
+    syl.scheme === "std" ? "60 end-term · 40 internal · every unit is 12 marks of the paper"
+    : syl.scheme === "nues" ? "No end-term paper · 100 marks, all from your teacher"
+    : "Marking scheme isn't in our copy of the syllabus"));
+
+  const rail = el("div", "syl-rail");
+  syl.units.forEach((topics, u) => {
+    const unit = el("section", "syl-unit");
+    unit.id = "syl-u" + u;
+    const head = el("div", "syl-uhead");
+    const st = el("i", "syl-node");
+    head.appendChild(st);
+    head.appendChild(el("h3", null, "Unit " + ROMAN[u]));
+    const cnt = el("span", "syl-ucount");
+    head.appendChild(cnt);
+    const all = el("button", "link syl-all");
+    all.type = "button";
+    head.appendChild(all);
+    unit.appendChild(head);
+
+    const chips = el("div", "syl-chips");
+    const btns = topics.map((t, i) => {
+      const id = sylId(k, u, i), b = el("button", "syl-chip");
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(isDone(id)));
+      const tick = el("span", "tk"); tick.setAttribute("aria-hidden", "true");
+      b.appendChild(tick);
+      b.appendChild(el("span", null, t));
+      b.addEventListener("click", () => {
+        const on = b.getAttribute("aria-pressed") !== "true";
+        b.setAttribute("aria-pressed", String(on));
+        toggleTopic(id, on);
+        tone(); say();
+      });
+      if (u === focusU && i === focusI) b.classList.add("found");
+      chips.appendChild(b);
+      return b;
+    });
+    const tone = () => {
+      const { d, n } = sylUnit(k, u);
+      cnt.textContent = d + "/" + n;
+      st.style.setProperty("--p", Math.round(d / n * 100) + "%");
+      st.classList.toggle("full", d === n);
+      unit.classList.toggle("full", d === n);
+      all.textContent = d === n ? "Clear unit" : "Mark unit done";
+    };
+    all.addEventListener("click", () => {
+      const on = sylUnit(k, u).d !== topics.length;
+      const ids = [];
+      btns.forEach((b, i) => {
+        const id = sylId(k, u, i);
+        if (isDone(id) === on) return;
+        b.setAttribute("aria-pressed", String(on));
+        sylDone[id] = { d: on ? 1 : 0, t: Date.now() };
+        ids.push(id);
+      });
+      saveSyl(); pushSyl(ids).catch(() => {});
+      tone(); say();
+    });
+    tone();
+    unit.appendChild(chips);
+    rail.appendChild(unit);
+  });
+  box.appendChild(rail);
+
+  if (syl.book) {
+    const bk = el("div", "d-rows");
+    const r = el("div", "d-row");
+    r.appendChild(el("span", null, "Textbook"));
+    r.appendChild(el("span", null, syl.book));
+    bk.appendChild(r);
+    box.appendChild(bk);
+  }
+  box.appendChild(actions());
+
+  const d = document.getElementById("dlg");
+  if (!d.dataset.sylWired) {                        /* the list behind the sheet catches up on close */
+    d.dataset.sylWired = "1";
+    d.addEventListener("close", () => { if (!document.getElementById("syllabus").hidden) renderSyllabus(); });
+  }
+  openDlg(true);
+  if (focusU != null) requestAnimationFrame(() => {
+    const f = box.querySelector(".syl-chip.found") || document.getElementById("syl-u" + focusU);
+    if (f) f.scrollIntoView({ block: "center" });
+  });
+}
+
+/* ---- how the paper is set: the same for every theory subject but EVS ---- */
+function renderPaper() {
+  const box = document.getElementById("sylPaper");
+  box.textContent = "";
+  const bar = el("div", "paper");
+  [["Q1", "All units"], ["I", "Unit I"], ["II", "Unit II"], ["III", "Unit III"], ["IV", "Unit IV"]].forEach(([k, lbl], n) => {
+    const c = el("div", n ? "pq" : "pq q1");
+    c.appendChild(el("b", null, "12"));
+    c.appendChild(el("span", null, lbl));
+    bar.appendChild(c);
+  });
+  box.appendChild(bar);
+  const ul = el("ul", "paper-notes");
+  [
+    "Question 1 is compulsory: short answers from the whole syllabus.",
+    "Then one question per unit — you pick 1 of 2. Every unit carries 12, so none can be skipped.",
+    "That's 60 at the end of term. The other 40 come from your teacher through the semester.",
+    "EVS is different: no end-term paper, all 100 marks from your teacher.",
+  ].forEach(t => ul.appendChild(el("li", null, t)));
+  box.appendChild(ul);
+}
+
+const PAGES = ["today", "week", "ranks", "directory", "attendance", "syllabus", "holidays", "cr"];
 /* four tabs, seven pages: a sub-page lights its parent tab and its own switch */
 const TAB_OF = { holidays:"week", ranks:"directory", cr:null };
 function show(id) {
@@ -7342,6 +7794,7 @@ function show(id) {
   if (id === "cr") { renderCR(); refreshSection(); }
   if (id === "ranks") renderRanks();
   if (id === "directory") renderDirectory();
+  if (id === "syllabus") renderSyllabus();
   PAGES.forEach(p => {
     const sec = document.getElementById(p);
     sec.hidden = p !== id;
@@ -7359,6 +7812,8 @@ document.querySelectorAll(".nav a").forEach(a => a.addEventListener("click", e =
   go(a.dataset.p);
 }));
 document.querySelectorAll(".subnav button").forEach(b => b.addEventListener("click", () => go(b.dataset.p)));
+document.getElementById("sylSearch").addEventListener("input", renderSyllabus);
+renderPaper();
 window.addEventListener("popstate", () => show(location.hash.slice(1)));
 window.addEventListener("hashchange", () => show(location.hash.slice(1)));
 
@@ -8279,6 +8734,7 @@ function adoptUser(id) {
     att = readAtt("adgips-att");
   }
   plan = readMap(nsKey("adgips-plan"));
+  sylDone = readMap(nsKey("bunkr-syl"));
   let saved = null;
   try { saved = localStorage.getItem(nsKey("adgips-batch")); } catch (e) {}
   batch = saved || (uid && profile && profile.batch) || "both";
@@ -8300,6 +8756,7 @@ function afterSignIn() {
   /* the account's records come down first, so a second device does not look empty
      and the catch-up below does not offer days that are already marked elsewhere */
   /* the first-run sheet opens in the top layer, above everything: let the welcome finish first */
+  syncSyllabus().catch(() => {});
   syncAttendance().catch(() => {}).then(afterWelcome).then(runOnboarding);
 }
 
