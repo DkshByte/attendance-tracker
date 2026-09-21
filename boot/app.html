@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+619cd38-->
+<!--secf-app--><!--build:1.1.2+7977067-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1583,6 +1583,22 @@ dialog .btn { margin-top:8px; }
 /* ============ syllabus: a line per subject, a station per unit ============ */
 @property --p { syntax:"<percentage>"; inherits:false; initial-value:0%; }
 .syl-plate { margin-bottom:14px; }
+/* mid-sems: the one date on this page with a deadline attached */
+.syl-mid { display:flex; align-items:center; gap:16px; margin-bottom:14px; padding:14px 16px;
+           background:var(--plate); border:1px solid var(--rule); border-radius:14px; }
+.syl-mid.on { border-color:var(--warn); }
+.syl-mid .m { flex:1; min-width:0; }
+.syl-mid .m b { display:block; font-family:'Blinker', sans-serif; font-size:19px; font-weight:700; line-height:1.15; }
+.syl-mid .m > span { display:block; margin-top:2px; font-size:13px; color:var(--ink-2); }
+.syl-mid .gauge { margin-top:10px; }
+.syl-mid .gauge .track { background:color-mix(in srgb, var(--mute) 45%, transparent); }
+.syl-mid .gauge .track i { background:var(--warn); }
+.syl-mid .r { flex:none; text-align:right; }
+.syl-mid .r b { display:block; font-family:'Blinker', sans-serif; font-size:34px; font-weight:700; line-height:1; letter-spacing:-.01em; color:var(--warn); }
+.syl-mid .r span { display:block; margin-top:3px; font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); }
+.syl-midtag { padding:2px 7px; border-radius:3px; font-size:10.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+              color:var(--warn); box-shadow:inset 0 0 0 1px var(--warn); }
+.syl-units button.mid b::after { content:""; display:inline-block; width:5px; height:5px; margin:0 0 3px 4px; border-radius:50%; background:var(--warn); vertical-align:middle; }
 .syl-plate h1 { color:var(--ink); }
 .syl-plate .who { max-width:46ch; }
 .syl-plate .gauge .track i { transition:width .6s var(--ease); }
@@ -2716,6 +2732,7 @@ input[type="date"] { padding:12px 14px; }
         <button type="button" data-v="read" aria-pressed="false">Read</button>
       </div>
     </div>
+    <div id="sylMid"></div>
     <div id="sylNext"></div>
     <div class="field syl-find">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="M15.5 15.5l4.6 4.6"/></svg>
@@ -4284,6 +4301,9 @@ function demo() {                                   // run demo() in the console
   ok(sylFind("precis")[0].k, "CSL", "search ignores accents: precis finds Précis");
   ok(sylFind("thevenin")[0].k, "BEE", "...and apostrophes do not get in the way");
   ok(sylFind("zzzz").length, 0, "a word in no topic finds nothing");
+  ok(midState("2026-09-21").days, 14, "mid-sems are 14 days out on 21 Sep");
+  ok(midState("2026-10-07").s, "on", "...running on 7 Oct");
+  ok(midState("2026-10-11").s, "over", "...and over after the 10th");
   ok(Object.keys(SYL).every(k => SUB[k] && SYL[k].units.length === 4), true, "every syllabus is a real subject with four units");
   const keptSyl = covered;
   covered = { "EM.0.0": { d:1, t:1 }, "EM.0.1": { d:0, t:2 } };
@@ -7572,6 +7592,16 @@ document.addEventListener("click", e => {
    and each topic ticked is a stretch of that line travelled.
    ============================================================ */
 const ROMAN = ["I", "II", "III", "IV"];
+/* Mid-semester exams, as announced for the section. ponytail: written in here, so the
+   end-sem needs a deploy; a CR-set exam row (like term.sem_end) if exams start moving. */
+const MIDSEM = { from:"2026-10-05", to:"2026-10-10", units:[0, 1] };
+const isMid = u => MIDSEM.units.includes(u);
+/* before (with days to go), on, or over — asked of a date so demo() can pin it */
+function midState(iso) {
+  if (iso > MIDSEM.to) return { s:"over" };
+  if (iso >= MIDSEM.from) return { s:"on" };
+  return { s:"before", days: Math.round((fromISO(MIDSEM.from) - fromISO(iso)) / 864e5) };
+}
 /* Track ticks topics off; Read is the syllabus and nothing else. A device preference,
    like the theme: it is how this phone gets used, not a fact about the student. */
 let sylView = "track";
@@ -7678,6 +7708,38 @@ function sylStations(k) {
   return line;
 }
 
+function renderMidsem() {
+  const box = document.getElementById("sylMid");
+  box.textContent = "";
+  const st = midState(nowISO());
+  if (st.s === "over") return;
+  const card = el("div", "syl-mid" + (st.s === "on" ? " on" : ""));
+  const m = el("div", "m");
+  m.appendChild(el("b", null, st.s === "on" ? "Mid-sems are on" : "Mid-sems"));
+  m.appendChild(el("span", null, "5–10 Oct · Units I and II"));
+  if (!reading()) {
+    let d = 0, n = 0;
+    Object.keys(SYL).forEach(k => MIDSEM.units.forEach(u => { const x = sylUnit(k, u); d += x.d; n += x.n; }));
+    const g = el("div", "gauge");
+    const tr = el("div", "track"), fill = el("i");
+    fill.style.width = (d / n * 100).toFixed(1) + "%";
+    tr.appendChild(fill); g.appendChild(tr);
+    g.appendChild(el("span", null, d + " of " + n + " topics covered"));
+    m.appendChild(g);
+  }
+  card.appendChild(m);
+  const r = el("div", "r");
+  if (st.s === "before") {
+    r.appendChild(el("b", null, String(st.days)));
+    r.appendChild(el("span", null, st.days === 1 ? "day to go" : "days to go"));
+  } else {
+    r.appendChild(el("b", null, "Now"));
+    r.appendChild(el("span", null, "until Sat 10"));
+  }
+  card.appendChild(r);
+  box.appendChild(card);
+}
+
 function renderSylNext() {
   const box = document.getElementById("sylNext");
   box.textContent = "";
@@ -7728,6 +7790,7 @@ function renderSyllabus() {
   list.textContent = ""; found.textContent = "";
   list.hidden = !!q;
   document.getElementById("sylNext").hidden = !!q || reading();
+  document.getElementById("sylMid").hidden = !!q;
   document.querySelectorAll("#sylView button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === sylView)));
   document.getElementById("sylPaperFold").hidden = !!q;
 
@@ -7755,6 +7818,7 @@ function renderSyllabus() {
     return;
   }
 
+  renderMidsem();
   if (!reading()) renderSylNext();
   const rows = el("div", "board syl-board");
   Object.keys(SYL).forEach(k => {
@@ -7829,6 +7893,7 @@ function openSyllabus(k, focusU, focusI) {
       head.id = "syl-u" + u;
       head.appendChild(el("h3", null, "Unit " + ROMAN[u]));
       if (syl.scheme === "std") head.appendChild(el("span", "syl-marks", "12 marks"));
+      if (isMid(u) && midState(nowISO()).s !== "over") head.appendChild(el("span", "syl-midtag", "Mid-sem"));
       doc.appendChild(head);
       const ul = el("ul");
       topics.forEach((t, i) => { const li = el("li", null, t); if (u === focusU && i === focusI) li.className = "syl-hl"; ul.appendChild(li); });
@@ -7867,6 +7932,7 @@ function openSyllabus(k, focusU, focusI) {
     const ring = el("i", "syl-ring");
     b.appendChild(ring);
     b.appendChild(el("b", null, ROMAN[u]));
+    if (isMid(u) && midState(nowISO()).s !== "over") b.classList.add("mid");
     const c = el("span");
     b.appendChild(c);
     b.addEventListener("click", () => { cur = u; paint(true); });
@@ -7904,6 +7970,7 @@ function openSyllabus(k, focusU, focusI) {
     const head = el("div", "syl-uhead");
     head.appendChild(el("h3", null, "Unit " + ROMAN[cur]));
     if (syl.scheme === "std") head.appendChild(el("span", "syl-marks", "12 marks"));
+    if (isMid(cur) && midState(nowISO()).s !== "over") head.appendChild(el("span", "syl-midtag", "Mid-sem"));
     const cr = isCR();
     const all = el("button", "link syl-all");
     all.type = "button";
