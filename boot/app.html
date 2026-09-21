@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+8dde0fe-->
+<!--secf-app--><!--build:1.1.2+57ff7ae-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -35,6 +35,7 @@
   --bg:#000000; --plate:#0D0D11; --plate-2:#14141A; --plate-3:#1C1C24;
   --rule:rgba(255,255,255,0.20); --rule-soft:rgba(255,255,255,0.10); --rail:#1F2026;
   --ink:#FFFFFF; --ink-2:#A0A4B0; --ink-3:#8A8F9E;   /* 6.5:1 on #000, 5.6:1 on the glass plate */
+  --mute:#666B7A;   /* an empty ring or an unticked stop: 3:1 on every plate, where --rail is 1.2:1 */
   --focus:var(--l-phy);        /* the Blue Line, not a browser blue */
   /* env(safe-area-inset-*) is the display cutout only. Android's status bar and
      gesture pill are systemBars() insets and never reach CSS, so MainActivity
@@ -60,6 +61,7 @@
   --bg:#000000; --plate:#0D0D11; --plate-2:#14141A; --plate-3:#1C1C24;
   --rule:rgba(255,255,255,0.20); --rule-soft:rgba(255,255,255,0.10); --rail:#1F2026;
   --ink:#FFFFFF; --ink-2:#A0A4B0; --ink-3:#8A8F9E;   /* 6.5:1 on #000, 5.6:1 on the glass plate */
+  --mute:#666B7A;   /* an empty ring or an unticked stop: 3:1 on every plate, where --rail is 1.2:1 */
   --focus:var(--l-phy);
   --l-pps:#FF4D40; --l-bee:#FFB92E; --l-phy:#4E96FF; --l-smt:#35D07F;
   --l-em:#B18CFF;  --l-csl:#FF6BB0; --l-evs:#29D6CD; --l-eg:#FF9147; --l-pd:#93A3C0;
@@ -80,7 +82,7 @@
   :root:not([data-theme="dark"]) {
     --bg:#EEF1F7; --plate:#FFFFFF; --plate-2:#F5F7FC; --plate-3:#EAEFF8;
     --rule:#D3DAE8; --rule-soft:#E4E9F2; --rail:#C3CCDE;
-    --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580;
+    --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580; --mute:#7E889E;
     --focus:var(--l-phy);
     --l-pps:#D62B1F; --l-bee:#9C6500; --l-phy:#1560D8; --l-smt:#0E8C4E;
     --l-em:#6B3FD4;  --l-csl:#C42B77; --l-evs:#0A857E; --l-eg:#BF5210; --l-pd:#5A6883;
@@ -100,7 +102,7 @@
 :root[data-theme="light"] {
   --bg:#EEF1F7; --plate:#FFFFFF; --plate-2:#F5F7FC; --plate-3:#EAEFF8;
   --rule:#D3DAE8; --rule-soft:#E4E9F2; --rail:#C3CCDE;
-  --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580;
+  --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580; --mute:#7E889E;
   --focus:var(--l-phy);
   --l-pps:#D62B1F; --l-bee:#9C6500; --l-phy:#1560D8; --l-smt:#0E8C4E;
   --l-em:#6B3FD4;  --l-csl:#C42B77; --l-evs:#0A857E; --l-eg:#BF5210; --l-pd:#5A6883;
@@ -1599,9 +1601,9 @@ dialog .btn { margin-top:8px; }
 .syl-row.fresh .held { font-size:12px; color:var(--ink-3); }
 .syl-line { position:relative; display:flex; justify-content:space-between; width:min(180px, 100%); height:14px; margin-top:10px; }
 .syl-line::before { content:""; position:absolute; left:7px; right:7px; top:6px; height:2px; border-radius:1px;
-                    background:linear-gradient(to right, var(--line) var(--prog, 0%), var(--rule) var(--prog, 0%)); }
+                    background:linear-gradient(to right, var(--line) var(--prog, 0%), var(--mute) var(--prog, 0%)); }
 .syl-line i { position:relative; width:14px; height:14px; border-radius:50%;
-              background:radial-gradient(closest-side, var(--bg) 50%, transparent 55%), conic-gradient(var(--line) var(--p), var(--rail) 0);
+              background:radial-gradient(closest-side, var(--bg) 50%, transparent 55%), conic-gradient(var(--line) var(--p), var(--mute) 0);
               transition:--p .6s var(--ease); }
 .syl-line i.full { background:var(--line); }
 
@@ -1620,6 +1622,7 @@ dialog .btn { margin-top:8px; }
 
 /* the sheet */
 #dlgIn > .gauge { margin-top:14px; }
+.syl-plate .gauge .track, #dlgIn > .gauge .track { background:color-mix(in srgb, var(--mute) 45%, transparent); }
 .syl-units { display:grid; grid-template-columns:repeat(4, 1fr); gap:4px; margin-top:18px; padding:3px;
              background:var(--plate-2); border-radius:12px; }
 .syl-units button { display:flex; flex-direction:column; align-items:center; gap:3px; min-height:62px; padding:9px 4px 8px;
@@ -1630,9 +1633,9 @@ dialog .btn { margin-top:8px; }
 .syl-units b { font-family:'Blinker', sans-serif; font-size:15px; font-weight:700; letter-spacing:.06em; line-height:1; }
 .syl-units span { font-size:11.5px; font-weight:600; color:var(--ink-3); }
 .syl-ring { width:14px; height:14px; border-radius:50%;
-            background:radial-gradient(closest-side, var(--plate-2) 50%, transparent 55%), conic-gradient(var(--line) var(--p), var(--rail) 0);
+            background:radial-gradient(closest-side, var(--plate-2) 50%, transparent 55%), conic-gradient(var(--line) var(--p), var(--mute) 0);
             transition:--p .5s var(--ease); }
-.syl-units button[aria-pressed="true"] .syl-ring { background:radial-gradient(closest-side, var(--plate) 50%, transparent 55%), conic-gradient(var(--line) var(--p), var(--rail) 0); }
+.syl-units button[aria-pressed="true"] .syl-ring { background:radial-gradient(closest-side, var(--plate) 50%, transparent 55%), conic-gradient(var(--line) var(--p), var(--mute) 0); }
 .syl-ring.full, .syl-units button[aria-pressed="true"] .syl-ring.full { background:var(--line); }
 
 .syl-pane { margin-top:18px; }
@@ -1647,9 +1650,9 @@ dialog .btn { margin-top:8px; }
 /* each stop draws its own stretch of track: above its disc (--up) and below it (--dn),
    so rows of any height join up; the disc centre sits 22px down every row */
 .syl-stop::before { content:""; position:absolute; left:10px; top:0; bottom:0; width:2px;
-                    background:linear-gradient(var(--up, var(--rail)) 22px, var(--dn, var(--rail)) 22px); }
-.syl-stop:first-child::before { top:22px; background:var(--dn, var(--rail)); }
-.syl-stop:last-child::before { bottom:auto; height:22px; background:var(--up, var(--rail)); }
+                    background:linear-gradient(var(--up, var(--mute)) 22px, var(--dn, var(--mute)) 22px); }
+.syl-stop:first-child::before { top:22px; background:var(--dn, var(--mute)); }
+.syl-stop:last-child::before { bottom:auto; height:22px; background:var(--up, var(--mute)); }
 .syl-stop:only-child::before { display:none; }
 .syl-stop.done + .syl-stop.done { --up:var(--line); }
 .syl-stop.done:has(+ .syl-stop.done) { --dn:var(--line); }
@@ -1658,9 +1661,9 @@ dialog .btn { margin-top:8px; }
                    transition:color .2s var(--ease); }
 .syl-stop button:hover { color:var(--ink); }
 .syl-disc { position:relative; z-index:1; flex:none; width:22px; height:22px; border-radius:50%; margin-top:-.5px;
-            background:var(--plate); box-shadow:inset 0 0 0 2px var(--rail);
+            background:var(--plate); box-shadow:inset 0 0 0 2px var(--mute);
             transition:background-color .2s var(--ease), box-shadow .2s var(--ease); }
-.syl-stop button:hover .syl-disc { box-shadow:inset 0 0 0 2px var(--ink-3); }
+.syl-stop button:hover .syl-disc { box-shadow:inset 0 0 0 2px var(--ink-2); }
 .syl-stop.done button { color:var(--ink); }
 .syl-stop.done .syl-disc, .syl-stop.done button:hover .syl-disc { background:var(--line); box-shadow:none; }
 .syl-stop.done .syl-disc::after { content:""; position:absolute; left:8px; top:4.5px; width:4.5px; height:9px;
@@ -1685,6 +1688,17 @@ dialog .btn { margin-top:8px; }
 .paper-notes { margin:14px 0 0; padding-left:18px; font-size:13.5px; line-height:1.5; color:var(--ink-2); }
 .paper-notes li + li { margin-top:6px; }
 .paper-notes li::marker { color:var(--ink-3); }
+
+/* read: the syllabus as a document — every unit in one scroll, nothing to tick */
+.syl-read { margin-top:6px; }
+.syl-read .syl-uhead { margin-top:22px; }
+.syl-read ul { margin:8px 0 0; padding:0; list-style:none; }
+.syl-read li { position:relative; padding:6px 0 6px 18px; font-size:15px; line-height:1.45; color:var(--ink); }
+.syl-read li::before { content:""; position:absolute; left:2px; top:14px; width:6px; height:6px; border-radius:50%; background:var(--line); }
+.syl-read li.syl-hl { font-weight:700; text-decoration:underline 2px var(--line); text-underline-offset:4px; }
+.syl-row .chev { font-size:22px; line-height:1; color:var(--ink-3); }
+#sylView { margin-left:auto; }
+#sylView button { padding:6px 13px; }
 
 @media (prefers-reduced-motion: no-preference) {
   .syl-stop.done .syl-disc::after { animation:tkIn .22s var(--ease) both; }
@@ -2692,6 +2706,10 @@ input[type="date"] { padding:12px 14px; }
   <section id="syllabus" hidden>
     <div class="h2row">
       <h2>Syllabus</h2>
+      <div class="seg" id="sylView" role="group" aria-label="How to show the syllabus">
+        <button type="button" data-v="track" aria-pressed="true">Track</button>
+        <button type="button" data-v="read" aria-pressed="false">Read</button>
+      </div>
     </div>
     <div id="sylNext"></div>
     <div class="field syl-find">
@@ -3689,7 +3707,7 @@ function openDetail(item, dayIdx, onIso) {
       const p = sylOf(key), b = el("button", "syl-open");
       b.type = "button";
       b.appendChild(el("b", null, "Syllabus"));
-      b.appendChild(el("span", null, p.d ? p.d + " of " + p.n + " topics done ›" : "4 units · " + p.n + " topics ›"));
+      b.appendChild(el("span", null, p.d && !reading() ? p.d + " of " + p.n + " topics done ›" : "4 units · " + p.n + " topics ›"));
       b.addEventListener("click", () => openSyllabus(key));
       rows.link = b;
     }
@@ -7549,6 +7567,11 @@ document.addEventListener("click", e => {
    and each topic ticked is a stretch of that line travelled.
    ============================================================ */
 const ROMAN = ["I", "II", "III", "IV"];
+/* Track ticks topics off; Read is the syllabus and nothing else. A device preference,
+   like the theme: it is how this phone gets used, not a fact about the student. */
+let sylView = "track";
+try { if (localStorage.getItem("bunkr-syl-view") === "read") sylView = "read"; } catch (e) {}
+const reading = () => sylView === "read";
 /* { "PHL.2.13": { d:1|0, t:ms } } — an untick is kept as d:0 so it syncs like a tick */
 let sylDone = readMap(nsKey("bunkr-syl"));
 const saveSyl = () => { try { localStorage.setItem(nsKey("bunkr-syl"), JSON.stringify(sylDone)); } catch (e) {} };
@@ -7700,7 +7723,8 @@ function renderSyllabus() {
   const list = document.getElementById("sylList"), found = document.getElementById("sylFound");
   list.textContent = ""; found.textContent = "";
   list.hidden = !!q;
-  document.getElementById("sylNext").hidden = !!q;
+  document.getElementById("sylNext").hidden = !!q || reading();
+  document.querySelectorAll("#sylView button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === sylView)));
   document.getElementById("sylPaperFold").hidden = !!q;
 
   if (q) {
@@ -7714,7 +7738,7 @@ function renderSyllabus() {
     hits.slice(0, 60).forEach(h => {
       const b = el("button", "syl-hit");
       b.type = "button"; b.dataset.line = SUB[h.k].line;
-      if (isDone(sylId(h.k, h.u, h.i))) b.classList.add("done");
+      if (!reading() && isDone(sylId(h.k, h.u, h.i))) b.classList.add("done");
       b.appendChild(el("span", "bar"));
       const m = el("span", "m");
       m.appendChild(markWords(h.t, words));
@@ -7727,16 +7751,26 @@ function renderSyllabus() {
     return;
   }
 
-  renderSylNext();
+  if (!reading()) renderSylNext();
   const rows = el("div", "board syl-board");
   Object.keys(SYL).forEach(k => {
     const s = SUB[k], p = sylOf(k);
     const b = el("button", "srow syl-row" + (p.d ? "" : " fresh"));
     b.type = "button"; b.dataset.line = s.line;
-    b.setAttribute("aria-label", s.name + ", " + p.d + " of " + p.n + " topics done");
+    b.setAttribute("aria-label", s.name + (reading() ? "" : ", " + p.d + " of " + p.n + " topics done"));
     b.appendChild(el("span", "bar"));
     const m = el("div", "m");
     m.appendChild(el("div", "n", s.short));
+    b.addEventListener("click", () => openSyllabus(k));
+    if (reading()) {
+      m.appendChild(el("div", "adv", s.code + " · 4 units · " + p.n + " topics"));
+      b.appendChild(m);
+      const r = el("div", "r");
+      r.appendChild(el("span", "chev", "›"));
+      b.appendChild(r);
+      rows.appendChild(b);
+      return;
+    }
     m.appendChild(el("div", "adv", s.code + " · " + (p.units ? p.units + " of 4 units done" : p.n + " topics")));
     m.appendChild(sylStations(k));
     b.appendChild(m);
@@ -7746,7 +7780,6 @@ function renderSyllabus() {
       r.appendChild(el("div", "held", p.d + " of " + p.n));
     } else r.appendChild(el("div", "held", "Not started"));
     b.appendChild(r);
-    b.addEventListener("click", () => openSyllabus(k));
     rows.appendChild(b);
   });
   list.appendChild(rows);
@@ -7779,6 +7812,34 @@ function openSyllabus(k, focusU, focusI) {
   box.appendChild(top);
   box.appendChild(el("div", "d-name", s.short));
   box.appendChild(el("div", "d-full", s.name));
+
+  const foot = el("div", "d-rows");
+  const row = (a, b) => { const r = el("div", "d-row"); r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b)); foot.appendChild(r); };
+  row("Paper", syl.scheme === "std" ? "60 end-term · 40 internal" : syl.scheme === "nues" ? "No end-term · 100 internal" : "Not in our copy");
+  if (syl.book) row("Textbook", syl.book);
+
+  if (reading()) {
+    const doc = el("div", "syl-read");
+    syl.units.forEach((topics, u) => {
+      const head = el("div", "syl-uhead");
+      head.id = "syl-u" + u;
+      head.appendChild(el("h3", null, "Unit " + ROMAN[u]));
+      if (syl.scheme === "std") head.appendChild(el("span", "syl-marks", "12 marks"));
+      doc.appendChild(head);
+      const ul = el("ul");
+      topics.forEach((t, i) => { const li = el("li", null, t); if (u === focusU && i === focusI) li.className = "syl-hl"; ul.appendChild(li); });
+      doc.appendChild(ul);
+    });
+    box.appendChild(doc);
+    box.appendChild(foot);
+    box.appendChild(actions());
+    openDlg(true);
+    if (focusU != null) requestAnimationFrame(() => {
+      const f = box.querySelector(".syl-hl") || document.getElementById("syl-u" + focusU);
+      if (f) f.scrollIntoView({ block: "center" });
+    });
+    return;
+  }
 
   const g = el("div", "gauge");
   const tr = el("div", "track"), fill = el("i"), gl = el("span");
@@ -7813,10 +7874,6 @@ function openSyllabus(k, focusU, focusI) {
   const pane = el("div", "syl-pane");
   box.appendChild(pane);
 
-  const foot = el("div", "d-rows");
-  const row = (a, b) => { const r = el("div", "d-row"); r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b)); foot.appendChild(r); };
-  row("Paper", syl.scheme === "std" ? "60 end-term · 40 internal" : syl.scheme === "nues" ? "No end-term · 100 internal" : "Not in our copy");
-  if (syl.book) row("Textbook", syl.book);
   box.appendChild(foot);
   box.appendChild(actions());
 
@@ -7941,6 +7998,11 @@ document.querySelectorAll(".nav a").forEach(a => a.addEventListener("click", e =
 }));
 document.querySelectorAll(".subnav button").forEach(b => b.addEventListener("click", () => go(b.dataset.p)));
 document.getElementById("sylSearch").addEventListener("input", renderSyllabus);
+document.querySelectorAll("#sylView button").forEach(b => b.addEventListener("click", () => {
+  sylView = b.dataset.v;
+  try { localStorage.setItem("bunkr-syl-view", sylView); } catch (e) {}
+  renderSyllabus();
+}));
 renderPaper();
 window.addEventListener("popstate", () => show(location.hash.slice(1)));
 window.addEventListener("hashchange", () => show(location.hash.slice(1)));
