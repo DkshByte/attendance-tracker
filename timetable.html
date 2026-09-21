@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+74f236a-->
+<!--secf-app--><!--build:1.1.2+78abfb4-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -7043,22 +7043,21 @@ async function offerLock() {
    ============================================================ */
 const OB_KEY = "adgips-onboarded";
 
-/* What's new. Change id when a major feature ships and every returning account sees
-   this once; small fixes leave it alone, or people learn to tap it away unread. */
-const NEWS = {
-  id: "2026-09-arranged",
-  items: [
-    ['<path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/>',
-     "Arranged classes count for your subject",
-     "If Physics is arranged to Mechanics, the class still counts for Physics."],
-    ['<path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/>',
-     "Privacy, Terms and Delete account",
-     "All three now live in Your profile."],
-  ],
-};
+/* What's new. The latest row of public.announcements (supabase/12), posted from the
+   Supabase dashboard, so an announcement needs no deploy. Every returning account
+   sees a new id once. Offline or empty: nothing is shown, and it is asked again
+   next time. */
+let news = null;
+async function fetchNews() {
+  try {
+    const r = await call("/rest/v1/announcements?select=id,items&order=created_at.desc&limit=1");
+    const n = r && r[0];
+    news = n && Array.isArray(n.items) && n.items.some(x => x && x.title) ? n : null;
+  } catch (e) { news = null; }
+}
 const NEWS_KEY = "bunkr-news-seen";
-const newsSeen = () => { try { return localStorage.getItem(NEWS_KEY) === NEWS.id; } catch (e) { return true; } };
-const markNewsSeen = () => { try { localStorage.setItem(NEWS_KEY, NEWS.id); } catch (e) {} };
+const newsSeen = () => { if (!news) return true; try { return localStorage.getItem(NEWS_KEY) === news.id; } catch (e) { return true; } };
+const markNewsSeen = () => { if (news) try { localStorage.setItem(NEWS_KEY, news.id); } catch (e) {} };
 const obDone = () => { try { return !!localStorage.getItem(nsKey(OB_KEY)); } catch (e) { return true; } };
 
 /* An account already carrying marks, or already asked by the old flow, has met these
@@ -7124,14 +7123,16 @@ function obPoint(path, head, note) {
   return r;
 }
 
-/* what the app is for, in the student's own name — three lines, then out of the way */
 function obNews(i, n) {
   return obStep((box, next) => {
     box.appendChild(el("div", "grab"));
     box.appendChild(obDots(i, n));
     box.appendChild(el("div", "d-name", "What's new"));
     const list = el("div", "d-rows");
-    NEWS.items.forEach(([icon, head, body]) => list.appendChild(obPoint(icon, head, body)));
+    /* one fixed icon: the row is text only, and never reaches innerHTML */
+    news.items.filter(x => x && x.title).forEach(x => list.appendChild(obPoint(
+      '<path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9-1.9 5.1-1.9-5.1-5.1-1.9 5.1-1.9z"/>',
+      String(x.title), String(x.body || ""))));
     box.appendChild(list);
     const act = el("div", "d-act");
     act.appendChild(obBtn("btn pri", "Got it", () => next("ok")));
@@ -7139,6 +7140,7 @@ function obNews(i, n) {
   });
 }
 
+/* what the app is for, in the student's own name — three lines, then out of the way */
 function obWelcome(i, n) {
   const who = ((profile && profile.name) || "").trim().split(/\s+/)[0] || "";
   return obStep((box, next) => {
@@ -7247,6 +7249,7 @@ function obAlerts(i, n) {
 async function runOnboarding() {
   if (!profile) return;
   obBackfill();
+  await fetchNews();
   const first = !obDone();
   let lockAsked = null, caught = null;
   try { lockAsked = localStorage.getItem("adgips-lock-asked"); } catch (e) {}

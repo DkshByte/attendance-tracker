@@ -16,6 +16,7 @@ When setting up a new Supabase project, execute these scripts in **Supabase SQL 
 | **04** | [`04-leaderboard-setup.sql`](./04-leaderboard-setup.sql) | Section attendance leaderboard | `public.leaderboard`, aggregated stats |
 | **05** | [`05-features-setup.sql`](./05-features-setup.sql) | CR role, contacts & cancelled classes | CR authorization, class cancellations |
 | **10** | [`10-rate-limits.sql`](./10-rate-limits.sql) | Per-account write limits (429 when exceeded) | `public.rate_limits`, `rate_hit()`, `rate_limit` triggers |
+| **12** | [`12-announcements.sql`](./12-announcements.sql) | "What's new" popup, posted from the dashboard | `public.announcements`, read-only to the app |
 | **Reset** | [`production-reset.sql`](./production-reset.sql) | Clean production launch reset | Truncates marks and resets roster claims |
 
 ---
