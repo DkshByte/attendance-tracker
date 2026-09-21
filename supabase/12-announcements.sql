@@ -37,6 +37,10 @@ drop policy if exists "anyone reads" on public.announcements;
 create policy "anyone reads" on public.announcements
   for select using (true);
 
+-- Policies alone are not enough: this project holds no default table
+-- grants, so without this the read is a 42501 and nobody sees a popup.
+grant select on public.announcements to anon, authenticated;
+
 
 -- ---------- STEP 3 · the announcement the app already shipped ----------
 -- Same id as the build that had it written in, so a student who has
