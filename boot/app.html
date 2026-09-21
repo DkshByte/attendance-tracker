@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.3+74361ab-->
+<!--secf-app--><!--build:1.1.3+f04fb9c-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -4353,6 +4353,7 @@ function demo() {                                   // run demo() in the console
   /* best day to bunk: a Friday joins the weekend, exams are never offered */
   ok(freeDay("2026-09-26"), true, "a Saturday holds no class");
   ok(bestDays("2026-10-05", 6).length, 0, "mid-sem week offers no day to bunk");
+  ok(daysOffLeft({}, "2026-09-22", null), 0, "with no room in any subject, no day can be taken");
   ok(Object.keys(SYL).every(k => SUB[k] && SYL[k].units.length === 4), true, "every syllabus is a real subject with four units");
   const keptSyl = covered;
   covered = { "EM.0.0": { d:1, t:1 }, "EM.0.1": { d:0, t:2 } };
@@ -5019,13 +5020,50 @@ function renderBudget() {
   box.appendChild(note);
 }
 
-/* ---------- best day to bunk: the next week, ranked by what a day off costs ----------
+/* ---------- best day to bunk: the day that leaves the most days off for later ----------
    A day is only on the table if every subject it holds can still pay for its share
    and finish on target — the same per-subject room bunkPlan gives the ledger, so the
-   two never disagree. Among those, a class costs more the less room its subject has
-   left after it (the second-last skip in a tight subject is dear, one of eight spare
-   is cheap), and a day that joins a weekend or holiday buys more days off for the
-   same classes, so its cost is shared across the break it makes. */
+   two never disagree. Among those, the best is the one that keeps the most whole
+   days you could still take off before the term ends: what a student actually wants
+   is this day and as many more as possible, not the day that is merely cheap today.
+
+   "How many more days could I still take" is a packing problem (each day spends
+   classes from several subjects' budgets at once). It is solved greedily: every
+   remaining day is costed by the share of each subject's room it uses, and the
+   cheapest are packed while they fit. ponytail: greedy, not exact — an ILP would
+   squeeze out a day in rare cases; with ~60 days and 7 subjects it is never far off. */
+function classesOn(iso, di) {
+  const miss = {}; let n = 0, unknown = 0;
+  DAYS[di].items.forEach((it, ii) => {
+    if (att[iso + "|" + ii] || isCancelled(iso, it.i)) return;
+    const k = resolve(it);
+    if (!k) { unknown++; return; }
+    if (!tracked(k)) return;
+    miss[k] = (miss[k] || 0) + 1; n++;
+  });
+  return { miss, n, unknown };
+}
+function daysOffLeft(room, from, skip) {
+  const left = Object.assign({}, room), pool = [];
+  classDays(from, semEnd).forEach(({ iso, di }) => {
+    if (iso === skip || (iso >= MIDSEM.from && iso <= MIDSEM.to)) return;
+    const { miss, n } = classesOn(iso, di);
+    if (n) pool.push(miss);
+  });
+  const share = m => Object.keys(m).reduce((s, k) => s + m[k] / Math.max(0.5, left[k] || 0), 0);
+  let count = 0;
+  for (;;) {
+    let best = -1, bs = Infinity;
+    pool.forEach((m, i) => {
+      if (!m || Object.keys(m).some(k => m[k] > (left[k] || 0))) return;
+      const s = share(m);
+      if (s < bs) { bs = s; best = i; }
+    });
+    if (best < 0) return count;
+    Object.keys(pool[best]).forEach(k => { left[k] -= pool[best][k]; });
+    pool[best] = null; count++;
+  }
+}
 function freeDay(iso) {
   const d = fromISO(iso), di = d.getDay() - 1;
   if (di < 0 || di > 5 || !DAYS[di].items.length || gazettedOn(iso)) return true;
@@ -5038,30 +5076,35 @@ function bestDays(fromIso, span) {
   const out = [];
   classDays(fromIso, isoOf(end)).forEach(({ iso, di }) => {
     if (iso >= MIDSEM.from && iso <= MIDSEM.to) return;        /* exams are not a day to skip */
-    const miss = {}; let n = 0, unknown = 0;
-    DAYS[di].items.forEach((it, ii) => {
-      if (att[iso + "|" + ii] || isCancelled(iso, it.i)) return;
-      const k = resolve(it);
-      if (!k) { unknown++; return; }
-      if (!tracked(k)) return;
-      miss[k] = (miss[k] || 0) + 1; n++;
-    });
+    const { miss, n, unknown } = classesOn(iso, di);
     if (!n) return;
     const ks = Object.keys(miss);
     const short = ks.filter(k => miss[k] > (room[k] || 0) || lost[k]);
     const tight = ks.filter(k => !short.includes(k) && (room[k] || 0) - miss[k] <= 1);
-    const cost = ks.reduce((c, k) => c + miss[k] * (lost[k] ? 8 : 1 + 4 / Math.max(1, (room[k] || 0) - miss[k] + 1)), 0);
     /* the break this day makes: itself plus the free days either side */
     let off = 1;
     for (const step of [-1, 1]) {
       const d = fromISO(iso);
       for (let g = 0; g < 10; g++) { d.setDate(d.getDate() + step); if (!freeDay(isoOf(d))) break; off++; }
     }
-    out.push({ iso, di, miss, n, unknown, off, short, tight,
-               verdict: short.length ? "no" : tight.length ? "risky" : "safe",
-               score: short.length ? Infinity : cost / Math.sqrt(off) });
+    /* what is left for the rest of term if this day goes */
+    let later = 0;
+    if (!short.length) {
+      const after = Object.assign({}, room);
+      ks.forEach(k => { after[k] = (after[k] || 0) - miss[k]; });
+      later = daysOffLeft(after, fromIso, iso);
+    }
+    /* the tightest subject's room after this day: a tie goes to the day that spares it */
+    const floor = Math.min(...Object.keys(room).filter(k => !lost[k]).map(k => (room[k] || 0) - (miss[k] || 0)));
+    out.push({ iso, di, miss, n, unknown, off, short, tight, later, floor,
+               verdict: short.length ? "no" : tight.length ? "risky" : "safe" });
   });
-  out.sort((a, b) => a.score - b.score || a.n - b.n || (a.iso < b.iso ? -1 : 1));
+  /* most days kept for later; then the longer break; then fewer classes; then sooner.
+     The packing is greedy, so a difference of one day is within its error: only a
+     clear gap outranks a real long weekend. Past that, spare the tightest subject. */
+  const rank = d => d.verdict === "no" ? 2 : d.verdict === "risky" ? 1 : 0;
+  out.sort((a, b) => rank(a) - rank(b) || (Math.abs(b.later - a.later) > 1 ? b.later - a.later : 0)
+    || b.off - a.off || b.later - a.later || b.floor - a.floor || a.n - b.n || (a.iso < b.iso ? -1 : 1));
   return out;
 }
 const tomorrowISO = () => { const d = new Date(); d.setDate(d.getDate() + 1); return isoOf(d); };
@@ -5095,7 +5138,7 @@ function openBestDays() {
   box.textContent = ""; box.dataset.line = "";
   box.appendChild(el("div", "grab"));
   box.appendChild(el("div", "d-name", "Best day to bunk"));
-  box.appendChild(el("div", "d-full", "The next 7 days, ranked by what a day off costs you. Every subject has to still finish on " + targetPct + "%."));
+  box.appendChild(el("div", "d-full", "The next 7 days, ranked by how many days off each one still leaves you for the rest of term. Every subject stays on " + targetPct + "%."));
 
   const behind = untouchedDays().length;
   if (behind) box.appendChild(el("div", "d-note", behind + (behind === 1 ? " class day is" : " class days are") + " still unmarked, so these numbers are hopeful. Catch up on Attendance for real ones."));
@@ -5124,16 +5167,12 @@ function openBestDays() {
     });
     m.appendChild(subs);
     const safeWhy = () => {
-      const parts = [];
-      if (d.off > 1) parts.push(d.off + " days off in a row");
-      if (tightest) parts.push(d.miss[tightest.k]
-        ? "costs one " + SUB[tightest.k].short + " skip, your tightest"
-        : "no " + SUB[tightest.k].short + ", your tightest");
-      const s = parts.join(" · ") || "every subject stays on track";
-      return s[0].toUpperCase() + s.slice(1);
+      const parts = [d.later ? "Leaves room for " + d.later + " more " + (d.later === 1 ? "day" : "days") + " off this term" : "Your last full day off this term"];
+      if (tightest && !d.miss[tightest.k]) parts.push("no " + SUB[tightest.k].short);
+      return parts.join(" · ");
     };
     const why = d.verdict === "no" ? SUB[d.short[0]].short + " can't afford it" + (d.short.length > 1 ? ", nor " + d.short.slice(1).map(k => SUB[k].short).join(", ") : "")
-      : d.verdict === "risky" ? "Uses your last skip in " + d.tight.map(k => SUB[k].short).join(", ")
+      : d.verdict === "risky" ? "Uses your last skip in " + d.tight.map(k => SUB[k].short).join(", ") + (d.later ? " · " + d.later + " more days off after" : "")
       : safeWhy();
     m.appendChild(el("div", "bd-why", why + (d.unknown ? " · " + d.unknown + " split lab not counted, pick a batch" : "")));
     row.appendChild(m);
