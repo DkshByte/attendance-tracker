@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.3+cd99c9c-->
+<!--secf-app--><!--build:1.1.3+1a5fc74-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1739,6 +1739,22 @@ div.sp { cursor:default; }
 .ai-lbl { font-size:11px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3); }
 .ai-pick .seg { width:max-content; max-width:100%; flex-wrap:wrap; border-radius:14px; }
 .ai-pick .seg button { padding:7px 13px; font-size:13px; }
+.ai-web { display:flex; align-items:center; gap:12px; margin-top:16px; padding:11px 12px; border-radius:12px; background:var(--plate-2); cursor:pointer; }
+.ai-web b { display:block; font-size:14.5px; font-weight:700; }
+.ai-web small { display:block; margin-top:1px; font-size:12px; color:var(--ink-3); }
+.ai-switch { appearance:none; -webkit-appearance:none; flex:none; position:relative; width:42px; height:24px; border-radius:12px; margin:0;
+             background:var(--mute); cursor:pointer; transition:background-color .2s var(--ease); }
+.ai-switch::after { content:""; position:absolute; left:3px; top:3px; width:18px; height:18px; border-radius:50%; background:#fff;
+                    transition:transform .2s var(--ease); }
+.ai-switch:checked { background:var(--ok); }
+.ai-switch:checked::after { transform:translateX(18px); }
+.ai-switch:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+.ai-webapps { display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+.ai-wa { display:flex; gap:8px; flex-wrap:wrap; }
+.ai-wlink { display:inline-flex; align-items:center; gap:8px; min-height:40px; padding:8px 14px 8px 11px; border:1px solid var(--rule); border-radius:999px;
+            background:var(--plate-2); color:var(--ink); font-size:13.5px; font-weight:600; text-decoration:none; }
+.ai-wlink:hover { background:var(--plate-3); }
+.ai-wlink svg { width:18px; height:18px; }
 .ai-apps { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:18px; }
 .ai-app { display:flex; align-items:center; gap:11px; min-height:58px; padding:10px 12px; border:1px solid var(--rule); border-radius:12px;
           background:var(--plate-2); color:var(--ink); text-decoration:none; transition:background-color .2s var(--ease), border-color .2s var(--ease); }
@@ -4385,6 +4401,8 @@ function demo() {                                   // run demo() in the console
   ok(aiPrompt("PHL", 1, "notes").includes("Kepler"), true, "the AI question carries the unit's real topics");
   ok(/Kleppner|Aarav|%/.test(aiPrompt("PHL", "all", "practice")), false, "...and nothing else: no textbook, no name, no marks");
   ok(aiPrompt("EVSL", "mid", "explain").includes("no end-term paper"), true, "EVS says it has no end-term paper");
+  ok(aiPrompt("PHL", 1, "pdf", true).includes("PDF") && aiPrompt("PHL", 1, "pdf", true).includes("cite"), true, "a full PDF, from the web, asks for both");
+  ok(aiPrompt("PHL", 1, "notes", false).includes("cite"), false, "...and the web is only asked for when switched on");
   ok(Object.values(SYL_OF).every(k => SYL[k]), true, "every lab maps to a subject that has a syllabus");
   ok(Object.keys(SYL).every(k => SUB[k] && SYL[k].units.length === 4), true, "every syllabus is a real subject with four units");
   const keptSyl = covered;
@@ -8383,8 +8401,21 @@ const AI_GOALS = {
   explain:  "Explain these topics simply, one by one, with an everyday example for each. Keep it at first-year level.",
   notes:    "Make concise exam notes for these topics: key definitions, formulas, derivation outlines and diagrams worth drawing. Mark what is most likely to be asked.",
   practice: "Give me practice questions on these topics in the pattern above: 5 short-answer (2-3 marks) and 3 long (12 marks). Put all the answers after the questions.",
+  pdf:      "Make me a complete study guide for these topics as a downloadable PDF. For every topic: a clear explanation, key definitions and formulas, a worked example, and the diagram to draw (described if you can't draw it). End with a one-page formula sheet and practice questions in the exam pattern, with answers. Cover every topic listed; don't skip any.",
 };
-function aiPrompt(k, scope, goal) {
+const AI_WEB = "Search the web for reliable, up-to-date explanations and cite your sources with links.";
+/* the web, for the same unit: a search, and lectures to watch */
+const WEB_APPS = [
+  { name:"Google",  color:"#4285F4", d:"M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z", url:q => "https://www.google.com/search?q=" + encodeURIComponent(q) },
+  { name:"YouTube", color:"#FF0000", d:"M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z", url:q => "https://www.youtube.com/results?search_query=" + encodeURIComponent(q) },
+];
+function webQuery(k, scope) {
+  const syl = SYL[k], units = scope === "all" ? [0, 1, 2, 3] : scope === "mid" ? MIDSEM.units : [scope];
+  /* a search engine wants a few words, not a syllabus: the subject and its first topics */
+  const topics = units.flatMap(u => syl.units[u]).slice(0, 3).map(x => x.replace(/\s*\(.*?\)/g, ""));
+  return SUB[k].name + " " + topics.join(", ") + " B.Tech";
+}
+function aiPrompt(k, scope, goal, web) {
   const s = SUB[k], syl = SYL[k];
   const units = scope === "all" ? [0, 1, 2, 3] : scope === "mid" ? MIDSEM.units : [scope];
   const lines = ["I'm a first-year B.Tech student at a GGSIPU-affiliated college in Delhi, studying " + s.name + " (" + s.code + ").",
@@ -8397,6 +8428,7 @@ function aiPrompt(k, scope, goal) {
   if (syl.scheme === "std") lines.push("Exam pattern: a 60-mark end-term paper. Q1 (12 marks) is short answers from the whole syllabus; then one 12-mark question per unit, choosing 1 of 2.", "");
   if (syl.scheme === "nues") lines.push("It's assessed internally by the teacher; there's no end-term paper.", "");
   lines.push(AI_GOALS[goal]);
+  if (web) lines.push("", AI_WEB);
   return lines.join("\n");
 }
 async function copyText(s) {
@@ -8416,7 +8448,8 @@ const aiLogo = a => {
 
 function openAskAI(k, unit) {
   const s = SUB[k];
-  let scope = unit == null ? "mid" : unit, goal = "notes";
+  let scope = unit == null ? "mid" : unit, goal = "notes", web = false;
+  const Q = () => aiPrompt(k, scope, goal, web);
   const box = document.getElementById("dlgIn");
   box.textContent = ""; box.dataset.line = s.line;
   box.appendChild(el("div", "grab"));
@@ -8441,8 +8474,15 @@ function openAskAI(k, unit) {
   };
   const unitOpt = typeof scope === "number" ? [[scope, "Unit " + ROMAN[scope]]] : [];
   const pickScope = seg("Study", unitOpt.concat([["mid", "Mid-sem"], ["all", "Whole subject"]]), () => scope, v => { scope = v === "mid" || v === "all" ? v : +v; });
-  const pickGoal = seg("I want", [["explain", "Explain"], ["notes", "Exam notes"], ["practice", "Practice Qs"]], () => goal, v => { goal = v; });
+  const pickGoal = seg("I want", [["explain", "Explain"], ["notes", "Exam notes"], ["practice", "Practice Qs"], ["pdf", "Full PDF"]], () => goal, v => { goal = v; });
   box.appendChild(pickScope.wrap); box.appendChild(pickGoal.wrap);
+  const webRow = el("label", "ai-web");
+  const webBox = el("input"); webBox.type = "checkbox"; webBox.className = "ai-switch";
+  webBox.addEventListener("change", () => { web = webBox.checked; paint(); });
+  webRow.appendChild(webBox);
+  const wt = el("span"); wt.appendChild(el("b", null, "Use the web")); wt.appendChild(el("small", null, "The AI looks things up online and cites its sources"));
+  webRow.appendChild(wt);
+  box.appendChild(webRow);
 
   const apps = el("div", "ai-apps");
   const note = el("div", "ai-note");
@@ -8454,7 +8494,7 @@ function openAskAI(k, unit) {
     const tx = el("span"); tx.appendChild(el("b", null, a.name)); tx.appendChild(el("small", null, a.paste ? "Copies, then opens" : "Opens with the question"));
     link.appendChild(tx);
     link.addEventListener("click", () => {
-      const q = aiPrompt(k, scope, goal);
+      const q = Q();
       link.href = a.url(q);
       if (a.paste) copyText(q).then(ok => { note.textContent = ok ? "Question copied. Paste it into Gemini." : "Couldn't copy. Use Copy question below."; });
     });
@@ -8464,11 +8504,24 @@ function openAskAI(k, unit) {
 
   const copy = el("button", "btn ai-copy", "Copy question for any AI");
   copy.type = "button";
-  copy.addEventListener("click", () => copyText(aiPrompt(k, scope, goal)).then(ok => {
+  copy.addEventListener("click", () => copyText(Q()).then(ok => {
     note.textContent = ok ? "Copied. Paste it into any AI app." : "Couldn't copy on this phone.";
   }));
   box.appendChild(copy);
   box.appendChild(note);
+
+  const webApps = el("div", "ai-webapps");
+  webApps.appendChild(el("span", "ai-lbl", "Or check the web yourself"));
+  const wa = el("div", "ai-wa");
+  WEB_APPS.forEach(w => {
+    const a = el("a", "ai-wlink");
+    a.target = "_blank"; a.rel = "noopener";
+    a.appendChild(aiLogo(w));
+    a.appendChild(el("span", null, w.name === "YouTube" ? "Lectures on YouTube" : "Search Google"));
+    wa.appendChild(a);
+  });
+  webApps.appendChild(wa);
+  box.appendChild(webApps);
 
   const peek = el("details", "ai-peek");
   peek.appendChild(el("summary", null, "See the question"));
@@ -8484,8 +8537,15 @@ function openAskAI(k, unit) {
 
   function paint() {
     [pickScope, pickGoal].forEach(p => p.g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === String(p.get())))));
-    AI_APPS.forEach((a, i) => { apps.children[i].href = a.url(aiPrompt(k, scope, goal)); });
-    pre.textContent = aiPrompt(k, scope, goal);
+    AI_APPS.forEach((a, i) => { apps.children[i].href = a.url(Q()); });
+    WEB_APPS.forEach((w, i) => { wa.children[i].href = w.url(webQuery(k, scope)); });
+    pre.textContent = Q();
+    /* a PDF is a file: say which apps can hand one back */
+    apps.querySelectorAll("small").forEach((s, i) => {
+      const a = AI_APPS[i];
+      s.textContent = goal === "pdf" && (a.id === "perplexity" || a.id === "gemini") ? "May reply as text, not a file"
+        : a.paste ? "Copies, then opens" : "Opens with the question";
+    });
     note.textContent = "";
   }
   paint();
