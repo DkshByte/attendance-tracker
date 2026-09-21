@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.3+1036914-->
+<!--secf-app--><!--build:1.1.3+74361ab-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1583,6 +1583,33 @@ dialog .btn { margin-top:8px; }
 .syl-mid { display:flex; align-items:center; gap:16px; margin-bottom:14px; padding:14px 16px;
            background:var(--plate); border:1px solid var(--rule); border-radius:14px; }
 .syl-mid.on { border-color:var(--warn); }
+#midBox { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+#midBox:empty { display:none; }
+#midBox .mid-pill { margin-top:0; }
+.mid-pill.bunk-pill i { background:var(--ok); }
+.mid-pill.bunk-pill.none i { background:var(--bad); }
+.bunk-pill span:not(.chev) { color:var(--ink); font-weight:600; }
+
+.bd-list { display:grid; gap:1px; margin-top:16px; background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; }
+.bd-row { display:grid; grid-template-columns:62px 1fr auto; gap:12px; align-items:start; padding:13px 14px; background:var(--plate); }
+.bd-row.top { background:color-mix(in srgb, var(--ok) 9%, var(--plate)); }
+.bd-when b { display:block; font-family:'Blinker', sans-serif; font-size:17px; font-weight:700; line-height:1.1; }
+.bd-when span { display:block; margin-top:2px; font-size:12px; color:var(--ink-3); font-weight:600; }
+.bd-m { min-width:0; }
+.bd-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:14px; font-weight:600; color:var(--ink); }
+.bd-off { padding:1px 7px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.04em; color:var(--ok); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ok) 55%, transparent); }
+.bd-subs { display:flex; flex-wrap:wrap; gap:4px 10px; margin-top:6px; }
+.bd-sub { display:inline-flex; align-items:center; gap:5px; font-size:12.5px; color:var(--ink-2); }
+.bd-sub i { width:7px; height:7px; border-radius:50%; background:var(--line); }
+.bd-why { margin-top:6px; font-size:12.5px; color:var(--ink-3); }
+.bd-row.risky .bd-why { color:var(--warn); }
+.bd-row.no .bd-why { color:var(--bad); }
+.bd-v { align-self:center; padding:3px 9px; border-radius:3px; font-size:10.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; }
+.bd-row.safe .bd-v { color:var(--ok); box-shadow:inset 0 0 0 1px var(--ok); }
+.bd-row.top .bd-v { background:var(--ok); color:var(--badge-ink); box-shadow:none; }
+.bd-row.risky .bd-v { color:var(--warn); box-shadow:inset 0 0 0 1px var(--warn); }
+.bd-row.no .bd-v { color:var(--bad); box-shadow:inset 0 0 0 1px var(--bad); }
+.bd-row.no { opacity:.8; }
 .mid-pill { display:inline-flex; align-items:center; gap:7px; max-width:100%; min-height:36px; margin-top:12px; padding:7px 12px 7px 11px;
             border:1px solid var(--rule); border-radius:999px; background:var(--plate); color:var(--ink-2);
             font:inherit; font-size:13px; white-space:nowrap; cursor:pointer; transition:background-color .2s var(--ease); }
@@ -3436,7 +3463,7 @@ function renderToday() {
   const di = new Date().getDay() - 1;
   const live = di >= 0 && di < 6;                  /* Sunday: di is -1, and it owns no rail */
   renderPlate();
-  renderMidToday();
+  renderTodayPills();
   const up = live ? null : nextRunningDay(isoOf(new Date()));
   const dayIdx = live ? di : (up ? up.di : 0);
   document.getElementById("todayHead").textContent =
@@ -4323,6 +4350,9 @@ function demo() {                                   // run demo() in the console
   ok(midState("2026-09-21").days, 14, "mid-sems are 14 days out on 21 Sep");
   ok(midState("2026-10-07").s, "on", "...running on 7 Oct");
   ok(midState("2026-10-11").s, "over", "...and over after the 10th");
+  /* best day to bunk: a Friday joins the weekend, exams are never offered */
+  ok(freeDay("2026-09-26"), true, "a Saturday holds no class");
+  ok(bestDays("2026-10-05", 6).length, 0, "mid-sem week offers no day to bunk");
   ok(Object.keys(SYL).every(k => SUB[k] && SYL[k].units.length === 4), true, "every syllabus is a real subject with four units");
   const keptSyl = covered;
   covered = { "EM.0.0": { d:1, t:1 }, "EM.0.1": { d:0, t:2 } };
@@ -4987,6 +5017,134 @@ function renderBudget() {
     note.appendChild(d);
   }
   box.appendChild(note);
+}
+
+/* ---------- best day to bunk: the next week, ranked by what a day off costs ----------
+   A day is only on the table if every subject it holds can still pay for its share
+   and finish on target — the same per-subject room bunkPlan gives the ledger, so the
+   two never disagree. Among those, a class costs more the less room its subject has
+   left after it (the second-last skip in a tight subject is dear, one of eight spare
+   is cheap), and a day that joins a weekend or holiday buys more days off for the
+   same classes, so its cost is shared across the break it makes. */
+function freeDay(iso) {
+  const d = fromISO(iso), di = d.getDay() - 1;
+  if (di < 0 || di > 5 || !DAYS[di].items.length || gazettedOn(iso)) return true;
+  return DAYS[di].items.every(it => isCancelled(iso, it.i));
+}
+function bestDays(fromIso, span) {
+  const room = {}, lost = {};
+  bunkPlan().subs.forEach(s => { room[s.k] = s.left; if (s.lost) lost[s.k] = true; });
+  const end = fromISO(fromIso); end.setDate(end.getDate() + (span || 7) - 1);
+  const out = [];
+  classDays(fromIso, isoOf(end)).forEach(({ iso, di }) => {
+    if (iso >= MIDSEM.from && iso <= MIDSEM.to) return;        /* exams are not a day to skip */
+    const miss = {}; let n = 0, unknown = 0;
+    DAYS[di].items.forEach((it, ii) => {
+      if (att[iso + "|" + ii] || isCancelled(iso, it.i)) return;
+      const k = resolve(it);
+      if (!k) { unknown++; return; }
+      if (!tracked(k)) return;
+      miss[k] = (miss[k] || 0) + 1; n++;
+    });
+    if (!n) return;
+    const ks = Object.keys(miss);
+    const short = ks.filter(k => miss[k] > (room[k] || 0) || lost[k]);
+    const tight = ks.filter(k => !short.includes(k) && (room[k] || 0) - miss[k] <= 1);
+    const cost = ks.reduce((c, k) => c + miss[k] * (lost[k] ? 8 : 1 + 4 / Math.max(1, (room[k] || 0) - miss[k] + 1)), 0);
+    /* the break this day makes: itself plus the free days either side */
+    let off = 1;
+    for (const step of [-1, 1]) {
+      const d = fromISO(iso);
+      for (let g = 0; g < 10; g++) { d.setDate(d.getDate() + step); if (!freeDay(isoOf(d))) break; off++; }
+    }
+    out.push({ iso, di, miss, n, unknown, off, short, tight,
+               verdict: short.length ? "no" : tight.length ? "risky" : "safe",
+               score: short.length ? Infinity : cost / Math.sqrt(off) });
+  });
+  out.sort((a, b) => a.score - b.score || a.n - b.n || (a.iso < b.iso ? -1 : 1));
+  return out;
+}
+const tomorrowISO = () => { const d = new Date(); d.setDate(d.getDate() + 1); return isoOf(d); };
+const dayWord = iso => fromISO(iso).toLocaleDateString("en-IN", { weekday:"short" });
+const dayDate = iso => iso === tomorrowISO() ? "Tomorrow" : fromISO(iso).toLocaleDateString("en-IN", { day:"numeric", month:"short" });
+
+/* Today's one-liners: mid-sems, and the day this week a skip costs least */
+function renderTodayPills() {
+  const box = document.getElementById("midBox");
+  if (!box) return;
+  box.textContent = "";
+  const mid = midPill();
+  if (mid) box.appendChild(mid);
+  const days = bestDays(tomorrowISO(), 7);
+  if (!days.length) return;
+  const top = days[0], ok = top.verdict !== "no";
+  const pill = el("button", "mid-pill bunk-pill" + (ok ? "" : " none"));
+  pill.type = "button";
+  pill.appendChild(el("i"));
+  pill.appendChild(el("b", null, ok ? "Best day to bunk" : "No safe day to bunk"));
+  pill.appendChild(el("span", null, ok ? (top.iso === tomorrowISO() ? "tomorrow" : dayWord(top.iso) + " " + dayDate(top.iso)) : "this week"));
+  pill.appendChild(el("span", "chev", "›"));
+  pill.setAttribute("aria-label", pill.textContent.replace("›", "") + ", see every day");
+  pill.addEventListener("click", openBestDays);
+  box.appendChild(pill);
+}
+
+function openBestDays() {
+  const days = bestDays(tomorrowISO(), 7);
+  const box = document.getElementById("dlgIn");
+  box.textContent = ""; box.dataset.line = "";
+  box.appendChild(el("div", "grab"));
+  box.appendChild(el("div", "d-name", "Best day to bunk"));
+  box.appendChild(el("div", "d-full", "The next 7 days, ranked by what a day off costs you. Every subject has to still finish on " + targetPct + "%."));
+
+  const behind = untouchedDays().length;
+  if (behind) box.appendChild(el("div", "d-note", behind + (behind === 1 ? " class day is" : " class days are") + " still unmarked, so these numbers are hopeful. Catch up on Attendance for real ones."));
+
+  /* the subject with least room decides most of the ranking, so name it */
+  const tightest = bunkPlan().subs.filter(s => !s.lost)[0];
+  const list = el("div", "bd-list");
+  days.forEach((d, n) => {
+    const row = el("div", "bd-row " + d.verdict + (n === 0 && d.verdict !== "no" ? " top" : ""));
+    const when = el("div", "bd-when");
+    when.appendChild(el("b", null, dayWord(d.iso)));
+    when.appendChild(el("span", null, dayDate(d.iso)));
+    row.appendChild(when);
+
+    const m = el("div", "bd-m");
+    const head = el("div", "bd-head");
+    head.appendChild(el("span", null, d.n + (d.n === 1 ? " class" : " classes")));
+    if (d.off > 1) head.appendChild(el("span", "bd-off", d.off + " days off"));
+    m.appendChild(head);
+    const subs = el("div", "bd-subs");
+    Object.keys(d.miss).forEach(k => {
+      const s = el("span", "bd-sub"); s.dataset.line = SUB[k].line;
+      s.appendChild(el("i"));
+      s.appendChild(document.createTextNode(SUB[k].short + (d.miss[k] > 1 ? " ×" + d.miss[k] : "")));
+      subs.appendChild(s);
+    });
+    m.appendChild(subs);
+    const safeWhy = () => {
+      const parts = [];
+      if (d.off > 1) parts.push(d.off + " days off in a row");
+      if (tightest) parts.push(d.miss[tightest.k]
+        ? "costs one " + SUB[tightest.k].short + " skip, your tightest"
+        : "no " + SUB[tightest.k].short + ", your tightest");
+      const s = parts.join(" · ") || "every subject stays on track";
+      return s[0].toUpperCase() + s.slice(1);
+    };
+    const why = d.verdict === "no" ? SUB[d.short[0]].short + " can't afford it" + (d.short.length > 1 ? ", nor " + d.short.slice(1).map(k => SUB[k].short).join(", ") : "")
+      : d.verdict === "risky" ? "Uses your last skip in " + d.tight.map(k => SUB[k].short).join(", ")
+      : safeWhy();
+    m.appendChild(el("div", "bd-why", why + (d.unknown ? " · " + d.unknown + " split lab not counted, pick a batch" : "")));
+    row.appendChild(m);
+
+    row.appendChild(el("span", "bd-v", n === 0 && d.verdict !== "no" ? "Best" : d.verdict === "safe" ? "Safe" : d.verdict === "risky" ? "Risky" : "Can't"));
+    list.appendChild(row);
+  });
+  if (!days.length) list.appendChild(el("div", "d-note", "No classes to skip in the next 7 days."));
+  box.appendChild(list);
+  box.appendChild(actions());
+  openDlg(true);
 }
 
 /* ---------- leave planner: name the days, get the bill ---------- */
@@ -7749,13 +7907,10 @@ function renderMidsem() {
   const c = midCard();
   if (c) box.appendChild(c);
 }
-/* On Today it is one line: a pill that says when, and opens the syllabus */
-function renderMidToday() {
-  const box = document.getElementById("midBox");
-  if (!box) return;
-  box.textContent = "";
+/* On Today the mid-sem is one line: a pill that says when, and opens the syllabus */
+function midPill() {
   const st = midState(nowISO());
-  if (st.s === "over") return;
+  if (st.s === "over") return null;
   const pill = el("button", "mid-pill" + (st.s === "on" ? " on" : ""));
   pill.type = "button";
   pill.appendChild(el("i"));
@@ -7770,7 +7925,7 @@ function renderMidToday() {
     if (s) s.value = "";
     go("syllabus");
   });
-  box.appendChild(pill);
+  return pill;
 }
 
 function renderSylNext() {
