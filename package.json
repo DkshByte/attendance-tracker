@@ -1,6 +1,6 @@
 {
   "name": "bunkr",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Universal glassmorphic attendance tracker, 75% bunk budget calculator, and real-time smart timetable for college & university students",
   "main": "timetable.html",
   "scripts": {
