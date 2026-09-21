@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+77acf44-->
+<!--secf-app--><!--build:1.1.2+1036914-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -646,7 +646,6 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .cu-date { font-family:'Blinker',sans-serif; font-size:17px; font-weight:700;
            color:var(--ink); letter-spacing:.005em; }
 .cu-count { font-size:11px; font-weight:600; color:var(--ink-3); }
-.cu-q { font-size:12px; font-weight:600; color:var(--ink-2); margin-bottom:8px; }
 .cu-checks { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; }
 .cu-cls {
   display:flex; align-items:center; gap:9px; cursor:pointer;
@@ -656,11 +655,10 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
   user-select:none;
 }
 .cu-cls:hover { background:var(--plate-3); border-color:var(--rule-soft); }
-/* when checked (missed) highlight the row */
-.cu-cls:has(.cu-cb:checked) {
-  background:rgba(var(--bad-rgb, 214,43,31),.08);
-  border-color:rgba(var(--bad-rgb, 214,43,31),.22);
-}
+/* ticked = present: the row lights up; an empty one just says absent */
+.cu-cls:has(.cu-cb:checked) { border-color:color-mix(in srgb, var(--ok) 40%, transparent); }
+.cu-st { flex:none; min-width:50px; text-align:right; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ok); }
+.cu-cls:has(.cu-cb:not(:checked)) .cu-st { color:var(--bad); }
 .cu-cb {
   appearance:none; -webkit-appearance:none;
   width:16px; height:16px; border-radius:5px; flex-shrink:0;
@@ -669,7 +667,7 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
   position:relative;
 }
 .cu-cb:checked {
-  background:var(--bad); border-color:var(--bad);
+  background:var(--ok); border-color:var(--ok);
 }
 .cu-cb:checked::after {
   content:""; position:absolute; inset:0; display:flex;
@@ -684,8 +682,6 @@ input[type="date"]:hover { border-color:var(--glass-border-hover); }
 .cu-confirm { margin-top:4px; align-self:flex-start; font-size:12.5px; padding:7px 16px; border-radius:999px; transition:background .18s var(--ease), color .18s var(--ease), border-color .18s var(--ease); }
 .cu-all-attended { background:var(--plate-2); border:1px solid var(--ok); color:var(--ok); }
 .cu-all-attended:hover { background:var(--ok); color:var(--badge-ink); }
-.cu-has-missed { background:var(--bad); border:1px solid var(--bad); color:#fff; }
-.cu-has-missed:hover { filter:brightness(1.1); }
 .cu-confirm:disabled { opacity:.5; cursor:default; }
 .cu-reset-row { display:flex; justify-content:center; padding:10px 0 2px; }
 .cu-reset-btn { font-size:12px; color:var(--ink-3); opacity:.6; }
@@ -5077,7 +5073,7 @@ function openCatchup() {
     const days = untouchedDays();
     box.appendChild(el("div", "d-name", "Catch up"));
     box.appendChild(el("div", "d-full", days.length
-      ? "For each day below, tick the classes you missed. Unticked ones are counted as attended."
+      ? "Tick the classes you attended. Anything left empty is saved as absent."
       : "All done — every class day since " + longDate(SEM_START) + " has been marked."));
 
     if (days.length) {
@@ -5098,10 +5094,8 @@ function openCatchup() {
           classes.length + (classes.length === 1 ? " class" : " classes")));
         card.appendChild(hdr);
 
-        /* Prompt */
-        card.appendChild(el("div", "cu-q", "Did you miss any class on this day? (tick only the ones you missed)"));
-
-        /* Per-class checkboxes — checked = missed */
+        /* Per-class checkboxes: ticked = present, empty = absent. Nothing is ticked
+           for you, so every present is one the student said. */
         const checks = el("div", "cu-checks");
         const boxes = [];
 
@@ -5110,14 +5104,10 @@ function openCatchup() {
         confirmBtn.type = "button";
 
         const updateBtn = () => {
-          const missed = boxes.filter(b => b.cb.checked).length;
-          if (missed === 0) {
-            confirmBtn.textContent = "✓ Attended all " + classes.length + " classes";
-            confirmBtn.className = "btn cu-confirm cu-all-attended";
-          } else {
-            confirmBtn.textContent = "Save (" + missed + " missed, " + (classes.length - missed) + " attended)";
-            confirmBtn.className = "btn cu-confirm cu-has-missed";
-          }
+          const here = boxes.filter(b => b.cb.checked).length, away = classes.length - here;
+          confirmBtn.textContent = !away ? "Save · all present" : !here ? "Save · all absent"
+            : "Save · " + here + " present, " + away + " absent";
+          confirmBtn.className = "btn cu-confirm" + (away ? "" : " cu-all-attended");
         };
 
         classes.forEach(({ ii, k }) => {
@@ -5132,7 +5122,8 @@ function openCatchup() {
           cb.type = "checkbox";
           cb.id = uid;
           cb.className = "cu-cb";
-          cb.addEventListener("change", updateBtn);
+          const st = el("span", "cu-st", "Absent");
+          cb.addEventListener("change", () => { st.textContent = cb.checked ? "Present" : "Absent"; updateBtn(); });
           boxes.push({ cb, ii, k });
 
           const dot = el("span", "cu-dot");
@@ -5142,6 +5133,7 @@ function openCatchup() {
           lbl.appendChild(dot);
           lbl.appendChild(el("span", "cu-sub", sub.short));
           lbl.appendChild(el("span", "cu-fac", sub.lab ? "Lab · " + sub.fac : sub.fac));
+          lbl.appendChild(st);
           checks.appendChild(lbl);
         });
 
@@ -5151,7 +5143,7 @@ function openCatchup() {
 
         confirmBtn.addEventListener("click", () => {
           boxes.forEach(({ cb, ii, k }) => {
-            att[iso + "|" + ii] = { m: cb.checked ? "A" : "P", s: k, t: Date.now() };
+            att[iso + "|" + ii] = { m: cb.checked ? "P" : "A", s: k, t: Date.now() };
           });
           saveAtt(); renderAttendance();
           if (profile) { syncAttendance().catch(() => {}); pushScore().catch(() => {}); }
