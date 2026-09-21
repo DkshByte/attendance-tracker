@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+3100d93-->
+<!--secf-app--><!--build:1.1.2+8dde0fe-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1580,15 +1580,28 @@ dialog .btn { margin-top:8px; }
 
 /* ============ syllabus: a line per subject, a station per unit ============ */
 @property --p { syntax:"<percentage>"; inherits:false; initial-value:0%; }
-.syl-find { margin-top:0; }
+.syl-plate { margin-bottom:14px; }
+.syl-plate h1 { color:var(--ink); }
+.syl-plate .who { max-width:46ch; }
+.syl-plate .gauge .track i { transition:width .6s var(--ease); }
+.syl-plate .upnext .syl-nt { font-size:15px; font-weight:600; color:var(--ink); }
+.syl-plate .upnext .chev { flex:none; font-size:20px; line-height:1; color:var(--ink-3); }
+
+.syl-find { position:relative; margin-top:0; }
+.syl-find svg { position:absolute; left:13px; top:50%; width:17px; height:17px; transform:translateY(-50%); color:var(--ink-3); pointer-events:none; }
+.syl-find input { padding-left:39px; }
+
+.syl-board { margin-top:14px; }
 .syl-board .syl-row { width:100%; border:0; font:inherit; color:inherit; text-align:left; cursor:pointer;
                       transition:background-color .2s var(--ease); }
 .syl-board .syl-row:hover { background:var(--plate-2); }
 .syl-row .pct { font-size:23px; color:var(--ink); }
-.syl-line { position:relative; display:flex; justify-content:space-between; width:min(172px, 100%); height:12px; margin-top:10px; }
-.syl-line::before { content:""; position:absolute; left:6px; right:6px; top:5px; height:2px; background:var(--rule); }
-.syl-line i { position:relative; width:12px; height:12px; border-radius:50%;
-              background:radial-gradient(closest-side, var(--bg) 48%, transparent 54%), conic-gradient(var(--line) var(--p), var(--rail) 0);
+.syl-row.fresh .held { font-size:12px; color:var(--ink-3); }
+.syl-line { position:relative; display:flex; justify-content:space-between; width:min(180px, 100%); height:14px; margin-top:10px; }
+.syl-line::before { content:""; position:absolute; left:7px; right:7px; top:6px; height:2px; border-radius:1px;
+                    background:linear-gradient(to right, var(--line) var(--prog, 0%), var(--rule) var(--prog, 0%)); }
+.syl-line i { position:relative; width:14px; height:14px; border-radius:50%;
+              background:radial-gradient(closest-side, var(--bg) 50%, transparent 55%), conic-gradient(var(--line) var(--p), var(--rail) 0);
               transition:--p .6s var(--ease); }
 .syl-line i.full { background:var(--line); }
 
@@ -1605,32 +1618,57 @@ dialog .btn { margin-top:8px; }
 .syl-hit .where { font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); }
 .syl-hit.done::after { content:"Done"; font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ok); }
 
-.syl-sum { margin-top:14px; font-size:14px; color:var(--ink-2); }
-.syl-sum b { font-family:'Blinker', sans-serif; font-weight:700; font-size:17px; color:var(--ink); }
-.syl-scheme { margin-top:3px; font-size:12.5px; color:var(--ink-3); }
-.syl-rail { position:relative; margin-top:20px; padding-left:28px; }
-.syl-rail::before { content:""; position:absolute; left:7px; top:9px; bottom:12px; width:2px; border-radius:1px; background:var(--rail); }
-.syl-unit + .syl-unit { margin-top:22px; }
-.syl-uhead { position:relative; display:flex; align-items:center; gap:10px; min-height:22px; }
-.syl-node { position:absolute; left:-28px; top:3px; width:16px; height:16px; border-radius:50%;
-            background:radial-gradient(closest-side, var(--plate) 50%, transparent 56%), conic-gradient(var(--line) var(--p), var(--rail) 0);
+/* the sheet */
+#dlgIn > .gauge { margin-top:14px; }
+.syl-units { display:grid; grid-template-columns:repeat(4, 1fr); gap:4px; margin-top:18px; padding:3px;
+             background:var(--plate-2); border-radius:12px; }
+.syl-units button { display:flex; flex-direction:column; align-items:center; gap:3px; min-height:62px; padding:9px 4px 8px;
+                    border:0; border-radius:9px; background:transparent; color:var(--ink-2); font:inherit; cursor:pointer;
+                    transition:background-color .2s var(--ease), color .2s var(--ease); }
+.syl-units button:hover { color:var(--ink); background:var(--plate-3); }
+.syl-units button[aria-pressed="true"] { background:var(--plate); color:var(--ink); box-shadow:var(--lift-edge); }
+.syl-units b { font-family:'Blinker', sans-serif; font-size:15px; font-weight:700; letter-spacing:.06em; line-height:1; }
+.syl-units span { font-size:11.5px; font-weight:600; color:var(--ink-3); }
+.syl-ring { width:14px; height:14px; border-radius:50%;
+            background:radial-gradient(closest-side, var(--plate-2) 50%, transparent 55%), conic-gradient(var(--line) var(--p), var(--rail) 0);
             transition:--p .5s var(--ease); }
-.syl-node.full { background:var(--line); box-shadow:0 0 0 3px var(--plate); }
+.syl-units button[aria-pressed="true"] .syl-ring { background:radial-gradient(closest-side, var(--plate) 50%, transparent 55%), conic-gradient(var(--line) var(--p), var(--rail) 0); }
+.syl-ring.full, .syl-units button[aria-pressed="true"] .syl-ring.full { background:var(--line); }
+
+.syl-pane { margin-top:18px; }
+.syl-uhead { display:flex; align-items:baseline; gap:10px; }
 .syl-uhead h3 { margin:0; font-family:'Blinker', sans-serif; font-size:15px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--line); }
-.syl-ucount { font-size:12.5px; font-weight:600; color:var(--ink-3); }
-.syl-all { margin-left:auto; font-size:12.5px; padding:6px 0; }
-.syl-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
-.syl-chip { display:inline-flex; align-items:flex-start; gap:8px; min-height:36px; padding:8px 12px 8px 9px; border-radius:10px;
-            border:1px solid transparent; background:var(--plate-2); color:var(--ink-2); font:inherit; font-size:13.5px; font-weight:500;
-            line-height:1.35; text-align:left; cursor:pointer; transition:background-color .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease); }
-.syl-chip:hover { background:var(--plate-3); }
-.syl-chip .tk { position:relative; flex:none; width:16px; height:16px; margin-top:1px; border-radius:50%; box-shadow:inset 0 0 0 1.5px var(--rail);
-                transition:background-color .2s var(--ease), box-shadow .2s var(--ease); }
-.syl-chip[aria-pressed="true"] { color:var(--ink); border-color:color-mix(in srgb, var(--line) 42%, transparent); }
-.syl-chip[aria-pressed="true"] .tk { background:var(--line); box-shadow:none; }
-.syl-chip[aria-pressed="true"] .tk::after { content:""; position:absolute; left:5.5px; top:3px; width:4px; height:7.5px;
-                                            border:solid var(--badge-ink); border-width:0 2px 2px 0; transform:rotate(45deg); }
-.syl-chip.found { border-color:var(--line); }
+.syl-marks { font-size:12.5px; font-weight:600; color:var(--ink-3); }
+.syl-all { margin-left:auto; font-size:13px; padding:8px 0; }
+
+/* topics are stops on the unit's line; consecutive ticked stops light the track between them */
+.syl-stops { list-style:none; margin:6px 0 0; padding:0; }
+.syl-stop { position:relative; }
+/* each stop draws its own stretch of track: above its disc (--up) and below it (--dn),
+   so rows of any height join up; the disc centre sits 22px down every row */
+.syl-stop::before { content:""; position:absolute; left:10px; top:0; bottom:0; width:2px;
+                    background:linear-gradient(var(--up, var(--rail)) 22px, var(--dn, var(--rail)) 22px); }
+.syl-stop:first-child::before { top:22px; background:var(--dn, var(--rail)); }
+.syl-stop:last-child::before { bottom:auto; height:22px; background:var(--up, var(--rail)); }
+.syl-stop:only-child::before { display:none; }
+.syl-stop.done + .syl-stop.done { --up:var(--line); }
+.syl-stop.done:has(+ .syl-stop.done) { --dn:var(--line); }
+.syl-stop button { position:relative; display:flex; align-items:flex-start; gap:14px; width:100%; min-height:44px; padding:11px 8px 11px 0;
+                   border:0; background:none; color:var(--ink-2); font:inherit; font-size:15px; line-height:1.4; text-align:left; cursor:pointer;
+                   transition:color .2s var(--ease); }
+.syl-stop button:hover { color:var(--ink); }
+.syl-disc { position:relative; z-index:1; flex:none; width:22px; height:22px; border-radius:50%; margin-top:-.5px;
+            background:var(--plate); box-shadow:inset 0 0 0 2px var(--rail);
+            transition:background-color .2s var(--ease), box-shadow .2s var(--ease); }
+.syl-stop button:hover .syl-disc { box-shadow:inset 0 0 0 2px var(--ink-3); }
+.syl-stop.done button { color:var(--ink); }
+.syl-stop.done .syl-disc, .syl-stop.done button:hover .syl-disc { background:var(--line); box-shadow:none; }
+.syl-stop.done .syl-disc::after { content:""; position:absolute; left:8px; top:4.5px; width:4.5px; height:9px;
+                                  border:solid var(--badge-ink); border-width:0 2.2px 2.2px 0; transform:rotate(45deg); }
+.syl-stop.found button { color:var(--ink); }
+.syl-stop.found::after { content:""; position:absolute; inset:2px -8px; border-radius:10px; pointer-events:none;
+                         background:color-mix(in srgb, var(--line) 12%, transparent); }
+
 .syl-open { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; margin-top:14px; padding:12px 14px;
             border:1px solid var(--rule-soft); border-radius:10px; background:var(--plate-2); color:var(--ink); font:inherit; cursor:pointer; }
 .syl-open:hover { background:var(--plate-3); }
@@ -1649,11 +1687,13 @@ dialog .btn { margin-top:8px; }
 .paper-notes li::marker { color:var(--ink-3); }
 
 @media (prefers-reduced-motion: no-preference) {
-  .syl-chip[aria-pressed="true"] .tk::after { animation:tkIn .24s var(--ease) both; }
-  .syl-chip.found { animation:sylFound 1.4s var(--ease) .25s both; }
+  .syl-stop.done .syl-disc::after { animation:tkIn .22s var(--ease) both; }
+  .syl-pane.swap { animation:sylSwap .22s var(--ease) both; }
+  .syl-stop.found::after { animation:sylFound 2.2s var(--ease) .3s both; }
 }
 @keyframes tkIn { from { opacity:0; transform:rotate(45deg) scale(.4); } }
-@keyframes sylFound { 0%, 40% { box-shadow:0 0 0 4px color-mix(in srgb, var(--line) 30%, transparent); } }
+@keyframes sylSwap { from { opacity:0; transform:translateY(6px); } }
+@keyframes sylFound { 70% { opacity:1; } to { opacity:0; } }
 
 /* ============ welcome: entering the app ============
    One idea, in the network's own grammar: your line is drawn across the screen and
@@ -2653,13 +2693,15 @@ input[type="date"] { padding:12px 14px; }
     <div class="h2row">
       <h2>Syllabus</h2>
     </div>
+    <div id="sylNext"></div>
     <div class="field syl-find">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="M15.5 15.5l4.6 4.6"/></svg>
       <input id="sylSearch" aria-label="Find a topic in the syllabus" type="search" autocapitalize="off" spellcheck="false"
              placeholder="Find a topic — Kepler, Thevenin, pointers" enterkeyhint="search">
     </div>
     <div id="sylFound" role="status" aria-live="polite"></div>
     <div id="sylList"></div>
-    <details class="fold">
+    <details class="fold" id="sylPaperFold">
       <summary>How the paper is set</summary>
       <div id="sylPaper"></div>
     </details>
@@ -7574,11 +7616,34 @@ async function syncSyllabus() {
   if (!document.getElementById("syllabus").hidden) renderSyllabus();
 }
 
-/* ---- the tab ---- */
+/* ---- where you are: the unit you last worked in, and the next topic on it ---- */
+function sylNext() {
+  let last = null, lt = -1;
+  Object.keys(sylDone).forEach(id => {
+    const r = sylDone[id], [k] = id.split(".");
+    if (r.d && SYL[k] && (r.t || 0) > lt) { lt = r.t || 0; last = id; }
+  });
+  if (!last) return null;
+  const firstOpen = (k, from) => {
+    for (let n = 0; n < 4; n++) {
+      const u = (from + n) % 4;
+      const i = SYL[k].units[u].findIndex((_, i) => !isDone(sylId(k, u, i)));
+      if (i > -1) return { k, u, i };
+    }
+    return null;
+  };
+  const [k, u] = last.split(".");
+  /* this line is finished: the least-travelled one is where to go next */
+  return firstOpen(k, +u) || Object.keys(SYL).map(x => [x, sylOf(x)]).filter(([, p]) => p.d < p.n)
+    .sort((a, b) => a[1].d / a[1].n - b[1].d / b[1].n).map(([x]) => firstOpen(x, 0))[0] || { done: true };
+}
+
 function sylStations(k) {
-  /* four stations on a short line; each ring fills with the share of its unit ticked */
-  const line = el("div", "syl-line");
+  /* four stations on a short line: the line fills as far as the subject has travelled,
+     and each ring fills with the share of its own unit */
+  const line = el("div", "syl-line"), p = sylOf(k);
   line.setAttribute("aria-hidden", "true");
+  line.style.setProperty("--prog", (p.d / p.n * 100).toFixed(1) + "%");
   SYL[k].units.forEach((_, u) => {
     const { d, n } = sylUnit(k, u);
     const st = el("i", d === n ? "full" : null);
@@ -7588,17 +7653,61 @@ function sylStations(k) {
   return line;
 }
 
+function renderSylNext() {
+  const box = document.getElementById("sylNext");
+  box.textContent = "";
+  const plate = el("div", "plate syl-plate");
+  const nx = sylNext();
+  let all = 0, tot = 0;
+  Object.keys(SYL).forEach(k => { const p = sylOf(k); all += p.d; tot += p.n; });
+
+  if (!nx) {
+    plate.appendChild(el("h1", null, "Tick topics as they're taught"));
+    plate.appendChild(el("p", "who", "Open a subject and tick what's been covered. Your progress stays with your account, on every phone you sign in on."));
+    box.appendChild(plate);
+    return;
+  }
+  if (nx.done) {
+    plate.appendChild(el("h1", null, "Every topic ticked"));
+    plate.appendChild(el("p", "who", "All " + tot + " topics across seven subjects. That's the whole syllabus."));
+    box.appendChild(plate);
+    return;
+  }
+  const s = SUB[nx.k], un = sylUnit(nx.k, nx.u);
+  plate.dataset.line = s.line;
+  plate.appendChild(el("h1", null, s.short + " · Unit " + ROMAN[nx.u]));
+  plate.appendChild(el("p", "who", un.d + " of " + un.n + " topics covered"
+    + (SYL[nx.k].scheme === "std" ? " · 12 marks of the paper" : "")));
+  const g = el("div", "gauge");
+  const tr = el("div", "track"), fill = el("i");
+  fill.style.width = (all / tot * 100).toFixed(1) + "%";
+  tr.appendChild(fill); g.appendChild(tr);
+  g.appendChild(el("span", null, all + " of " + tot + " overall"));
+  plate.appendChild(g);
+  const up = el("button", "upnext");
+  up.type = "button";
+  up.appendChild(el("span", "lbl", "Next"));
+  up.appendChild(el("span", "fac syl-nt", SYL[nx.k].units[nx.u][nx.i]));
+  up.appendChild(el("span", "chev", "›"));
+  up.addEventListener("click", () => openSyllabus(nx.k, nx.u, nx.i));
+  plate.appendChild(up);
+  box.appendChild(plate);
+}
+
+/* ---- the tab ---- */
 function renderSyllabus() {
   const q = document.getElementById("sylSearch").value.trim();
   const list = document.getElementById("sylList"), found = document.getElementById("sylFound");
   list.textContent = ""; found.textContent = "";
   list.hidden = !!q;
+  document.getElementById("sylNext").hidden = !!q;
+  document.getElementById("sylPaperFold").hidden = !!q;
 
   if (q) {
     const hits = sylFind(q);
     found.appendChild(el("div", "syl-count", hits.length
       ? hits.length + (hits.length === 1 ? " topic" : " topics")
-      : "Nothing in the syllabus matches “" + q + "”"));
+      : "Nothing in the syllabus matches “" + q + "”. Try one word — “friction”, “pointers”."));
     if (!hits.length) return;
     const box = el("div", "syl-hits");
     const words = fold(q).split(/\s+/).filter(Boolean);
@@ -7618,21 +7727,24 @@ function renderSyllabus() {
     return;
   }
 
+  renderSylNext();
   const rows = el("div", "board syl-board");
   Object.keys(SYL).forEach(k => {
     const s = SUB[k], p = sylOf(k);
-    const b = el("button", "srow syl-row");
+    const b = el("button", "srow syl-row" + (p.d ? "" : " fresh"));
     b.type = "button"; b.dataset.line = s.line;
     b.setAttribute("aria-label", s.name + ", " + p.d + " of " + p.n + " topics done");
     b.appendChild(el("span", "bar"));
     const m = el("div", "m");
     m.appendChild(el("div", "n", s.short));
-    m.appendChild(el("div", "adv", s.code + " · " + (p.units ? p.units + " of 4 units done" : "4 units")));
+    m.appendChild(el("div", "adv", s.code + " · " + (p.units ? p.units + " of 4 units done" : p.n + " topics")));
     m.appendChild(sylStations(k));
     b.appendChild(m);
     const r = el("div", "r");
-    r.appendChild(el("div", "pct", Math.round(p.d / p.n * 100) + "%"));
-    r.appendChild(el("div", "held", p.d + " of " + p.n));
+    if (p.d) {
+      r.appendChild(el("div", "pct", Math.round(p.d / p.n * 100) + "%"));
+      r.appendChild(el("div", "held", p.d + " of " + p.n));
+    } else r.appendChild(el("div", "held", "Not started"));
     b.appendChild(r);
     b.addEventListener("click", () => openSyllabus(k));
     rows.appendChild(b);
@@ -7654,7 +7766,7 @@ function markWords(text, words) {
   return out;
 }
 
-/* ---- one subject's sheet: its four stations, and every topic on them ---- */
+/* ---- one subject's sheet: pick a station, and every stop on it ---- */
 function openSyllabus(k, focusU, focusI) {
   const s = SUB[k], syl = SYL[k];
   const box = document.getElementById("dlgIn");
@@ -7668,89 +7780,105 @@ function openSyllabus(k, focusU, focusI) {
   box.appendChild(el("div", "d-name", s.short));
   box.appendChild(el("div", "d-full", s.name));
 
-  const sum = el("div", "syl-sum");
-  const say = () => {
+  const g = el("div", "gauge");
+  const tr = el("div", "track"), fill = el("i"), gl = el("span");
+  tr.appendChild(fill); g.appendChild(tr); g.appendChild(gl);
+  box.appendChild(g);
+  const gauge = () => {
     const p = sylOf(k);
-    sum.textContent = "";
-    sum.appendChild(el("b", null, p.d + " of " + p.n));
-    sum.appendChild(document.createTextNode(" topics done · " + p.units + " of 4 units"));
+    fill.style.width = (p.d / p.n * 100).toFixed(1) + "%";
+    gl.textContent = p.d + " of " + p.n + " topics";
   };
-  say();
-  box.appendChild(sum);
-  box.appendChild(el("div", "syl-scheme",
-    syl.scheme === "std" ? "60 end-term · 40 internal · every unit is 12 marks of the paper"
-    : syl.scheme === "nues" ? "No end-term paper · 100 marks, all from your teacher"
-    : "Marking scheme isn't in our copy of the syllabus"));
 
-  const rail = el("div", "syl-rail");
-  syl.units.forEach((topics, u) => {
-    const unit = el("section", "syl-unit");
-    unit.id = "syl-u" + u;
+  /* the four stations; open on the one you asked for, else the first unfinished */
+  let cur = focusU != null ? focusU : syl.units.findIndex((_, u) => { const x = sylUnit(k, u); return x.d < x.n; });
+  if (cur < 0) cur = 0;
+  const tabs = el("div", "syl-units");
+  tabs.setAttribute("role", "group");
+  tabs.setAttribute("aria-label", "Units");
+  const tabBtns = syl.units.map((_, u) => {
+    const b = el("button");
+    b.type = "button";
+    const ring = el("i", "syl-ring");
+    b.appendChild(ring);
+    b.appendChild(el("b", null, ROMAN[u]));
+    const c = el("span");
+    b.appendChild(c);
+    b.addEventListener("click", () => { cur = u; paint(true); });
+    tabs.appendChild(b);
+    return { b, ring, c };
+  });
+  box.appendChild(tabs);
+
+  const pane = el("div", "syl-pane");
+  box.appendChild(pane);
+
+  const foot = el("div", "d-rows");
+  const row = (a, b) => { const r = el("div", "d-row"); r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b)); foot.appendChild(r); };
+  row("Paper", syl.scheme === "std" ? "60 end-term · 40 internal" : syl.scheme === "nues" ? "No end-term · 100 internal" : "Not in our copy");
+  if (syl.book) row("Textbook", syl.book);
+  box.appendChild(foot);
+  box.appendChild(actions());
+
+  function tabsPaint() {
+    tabBtns.forEach(({ b, ring, c }, u) => {
+      const { d, n } = sylUnit(k, u);
+      b.setAttribute("aria-pressed", String(u === cur));
+      b.setAttribute("aria-label", "Unit " + ROMAN[u] + ", " + d + " of " + n + " done");
+      ring.style.setProperty("--p", Math.round(d / n * 100) + "%");
+      ring.classList.toggle("full", d === n);
+      c.textContent = d + "/" + n;
+    });
+    gauge();
+  }
+
+  function paint(moved) {
+    tabsPaint();
+    pane.textContent = "";
+    if (moved) { pane.classList.remove("swap"); void pane.offsetWidth; pane.classList.add("swap"); }
+    const topics = syl.units[cur];
     const head = el("div", "syl-uhead");
-    const st = el("i", "syl-node");
-    head.appendChild(st);
-    head.appendChild(el("h3", null, "Unit " + ROMAN[u]));
-    const cnt = el("span", "syl-ucount");
-    head.appendChild(cnt);
+    head.appendChild(el("h3", null, "Unit " + ROMAN[cur]));
+    if (syl.scheme === "std") head.appendChild(el("span", "syl-marks", "12 marks"));
     const all = el("button", "link syl-all");
     all.type = "button";
     head.appendChild(all);
-    unit.appendChild(head);
+    pane.appendChild(head);
 
-    const chips = el("div", "syl-chips");
+    const stops = el("ol", "syl-stops");
     const btns = topics.map((t, i) => {
-      const id = sylId(k, u, i), b = el("button", "syl-chip");
+      const id = sylId(k, cur, i), li = el("li", "syl-stop"), b = el("button");
       b.type = "button";
-      b.setAttribute("aria-pressed", String(isDone(id)));
-      const tick = el("span", "tk"); tick.setAttribute("aria-hidden", "true");
-      b.appendChild(tick);
+      b.appendChild(el("i", "syl-disc"));
       b.appendChild(el("span", null, t));
+      const set = on => { b.setAttribute("aria-pressed", String(on)); li.classList.toggle("done", on); };
+      set(isDone(id));
       b.addEventListener("click", () => {
         const on = b.getAttribute("aria-pressed") !== "true";
-        b.setAttribute("aria-pressed", String(on));
-        toggleTopic(id, on);
-        tone(); say();
+        set(on); toggleTopic(id, on); allLabel(); tabsPaint();
       });
-      if (u === focusU && i === focusI) b.classList.add("found");
-      chips.appendChild(b);
-      return b;
+      if (cur === focusU && i === focusI) li.classList.add("found");
+      li.appendChild(b);
+      stops.appendChild(li);
+      return set;
     });
-    const tone = () => {
-      const { d, n } = sylUnit(k, u);
-      cnt.textContent = d + "/" + n;
-      st.style.setProperty("--p", Math.round(d / n * 100) + "%");
-      st.classList.toggle("full", d === n);
-      unit.classList.toggle("full", d === n);
-      all.textContent = d === n ? "Clear unit" : "Mark unit done";
-    };
+    pane.appendChild(stops);
+
+    const allLabel = () => { const x = sylUnit(k, cur); all.textContent = x.d === x.n ? "Clear unit" : "Mark unit done"; };
     all.addEventListener("click", () => {
-      const on = sylUnit(k, u).d !== topics.length;
-      const ids = [];
-      btns.forEach((b, i) => {
-        const id = sylId(k, u, i);
+      const on = sylUnit(k, cur).d !== topics.length, ids = [];
+      topics.forEach((_, i) => {
+        const id = sylId(k, cur, i);
         if (isDone(id) === on) return;
-        b.setAttribute("aria-pressed", String(on));
         sylDone[id] = { d: on ? 1 : 0, t: Date.now() };
-        ids.push(id);
+        btns[i](on); ids.push(id);
       });
       saveSyl(); pushSyl(ids).catch(() => {});
-      tone(); say();
+      allLabel(); tabsPaint();
     });
-    tone();
-    unit.appendChild(chips);
-    rail.appendChild(unit);
-  });
-  box.appendChild(rail);
-
-  if (syl.book) {
-    const bk = el("div", "d-rows");
-    const r = el("div", "d-row");
-    r.appendChild(el("span", null, "Textbook"));
-    r.appendChild(el("span", null, syl.book));
-    bk.appendChild(r);
-    box.appendChild(bk);
+    allLabel();
   }
-  box.appendChild(actions());
+  paint(false);
 
   const d = document.getElementById("dlg");
   if (!d.dataset.sylWired) {                        /* the list behind the sheet catches up on close */
@@ -7758,8 +7886,8 @@ function openSyllabus(k, focusU, focusI) {
     d.addEventListener("close", () => { if (!document.getElementById("syllabus").hidden) renderSyllabus(); });
   }
   openDlg(true);
-  if (focusU != null) requestAnimationFrame(() => {
-    const f = box.querySelector(".syl-chip.found") || document.getElementById("syl-u" + focusU);
+  if (focusI != null) requestAnimationFrame(() => {
+    const f = box.querySelector(".syl-stop.found");
     if (f) f.scrollIntoView({ block: "center" });
   });
 }
