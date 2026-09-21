@@ -177,7 +177,7 @@ check("attendance accepts the cleared mark 'X'", "('P','A','C','X')" in n09,
 
 # 8b'''. A mark is keyed by its position in the day, a verdict by its period. Mixing them
 #        called off the wrong subject on every day but Wednesday.
-check("tally maps a mark's position to its period", "periodOf(iso, +id.slice(bar + 1))" in html,
+check("tally maps a mark's position to its period", "ii = +id.slice(bar + 1)" in html and "periodOf(iso, ii)" in html,
       "CR verdicts would land on the wrong class")
 
 # 8b4. No signal is not a signed-out student. token() once wiped the session on any

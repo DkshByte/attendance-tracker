@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.1+3df19f4-->
+<!--secf-app--><!--build:1.1.1+14950b3-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -4014,9 +4014,12 @@ function demo() {                                   // run demo() in the console
   ok(tally()[sub1].p, 2, "...and calling off an absence never removes a present");
 
   overrides = { "2026-09-07|3": { kind:"swap", subject:sub2 } };
-  ok(tally()[sub1].h, 2, "an arranged period leaves the subject that did not run");
-  ok(tally()[sub2].h, 1, "...and lands on the one that did");
-  ok(tally()[sub2].p, 1, "...carrying the mark with it");
+  ok(tally()[sub1].h, 3, "an arranged period still counts for the timetabled subject");
+  ok(tally()[sub2], undefined, "...not the one that stood in for it");
+  att["2026-09-07|2"] = { m:"P", s:sub2 };            /* marked while the slot showed sub2 */
+  ok(tally()[sub1].p, 2, "a mark saved under the stand-in goes back to the timetabled class");
+  ok(tally()[sub2], undefined, "...and leaves the stand-in untouched");
+  att["2026-09-07|2"] = { m:"P", s:sub1 };
 
   overrides = { "2026-09-07|3": { kind:"swap", subject:"NOSUCHSUBJECT" } };
   ok(tally()[sub1].h, 3, "a swap to a subject the app does not know is ignored, not dropped");
@@ -4067,12 +4070,13 @@ function tally() {
   Object.entries(att).forEach(([id, { m, s }]) => {
     if (m === "C") return;
     /* The CR's verdict outranks what was marked at the time. A class called off was
-       held against nobody, and an arranged period counts towards the subject that
-       actually ran — including for the students who marked it before the CR said so. */
-    const bar = id.indexOf("|");
-    const iso = id.slice(0, bar), period = periodOf(iso, +id.slice(bar + 1));
+       held against nobody, and an arranged period counts towards the subject that was
+       timetabled — Physics arranged to Mechanics is still Physics' class — whatever
+       subject the mark was saved under while the slot showed as arranged. */
+    const bar = id.indexOf("|"), ii = +id.slice(bar + 1);
+    const iso = id.slice(0, bar), period = periodOf(iso, ii);
     if (period !== null && isCancelled(iso, period)) return;
-    const key = (period !== null && swapAt(iso, period)) || s;
+    const key = (period !== null && swapAt(iso, period) && resolve(DAYS[fromISO(iso).getDay() - 1].items[ii])) || s;
     if (!tracked(key)) return;
     const e = t[key] = t[key] || { p:0, h:0 };
     e.h++; if (m === "P") e.p++;
