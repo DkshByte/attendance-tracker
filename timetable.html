@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+1757021-->
+<!--secf-app--><!--build:1.1.2+77acf44-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1587,9 +1587,16 @@ dialog .btn { margin-top:8px; }
 .syl-mid { display:flex; align-items:center; gap:16px; margin-bottom:14px; padding:14px 16px;
            background:var(--plate); border:1px solid var(--rule); border-radius:14px; }
 .syl-mid.on { border-color:var(--warn); }
-#midBox .syl-mid { flex-wrap:wrap; margin:14px 0 0; }
-.syl-mid-go { flex:0 0 calc(100% + 32px); justify-content:space-between; margin:0 -16px -14px; border-radius:0 0 13px 13px; }
-.syl-mid-go .chev { font-size:20px; line-height:1; color:var(--ink-3); }
+.mid-pill { display:inline-flex; align-items:center; gap:7px; max-width:100%; min-height:36px; margin-top:12px; padding:7px 12px 7px 11px;
+            border:1px solid var(--rule); border-radius:999px; background:var(--plate); color:var(--ink-2);
+            font:inherit; font-size:13px; white-space:nowrap; cursor:pointer; transition:background-color .2s var(--ease); }
+.mid-pill:hover { background:var(--plate-2); }
+.mid-pill.on { border-color:var(--warn); }
+.mid-pill i { width:7px; height:7px; flex:none; border-radius:50%; background:var(--warn); }
+.mid-pill b { color:var(--ink); font-weight:700; }
+.mid-pill .u { overflow:hidden; text-overflow:ellipsis; color:var(--ink-3); }
+.mid-pill .u::before { content:"·"; margin-right:7px; }
+.mid-pill .chev { font-size:17px; line-height:1; color:var(--ink-3); }
 .syl-mid .m { flex:1; min-width:0; }
 .syl-mid .m b { display:block; font-family:'Blinker', sans-serif; font-size:19px; font-weight:700; line-height:1.15; }
 .syl-mid .m > span { display:block; margin-top:2px; font-size:13px; color:var(--ink-2); }
@@ -7714,9 +7721,8 @@ function sylStations(k) {
   return line;
 }
 
-/* The mid-sem card. On Today it carries a way into the syllabus; on the Syllabus tab it
-   is already there. null once the exams are over. */
-function midCard(withLink) {
+/* The mid-sem card on the Syllabus tab. null once the exams are over. */
+function midCard() {
   const st = midState(nowISO());
   if (st.s === "over") return null;
   const card = el("div", "syl-mid" + (st.s === "on" ? " on" : ""));
@@ -7743,32 +7749,36 @@ function midCard(withLink) {
     r.appendChild(el("span", null, "until Sat 10"));
   }
   card.appendChild(r);
-  if (withLink) {
-    const link = el("button", "upnext syl-mid-go");
-    link.type = "button";
-    link.appendChild(el("span", "t", "View syllabus"));
-    link.appendChild(el("span", "chev", "›"));
-    link.addEventListener("click", () => {
-      const s = document.getElementById("sylSearch");
-      if (s) s.value = "";
-      go("syllabus");
-    });
-    card.appendChild(link);
-  }
   return card;
 }
 function renderMidsem() {
   const box = document.getElementById("sylMid");
   box.textContent = "";
-  const c = midCard(false);
+  const c = midCard();
   if (c) box.appendChild(c);
 }
+/* On Today it is one line: a pill that says when, and opens the syllabus */
 function renderMidToday() {
   const box = document.getElementById("midBox");
   if (!box) return;
   box.textContent = "";
-  const c = midCard(true);
-  if (c) box.appendChild(c);
+  const st = midState(nowISO());
+  if (st.s === "over") return;
+  const pill = el("button", "mid-pill" + (st.s === "on" ? " on" : ""));
+  pill.type = "button";
+  pill.appendChild(el("i"));
+  pill.appendChild(el("b", null, st.s === "on" ? "Mid-sems on" : "Mid-sems"));
+  pill.appendChild(el("span", null, st.s === "on" ? "until Sat 10"
+    : st.days === 0 ? "start today" : st.days === 1 ? "tomorrow" : "in " + st.days + " days"));
+  pill.appendChild(el("span", "u", "Units I–II"));
+  pill.appendChild(el("span", "chev", "›"));
+  pill.setAttribute("aria-label", pill.textContent.replace("›", "") + ", view syllabus");
+  pill.addEventListener("click", () => {
+    const s = document.getElementById("sylSearch");
+    if (s) s.value = "";
+    go("syllabus");
+  });
+  box.appendChild(pill);
 }
 
 function renderSylNext() {
