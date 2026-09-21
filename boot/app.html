@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.3+1a5fc74-->
+<!--secf-app--><!--build:1.1.3+7af570b-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1769,6 +1769,15 @@ div.sp { cursor:default; }
 .ai-q { margin-top:6px; padding:12px; border-radius:10px; background:var(--plate-2); font-size:12.5px; line-height:1.5; color:var(--ink-2);
         white-space:pre-wrap; max-height:220px; overflow:auto; }
 .ai-priv { margin:12px 0 0; font-size:12px; color:var(--ink-3); }
+.syl-stop { display:flex; align-items:flex-start; }
+.syl-stop .sp { flex:1; min-width:0; }
+.syl-yt { flex:none; display:grid; place-items:center; width:40px; height:44px; margin-right:-8px; border-radius:10px; opacity:.55;
+          transition:opacity .2s var(--ease), background-color .2s var(--ease); }
+.syl-yt:hover, .syl-yt:focus-visible { opacity:1; background:var(--plate-2); }
+.syl-yt svg { width:19px; height:19px; }
+.syl-read li { display:flex; align-items:flex-start; gap:6px; }
+.syl-read li > span { flex:1; }
+.syl-read .syl-yt { height:28px; margin-top:-3px; }
 .syl-open { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; margin-top:14px; padding:12px 14px;
             border:1px solid var(--rule-soft); border-radius:10px; background:var(--plate-2); color:var(--ink); font:inherit; cursor:pointer; }
 .syl-open:hover { background:var(--plate-3); }
@@ -8245,7 +8254,11 @@ function openSyllabus(k, focusU, focusI) {
       if (isMid(u) && midState(nowISO()).s !== "over") head.appendChild(el("span", "syl-midtag", "Mid-sem"));
       doc.appendChild(head);
       const ul = el("ul");
-      topics.forEach((t, i) => { const li = el("li", null, t); if (u === focusU && i === focusI) li.className = "syl-hl"; ul.appendChild(li); });
+      topics.forEach((t, i) => {
+        const li = el("li"); li.appendChild(el("span", null, t)); li.appendChild(lectureLink(k, t));
+        if (u === focusU && i === focusI) li.className = "syl-hl";
+        ul.appendChild(li);
+      });
       doc.appendChild(ul);
     });
     box.appendChild(doc);
@@ -8352,6 +8365,7 @@ function openSyllabus(k, focusU, focusI) {
       });
       if (cur === focusU && i === focusI) li.classList.add("found");
       li.appendChild(b);
+      li.appendChild(lectureLink(k, t));
       stops.appendChild(li);
       return set;
     });
@@ -8409,6 +8423,16 @@ const WEB_APPS = [
   { name:"Google",  color:"#4285F4", d:"M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z", url:q => "https://www.google.com/search?q=" + encodeURIComponent(q) },
   { name:"YouTube", color:"#FF0000", d:"M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z", url:q => "https://www.youtube.com/results?search_query=" + encodeURIComponent(q) },
 ];
+/* lectures for one topic: the topic, its subject, and nothing that narrows it wrongly */
+function lectureLink(k, topic) {
+  const a = el("a", "syl-yt");
+  a.href = WEB_APPS[1].url(topic.replace(/\s*\(.*?\)/g, "") + " " + SUB[k].name.replace(/\s+(I|\(lecture\))$/, "") + " lecture");
+  a.target = "_blank"; a.rel = "noopener";
+  a.setAttribute("aria-label", "Lectures on YouTube: " + topic);
+  a.title = "Lectures on YouTube";
+  a.appendChild(aiLogo(WEB_APPS[1]));
+  return a;
+}
 function webQuery(k, scope) {
   const syl = SYL[k], units = scope === "all" ? [0, 1, 2, 3] : scope === "mid" ? MIDSEM.units : [scope];
   /* a search engine wants a few words, not a syllabus: the subject and its first topics */
@@ -8511,13 +8535,13 @@ function openAskAI(k, unit) {
   box.appendChild(note);
 
   const webApps = el("div", "ai-webapps");
-  webApps.appendChild(el("span", "ai-lbl", "Or check the web yourself"));
+  webApps.appendChild(el("span", "ai-lbl", "Or search it yourself · lectures are on each topic"));
   const wa = el("div", "ai-wa");
-  WEB_APPS.forEach(w => {
+  WEB_APPS.slice(0, 1).forEach(w => {
     const a = el("a", "ai-wlink");
     a.target = "_blank"; a.rel = "noopener";
     a.appendChild(aiLogo(w));
-    a.appendChild(el("span", null, w.name === "YouTube" ? "Lectures on YouTube" : "Search Google"));
+    a.appendChild(el("span", null, "Search Google"));
     wa.appendChild(a);
   });
   webApps.appendChild(wa);
@@ -8538,7 +8562,7 @@ function openAskAI(k, unit) {
   function paint() {
     [pickScope, pickGoal].forEach(p => p.g.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === String(p.get())))));
     AI_APPS.forEach((a, i) => { apps.children[i].href = a.url(Q()); });
-    WEB_APPS.forEach((w, i) => { wa.children[i].href = w.url(webQuery(k, scope)); });
+    wa.children[0].href = WEB_APPS[0].url(webQuery(k, scope));
     pre.textContent = Q();
     /* a PDF is a file: say which apps can hand one back */
     apps.querySelectorAll("small").forEach((s, i) => {
