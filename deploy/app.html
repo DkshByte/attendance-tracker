@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+57ff7ae-->
+<!--secf-app--><!--build:1.1.2+619cd38-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1618,7 +1618,7 @@ dialog .btn { margin-top:8px; }
 .syl-hit .t { font-size:15px; line-height:1.35; color:var(--ink-2); }
 .syl-hit mark { background:none; color:var(--ink); font-weight:700; text-decoration:underline 2px var(--line); text-underline-offset:3px; }
 .syl-hit .where { font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); }
-.syl-hit.done::after { content:"Done"; font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ok); }
+.syl-hit.done::after { content:"Covered"; font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ok); }
 
 /* the sheet */
 #dlgIn > .gauge { margin-top:14px; }
@@ -1638,7 +1638,12 @@ dialog .btn { margin-top:8px; }
 .syl-units button[aria-pressed="true"] .syl-ring { background:radial-gradient(closest-side, var(--plate) 50%, transparent 55%), conic-gradient(var(--line) var(--p), var(--mute) 0); }
 .syl-ring.full, .syl-units button[aria-pressed="true"] .syl-ring.full { background:var(--line); }
 
-.syl-pane { margin-top:18px; }
+.syl-pane { margin-top:14px; }
+.syl-who { margin:12px 0 0; font-size:12.5px; color:var(--ink-3); }
+.syl-err { margin-top:8px; font-size:12.5px; font-weight:600; color:var(--bad); }
+.syl-err:empty { display:none; }
+div.sp { cursor:default; }
+.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 .syl-uhead { display:flex; align-items:baseline; gap:10px; }
 .syl-uhead h3 { margin:0; font-family:'Blinker', sans-serif; font-size:15px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--line); }
 .syl-marks { font-size:12.5px; font-weight:600; color:var(--ink-3); }
@@ -1656,19 +1661,19 @@ dialog .btn { margin-top:8px; }
 .syl-stop:only-child::before { display:none; }
 .syl-stop.done + .syl-stop.done { --up:var(--line); }
 .syl-stop.done:has(+ .syl-stop.done) { --dn:var(--line); }
-.syl-stop button { position:relative; display:flex; align-items:flex-start; gap:14px; width:100%; min-height:44px; padding:11px 8px 11px 0;
+.syl-stop .sp { position:relative; display:flex; align-items:flex-start; gap:14px; width:100%; min-height:44px; padding:11px 8px 11px 0;
                    border:0; background:none; color:var(--ink-2); font:inherit; font-size:15px; line-height:1.4; text-align:left; cursor:pointer;
                    transition:color .2s var(--ease); }
-.syl-stop button:hover { color:var(--ink); }
+.syl-stop button.sp:hover { color:var(--ink); }
 .syl-disc { position:relative; z-index:1; flex:none; width:22px; height:22px; border-radius:50%; margin-top:-.5px;
             background:var(--plate); box-shadow:inset 0 0 0 2px var(--mute);
             transition:background-color .2s var(--ease), box-shadow .2s var(--ease); }
-.syl-stop button:hover .syl-disc { box-shadow:inset 0 0 0 2px var(--ink-2); }
-.syl-stop.done button { color:var(--ink); }
-.syl-stop.done .syl-disc, .syl-stop.done button:hover .syl-disc { background:var(--line); box-shadow:none; }
+.syl-stop button.sp:hover .syl-disc { box-shadow:inset 0 0 0 2px var(--ink-2); }
+.syl-stop.done .sp { color:var(--ink); }
+.syl-stop.done .syl-disc, .syl-stop.done button.sp:hover .syl-disc { background:var(--line); box-shadow:none; }
 .syl-stop.done .syl-disc::after { content:""; position:absolute; left:8px; top:4.5px; width:4.5px; height:9px;
                                   border:solid var(--badge-ink); border-width:0 2.2px 2.2px 0; transform:rotate(45deg); }
-.syl-stop.found button { color:var(--ink); }
+.syl-stop.found .sp { color:var(--ink); }
 .syl-stop.found::after { content:""; position:absolute; inset:2px -8px; border-radius:10px; pointer-events:none;
                          background:color-mix(in srgb, var(--line) 12%, transparent); }
 
@@ -3707,7 +3712,7 @@ function openDetail(item, dayIdx, onIso) {
       const p = sylOf(key), b = el("button", "syl-open");
       b.type = "button";
       b.appendChild(el("b", null, "Syllabus"));
-      b.appendChild(el("span", null, p.d && !reading() ? p.d + " of " + p.n + " topics done ›" : "4 units · " + p.n + " topics ›"));
+      b.appendChild(el("span", null, p.d && !reading() ? p.d + " of " + p.n + " topics covered ›" : "4 units · " + p.n + " topics ›"));
       b.addEventListener("click", () => openSyllabus(key));
       rows.link = b;
     }
@@ -4280,12 +4285,12 @@ function demo() {                                   // run demo() in the console
   ok(sylFind("thevenin")[0].k, "BEE", "...and apostrophes do not get in the way");
   ok(sylFind("zzzz").length, 0, "a word in no topic finds nothing");
   ok(Object.keys(SYL).every(k => SUB[k] && SYL[k].units.length === 4), true, "every syllabus is a real subject with four units");
-  const keptSyl = sylDone;
-  sylDone = { "EM.0.0": { d:1, t:1 }, "EM.0.1": { d:0, t:2 } };
+  const keptSyl = covered;
+  covered = { "EM.0.0": { d:1, t:1 }, "EM.0.1": { d:0, t:2 } };
   ok(sylOf("EM").d, 1, "an untick counts for nothing");
-  SYL.EM.units[0].forEach((_, i) => { sylDone["EM.0." + i] = { d:1, t:3 }; });
+  SYL.EM.units[0].forEach((_, i) => { covered["EM.0." + i] = { d:1, t:3 }; });
   ok(sylOf("EM").units, 1, "a unit with every topic ticked is done");
-  sylDone = keptSyl;
+  covered = keptSyl;
 
   /* the sync merge: records are irreplaceable, so this only ever resolves a collision */
   ok(mergeMark(undefined, 5), "take", "a class only the cloud has comes down");
@@ -5627,7 +5632,7 @@ async function heartbeatDevice() {
     if (res && res.valid === false) {
       const other = res.other_device || "another device";
       sess = null; profile = null; saveSess(); saveProfile();
-      att = {}; plan = {}; sylDone = {}; uid = null;
+      att = {}; plan = {}; uid = null;
       gateShow("login");
       say("liHint", "You were signed out because your account was logged in on " + other + ".", true);
     }
@@ -5651,7 +5656,7 @@ async function signOut() {
   const t = sess && sess.access_token;
   if (t) await releaseThisDevice(t).catch(() => {});
   sess = null; profile = null; saveSess(); saveProfile();
-  att = {}; plan = {}; sylDone = {}; uid = null;                 /* the records stay in their own bucket */
+  att = {}; plan = {}; uid = null;                 /* the records stay in their own bucket */
   /* a shared phone is the normal case here: the refresh token has to die on the
      server too, or the next person can still be signed in as you */
   if (t) await call("/auth/v1/logout", { method:"POST" }, t).catch(() => {});
@@ -7572,11 +7577,12 @@ const ROMAN = ["I", "II", "III", "IV"];
 let sylView = "track";
 try { if (localStorage.getItem("bunkr-syl-view") === "read") sylView = "read"; } catch (e) {}
 const reading = () => sylView === "read";
-/* { "PHL.2.13": { d:1|0, t:ms } } — an untick is kept as d:0 so it syncs like a tick */
-let sylDone = readMap(nsKey("bunkr-syl"));
-const saveSyl = () => { try { localStorage.setItem(nsKey("bunkr-syl"), JSON.stringify(sylDone)); } catch (e) {} };
+/* What the class has covered, as the CR marks it: one record for the whole section,
+   { "PHL.2.13": { d:1|0, t:ms } }. Cached so the tab draws offline; the server copy wins. */
+let covered = readMap("bunkr-covered");
+const saveCovered = () => { try { localStorage.setItem("bunkr-covered", JSON.stringify(covered)); } catch (e) {} };
 const sylId = (k, u, i) => k + "." + u + "." + i;
-const isDone = id => !!(sylDone[id] && sylDone[id].d);
+const isDone = id => !!(covered[id] && covered[id].d);
 
 function sylUnit(k, u) {
   const n = SYL[k].units[u].length;
@@ -7603,47 +7609,43 @@ function sylFind(q) {
   return hits;
 }
 
-function toggleTopic(id, on) {
-  sylDone[id] = { d: on ? 1 : 0, t: Date.now() };
-  saveSyl();
-  pushSyl([id]).catch(() => {});                  /* the next sync retries anything that missed */
+/* Readable by anyone, like the CR's holidays: which topics a class has reached is no
+   secret, and a signed-out classmate should see it too. */
+async function loadCovered() {
+  const rows = await call("/rest/v1/syllabus_covered?select=topic,covered,at");
+  covered = {};
+  rows.forEach(r => { covered[r.topic] = { d: r.covered ? 1 : 0, t: Date.parse(r.at) || 0 }; });
+  saveCovered();
+  if (!document.getElementById("syllabus").hidden) renderSyllabus();
 }
 
-/* ---- sync: same rules as attendance — newest write wins, nothing local is dropped ---- */
-async function pushSyl(ids) {
-  if (!profile || !ids.length) return;
+/* The CR marks topics for the section. Shown at once, put back if the server says no;
+   RLS refuses everyone but the CR, this check only saves them the round trip. */
+async function setCovered(ids, on) {
+  if (!ids.length) return;
   const t = await token();
-  if (!t) return;
-  return call("/rest/v1/syllabus_progress?on_conflict=user_id,topic", {
-    method: "POST",
-    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-    body: JSON.stringify(ids.map(id => ({ topic: id, done: !!sylDone[id].d,
-                                         updated_at: new Date(sylDone[id].t).toISOString() }))),
-  }, t);
-}
-async function syncSyllabus() {
-  if (!profile) return;
-  const t = await token();
-  if (!t) return;
-  const rows = await call("/rest/v1/syllabus_progress?select=topic,done,updated_at", {}, t);
-  const seen = {};
-  rows.forEach(r => {
-    const theirs = Date.parse(r.updated_at) || 0;
-    seen[r.topic] = theirs;
-    if (mergeMark(sylDone[r.topic], theirs) === "keep") return;
-    sylDone[r.topic] = { d: r.done ? 1 : 0, t: theirs };
-  });
-  saveSyl();
-  const up = Object.keys(sylDone).filter(id => !(id in seen) || (sylDone[id].t || 0) > seen[id]);
-  if (up.length) await pushSyl(up);
-  if (!document.getElementById("syllabus").hidden) renderSyllabus();
+  if (!t || !isCR()) throw new Error("Only the CR can mark what's been covered");
+  const was = ids.map(id => covered[id]), now = Date.now();
+  ids.forEach(id => { covered[id] = { d: on ? 1 : 0, t: now }; });
+  saveCovered();
+  try {
+    await call("/rest/v1/syllabus_covered?on_conflict=topic", {
+      method: "POST",
+      headers: { Prefer: "return=minimal,resolution=merge-duplicates" },
+      body: JSON.stringify(ids.map(id => ({ topic: id, covered: on, by_user: sess.user.id, at: new Date(now).toISOString() }))),
+    }, t);
+  } catch (err) {
+    ids.forEach((id, n) => { if (was[n]) covered[id] = was[n]; else delete covered[id]; });
+    saveCovered();
+    throw err;
+  }
 }
 
 /* ---- where you are: the unit you last worked in, and the next topic on it ---- */
 function sylNext() {
   let last = null, lt = -1;
-  Object.keys(sylDone).forEach(id => {
-    const r = sylDone[id], [k] = id.split(".");
+  Object.keys(covered).forEach(id => {
+    const r = covered[id], [k] = id.split(".");
     if (r.d && SYL[k] && (r.t || 0) > lt) { lt = r.t || 0; last = id; }
   });
   if (!last) return null;
@@ -7685,22 +7687,24 @@ function renderSylNext() {
   Object.keys(SYL).forEach(k => { const p = sylOf(k); all += p.d; tot += p.n; });
 
   if (!nx) {
-    plate.appendChild(el("h1", null, "Tick topics as they're taught"));
-    plate.appendChild(el("p", "who", "Open a subject and tick what's been covered. Your progress stays with your account, on every phone you sign in on."));
+    plate.appendChild(el("h1", null, isCR() ? "Mark what's been taught" : "Nothing marked yet"));
+    plate.appendChild(el("p", "who", isCR()
+      ? "Open a subject and tick topics as they're covered in class. The whole section sees it."
+      : "Your CR marks topics as they're taught, and the class's progress shows up here. Switch to Read for the full syllabus."));
     box.appendChild(plate);
     return;
   }
   if (nx.done) {
-    plate.appendChild(el("h1", null, "Every topic ticked"));
-    plate.appendChild(el("p", "who", "All " + tot + " topics across seven subjects. That's the whole syllabus."));
+    plate.appendChild(el("h1", null, "Syllabus covered"));
+    plate.appendChild(el("p", "who", "All " + tot + " topics across seven subjects have been taught."));
     box.appendChild(plate);
     return;
   }
   const s = SUB[nx.k], un = sylUnit(nx.k, nx.u);
   plate.dataset.line = s.line;
   plate.appendChild(el("h1", null, s.short + " · Unit " + ROMAN[nx.u]));
-  plate.appendChild(el("p", "who", un.d + " of " + un.n + " topics covered"
-    + (SYL[nx.k].scheme === "std" ? " · 12 marks of the paper" : "")));
+  plate.appendChild(el("p", "who", un.d + " of " + un.n + " topics covered in class"
+    + (SYL[nx.k].scheme === "std" ? " · 12 marks" : "")));
   const g = el("div", "gauge");
   const tr = el("div", "track"), fill = el("i");
   fill.style.width = (all / tot * 100).toFixed(1) + "%";
@@ -7709,7 +7713,7 @@ function renderSylNext() {
   plate.appendChild(g);
   const up = el("button", "upnext");
   up.type = "button";
-  up.appendChild(el("span", "lbl", "Next"));
+  up.appendChild(el("span", "lbl", "Next up"));
   up.appendChild(el("span", "fac syl-nt", SYL[nx.k].units[nx.u][nx.i]));
   up.appendChild(el("span", "chev", "›"));
   up.addEventListener("click", () => openSyllabus(nx.k, nx.u, nx.i));
@@ -7757,7 +7761,7 @@ function renderSyllabus() {
     const s = SUB[k], p = sylOf(k);
     const b = el("button", "srow syl-row" + (p.d ? "" : " fresh"));
     b.type = "button"; b.dataset.line = s.line;
-    b.setAttribute("aria-label", s.name + (reading() ? "" : ", " + p.d + " of " + p.n + " topics done"));
+    b.setAttribute("aria-label", s.name + (reading() ? "" : ", " + p.d + " of " + p.n + " topics covered"));
     b.appendChild(el("span", "bar"));
     const m = el("div", "m");
     m.appendChild(el("div", "n", s.short));
@@ -7771,14 +7775,14 @@ function renderSyllabus() {
       rows.appendChild(b);
       return;
     }
-    m.appendChild(el("div", "adv", s.code + " · " + (p.units ? p.units + " of 4 units done" : p.n + " topics")));
+    m.appendChild(el("div", "adv", s.code + " · " + (p.units ? p.units + " of 4 units covered" : p.n + " topics")));
     m.appendChild(sylStations(k));
     b.appendChild(m);
     const r = el("div", "r");
     if (p.d) {
       r.appendChild(el("div", "pct", Math.round(p.d / p.n * 100) + "%"));
       r.appendChild(el("div", "held", p.d + " of " + p.n));
-    } else r.appendChild(el("div", "held", "Not started"));
+    } else r.appendChild(el("div", "held", "Not started yet"));
     b.appendChild(r);
     rows.appendChild(b);
   });
@@ -7870,6 +7874,9 @@ function openSyllabus(k, focusU, focusI) {
     return { b, ring, c };
   });
   box.appendChild(tabs);
+  box.appendChild(el("p", "syl-who", isCR()
+    ? "You're the CR: tick topics as they're taught. The whole section sees it."
+    : "Marked by your CR as topics are taught in class."));
 
   const pane = el("div", "syl-pane");
   box.appendChild(pane);
@@ -7881,7 +7888,7 @@ function openSyllabus(k, focusU, focusI) {
     tabBtns.forEach(({ b, ring, c }, u) => {
       const { d, n } = sylUnit(k, u);
       b.setAttribute("aria-pressed", String(u === cur));
-      b.setAttribute("aria-label", "Unit " + ROMAN[u] + ", " + d + " of " + n + " done");
+      b.setAttribute("aria-label", "Unit " + ROMAN[u] + ", " + d + " of " + n + " covered");
       ring.style.setProperty("--p", Math.round(d / n * 100) + "%");
       ring.classList.toggle("full", d === n);
       c.textContent = d + "/" + n;
@@ -7897,22 +7904,34 @@ function openSyllabus(k, focusU, focusI) {
     const head = el("div", "syl-uhead");
     head.appendChild(el("h3", null, "Unit " + ROMAN[cur]));
     if (syl.scheme === "std") head.appendChild(el("span", "syl-marks", "12 marks"));
+    const cr = isCR();
     const all = el("button", "link syl-all");
     all.type = "button";
-    head.appendChild(all);
+    if (cr) head.appendChild(all);
     pane.appendChild(head);
+    const err = el("div", "hint err syl-err");
+    err.setAttribute("role", "alert");
+    pane.appendChild(err);
+    const fail = e => { const [what, fix] = explain(e); paint(false); pane.querySelector(".syl-err").textContent = what + " — " + fix; };
 
     const stops = el("ol", "syl-stops");
     const btns = topics.map((t, i) => {
-      const id = sylId(k, cur, i), li = el("li", "syl-stop"), b = el("button");
-      b.type = "button";
+      const id = sylId(k, cur, i), li = el("li", "syl-stop"), b = el(cr ? "button" : "div", "sp");
+      if (cr) b.type = "button";
       b.appendChild(el("i", "syl-disc"));
       b.appendChild(el("span", null, t));
-      const set = on => { b.setAttribute("aria-pressed", String(on)); li.classList.toggle("done", on); };
+      const state = el("span", "sr");
+      b.appendChild(state);
+      const set = on => {
+        if (cr) b.setAttribute("aria-pressed", String(on));
+        else state.textContent = on ? " (covered)" : "";
+        li.classList.toggle("done", on);
+      };
       set(isDone(id));
-      b.addEventListener("click", () => {
+      if (cr) b.addEventListener("click", () => {
         const on = b.getAttribute("aria-pressed") !== "true";
-        set(on); toggleTopic(id, on); allLabel(); tabsPaint();
+        set(on); allLabel(); tabsPaint(); err.textContent = "";
+        setCovered([id], on).catch(fail);
       });
       if (cur === focusU && i === focusI) li.classList.add("found");
       li.appendChild(b);
@@ -7921,16 +7940,13 @@ function openSyllabus(k, focusU, focusI) {
     });
     pane.appendChild(stops);
 
-    const allLabel = () => { const x = sylUnit(k, cur); all.textContent = x.d === x.n ? "Clear unit" : "Mark unit done"; };
+    const allLabel = () => { const x = sylUnit(k, cur); all.textContent = x.d === x.n ? "Clear unit" : "Mark unit covered"; };
     all.addEventListener("click", () => {
-      const on = sylUnit(k, cur).d !== topics.length, ids = [];
-      topics.forEach((_, i) => {
-        const id = sylId(k, cur, i);
-        if (isDone(id) === on) return;
-        sylDone[id] = { d: on ? 1 : 0, t: Date.now() };
-        btns[i](on); ids.push(id);
-      });
-      saveSyl(); pushSyl(ids).catch(() => {});
+      const on = sylUnit(k, cur).d !== topics.length;
+      const ids = topics.map((_, i) => sylId(k, cur, i)).filter(id => isDone(id) !== on);
+      ids.forEach(id => btns[+id.split(".")[2]](on));
+      err.textContent = "";
+      setCovered(ids, on).then(() => { allLabel(); tabsPaint(); }, fail);
       allLabel(); tabsPaint();
     });
     allLabel();
@@ -7979,7 +7995,7 @@ function show(id) {
   if (id === "cr") { renderCR(); refreshSection(); }
   if (id === "ranks") renderRanks();
   if (id === "directory") renderDirectory();
-  if (id === "syllabus") renderSyllabus();
+  if (id === "syllabus") { renderSyllabus(); loadCovered().catch(() => {}); }
   PAGES.forEach(p => {
     const sec = document.getElementById(p);
     sec.hidden = p !== id;
@@ -8860,6 +8876,7 @@ function refreshSection(force) {
   lastRefresh = Date.now();
   loadCR().catch(() => {});
   loadNotices().catch(() => {});
+  loadCovered().catch(() => {});
   /* The whole term, not just this week: tally() applies every verdict to every mark,
      so a class called off last week has to still be known this week. */
   if (profile) loadCancelled(SEM_START, semEnd > isoOfWeekday(5) ? semEnd : isoOfWeekday(5))
@@ -8924,7 +8941,6 @@ function adoptUser(id) {
     att = readAtt("adgips-att");
   }
   plan = readMap(nsKey("adgips-plan"));
-  sylDone = readMap(nsKey("bunkr-syl"));
   let saved = null;
   try { saved = localStorage.getItem(nsKey("adgips-batch")); } catch (e) {}
   batch = saved || (uid && profile && profile.batch) || "both";
@@ -8946,7 +8962,6 @@ function afterSignIn() {
   /* the account's records come down first, so a second device does not look empty
      and the catch-up below does not offer days that are already marked elsewhere */
   /* the first-run sheet opens in the top layer, above everything: let the welcome finish first */
-  syncSyllabus().catch(() => {});
   syncAttendance().catch(() => {}).then(afterWelcome).then(runOnboarding);
 }
 
