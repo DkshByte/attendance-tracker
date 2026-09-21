@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+78abfb4-->
+<!--secf-app--><!--build:1.1.2+4b27e85-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1579,44 +1579,50 @@ dialog .btn { margin-top:8px; }
 }
 
 /* ============ welcome: entering the app ============
-   The splash's own grammar (the mark pops, the wordmark slides out from behind it),
-   then your name arrives on its line colour and the nine lines run out under it. The
-   gate closes and the app renders underneath while this holds; then it dissolves. */
-.welcome { position:fixed; inset:0; z-index:130; display:grid; place-items:center; background:var(--bg); color:var(--ink);
-           padding:24px; --wl:var(--l-pps);
-           --sp-pop:linear(0, 0.052, 0.175, 0.351, 0.522, 0.698, 0.836, 0.956, 1.035, 1.09, 1.116, 1.123, 1.116, 1.1, 1.078, 1.057, 1.036, 1.019, 1.005, 0.995, 0.989, 0.986, 0.985, 0.986, 0.988, 0.991, 0.993, 0.996, 0.998, 1, 1.001, 1.001, 1.002, 1.002, 1.002, 1.001, 1.001, 1.001, 1.001, 1, 1);
-           --sp-rise:linear(0, 0.022, 0.079, 0.159, 0.241, 0.334, 0.426, 0.505, 0.585, 0.657, 0.715, 0.771, 0.818, 0.854, 0.887, 0.915, 0.935, 0.953, 0.967, 0.977, 0.985, 0.991, 0.996, 0.999, 1.001, 1.003, 1.004, 1.004, 1.004, 1.004, 1.004, 1.004, 1.003, 1.003, 1.002, 1.002, 1.002, 1.001, 1.001, 1.001, 1); }
-.wl-in { display:flex; flex-direction:column; align-items:center; text-align:center; width:min(560px, 100%); }
-.wl-logo { display:flex; align-items:center; height:clamp(52px, 13vw, 76px); }
-.wl-emb { height:100%; width:auto; flex:none; filter:drop-shadow(0 0 28px rgba(255,255,255,.18)); }
-.wl-word { display:block; height:74%; overflow:hidden; margin-left:clamp(12px, 3.4vw, 20px); }
+   One idea, in the network's own grammar: your line is drawn across the screen and
+   your name rises out from behind it, like a platform board turning over. No
+   overshoot, no spin — every arrival decelerates on one exponential curve, and the
+   exit is quicker than the entrance. The gate closes and the app renders underneath
+   while this holds; then it lifts away. */
+.welcome { position:fixed; inset:0; z-index:130; display:grid; place-items:center; overflow:hidden;
+           background:var(--bg); color:var(--ink); padding:24px; --wl:var(--l-pps);
+           --wl-ease:cubic-bezier(.16,1,.3,1); }
+.wl-in { width:min(440px, 100%); display:flex; flex-direction:column; align-items:flex-start; }
+.wl-logo { display:flex; align-items:center; height:26px; color:var(--ink); }
+.wl-emb { height:100%; width:auto; flex:none; }
+.wl-word { display:block; height:74%; margin-left:9px; }
 .wl-word svg { display:block; height:100%; width:auto; }
-.wl-hi { margin:clamp(28px, 7vw, 40px) 0 0; font-family:'Blinker', sans-serif; font-weight:800; font-size:clamp(30px, 8.6vw, 52px); line-height:1.04; letter-spacing:-.015em; text-wrap:balance; }
-.wl-w { display:inline-block; }
-.wl-name { display:inline-block; position:relative; color:var(--ink); }
-.wl-name::after { content:""; position:absolute; left:0; right:0; bottom:-.1em; height:.09em; border-radius:.05em; background:var(--wl); transform-origin:left; }
-.wl-lines { display:flex; gap:4px; width:min(360px, 80%); height:6px; margin-top:clamp(26px, 6vw, 36px); }
-.wl-lines i { flex:1; border-radius:3px; transform-origin:left; }
-.wl-sub { margin:16px 0 0; font-size:14px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); }
+.wl-greet { margin:clamp(56px, 14vh, 96px) 0 6px; font-size:clamp(17px, 4.6vw, 21px); font-weight:500; color:var(--ink-2); letter-spacing:.005em; }
+/* the mask is the platform edge: the name sits below it and rises into view */
+.wl-mask { display:block; max-width:100%; overflow:hidden; padding-bottom:.12em; margin-bottom:-.12em;
+           font-family:'Blinker', sans-serif; font-weight:800; font-size:clamp(46px, 15vw, 80px); line-height:.98; letter-spacing:-.025em; }
+.wl-name { display:block; font:inherit; overflow-wrap:anywhere; }
+.wl-name::after { content:"."; color:var(--wl); }
+/* full-bleed rail; the station disc is punched into it under the first letter */
+.wl-rail { position:relative; height:3px; margin:18px 0 0 calc(50% - 50vw); width:100vw; flex:none; }
+.wl-rail::before { content:""; position:absolute; inset:0; background:var(--wl); border-radius:2px; transform-origin:left; }
+.wl-stop { position:absolute; top:50%; width:17px; height:17px; margin:-8.5px 0 0 -2px; border-radius:50%;
+           left:calc(50vw - min(440px, 100vw - 48px) / 2); background:var(--bg); box-shadow:inset 0 0 0 3.5px var(--wl); }
+.wl-sub { margin:18px 0 0; font-size:12px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); }
 
-.welcome.play .wl-emb { animation:wlPop .7s var(--sp-pop) .05s both; }
-.welcome.play .wl-word { animation:wlOpen .75s cubic-bezier(.16,1,.3,1) .5s both; }
-.welcome.play .wl-word svg { animation:wlSlide .75s cubic-bezier(.16,1,.3,1) .5s both; }
-.welcome.play .wl-w { animation:wlRise .7s var(--sp-rise) both; }
-.welcome.play .wl-w:nth-child(1) { animation-delay:.95s; } .welcome.play .wl-w:nth-child(2) { animation-delay:1.03s; } .welcome.play .wl-w:nth-child(3) { animation-delay:1.11s; }
-.welcome.play .wl-name { animation:wlName .8s var(--sp-pop) 1.24s both; }
-.welcome.play .wl-name::after { animation:wlDraw .6s cubic-bezier(.16,1,.3,1) 1.55s both; }
-.welcome.play .wl-lines i { animation:wlLine .55s cubic-bezier(.16,1,.3,1) both; animation-delay:calc(1.6s + var(--i) * 45ms); }
-.welcome.play .wl-sub { animation:wlRise .6s var(--sp-rise) 2s both; }
-.welcome.out { animation:wlOut .55s cubic-bezier(.4,0,.2,1) both; }
-@keyframes wlPop { 0% { opacity:0; transform:scale(.18) rotate(-8deg); } 55% { opacity:1; } }
-@keyframes wlOpen { from { max-width:0; opacity:0; margin-left:0; } to { max-width:340px; opacity:1; } }
-@keyframes wlSlide { from { transform:translateX(-30px); filter:blur(5px); } }
-@keyframes wlRise { from { opacity:0; transform:translateY(.45em); filter:blur(6px); } }
-@keyframes wlName { from { opacity:0; transform:translateY(.3em) scale(.86); filter:blur(8px); } }
+@media (prefers-reduced-motion: no-preference) {
+  .welcome.play .wl-logo { animation:wlFade .5s var(--wl-ease) both; }
+  .welcome.play .wl-word { animation:wlWipe .8s var(--wl-ease) .12s both; }
+  .welcome.play .wl-rail::before { animation:wlDraw .9s var(--wl-ease) .18s both; }
+  .welcome.play .wl-stop { animation:wlStop .45s var(--wl-ease) .5s both; }
+  .welcome.play .wl-greet { animation:wlLift .7s var(--wl-ease) .3s both; }
+  .welcome.play .wl-name { animation:wlBoard .95s var(--wl-ease) .42s both; }
+  .welcome.play .wl-sub { animation:wlLift .7s var(--wl-ease) .78s both; }
+  .welcome.out .wl-in { animation:wlAway .38s cubic-bezier(.4,0,1,1) both; }
+}
+.welcome.out { animation:wlFade .38s cubic-bezier(.4,0,1,1) reverse both; }
+@keyframes wlFade { from { opacity:0; } }
+@keyframes wlWipe { from { clip-path:inset(0 100% 0 0); } to { clip-path:inset(0 0 0 0); } }
 @keyframes wlDraw { from { transform:scaleX(0); } }
-@keyframes wlLine { from { transform:scaleX(0); opacity:0; } }
-@keyframes wlOut { to { opacity:0; transform:scale(1.04); filter:blur(8px); } }
+@keyframes wlStop { from { transform:scale(.4); opacity:0; } }
+@keyframes wlLift { from { opacity:0; transform:translateY(10px); } }
+@keyframes wlBoard { from { transform:translateY(105%); } }
+@keyframes wlAway { to { opacity:0; transform:translateY(-14px); } }
 
 /* ============ lock ============ */
 .lock { position:fixed; inset:0; z-index:120; background:var(--bg);
@@ -2831,9 +2837,10 @@ input[type="date"] { padding:12px 14px; }
       <svg class="wl-emb" viewBox="695 770 252 245" fill="currentColor"><path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/><path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/></svg>
       <span class="wl-word"><svg viewBox="1020 780 710 215" fill="currentColor"><path fill-rule="evenodd" d="M1025.47 792.342L1051.02 792.273L1050.99 858.999C1120.74 807.461 1202.53 885.964 1155.28 954.022C1128.47 987.525 1076.38 994.23 1045.47 963.425C1036.58 954.479 1030.33 943.245 1027.43 930.967C1024.1 917.108 1025.41 886.141 1025.47 870.814C1025.3 844.657 1025.3 818.499 1025.47 792.342Z M1092.19 867.65C1116.92 865.119 1139.03 883.076 1141.63 907.798C1144.23 932.521 1126.34 954.686 1101.62 957.355C1076.81 960.036 1054.54 942.054 1051.93 917.234C1049.32 892.413 1067.36 870.191 1092.19 867.65Z"/><path d="M1294.84 844.521L1315.74 844.383L1315.85 891.106C1315.94 919.635 1318.81 942.075 1296.87 964.367C1284.28 977.153 1267.47 983.361 1249.6 983.341C1232.21 983.473 1215.49 976.63 1203.18 964.343C1181.53 942.508 1184.87 918.807 1185.05 890.499L1185.03 844.866L1210.77 844.731C1210.69 870.192 1209.05 902.522 1212.11 927.343C1216.04 959.216 1263.11 967.388 1281.86 942.914C1292.77 928.67 1290.76 913.463 1290.7 896.55L1290.61 858.678C1290.63 855.456 1290.19 847.38 1291.6 844.961L1294.84 844.521Z"/><path d="M1390.23 843.283C1411.5 840.883 1431.44 845.708 1446.94 861.243C1468.1 882.449 1465.03 908.078 1464.99 935.594L1464.92 983.054L1438.97 983.301L1439.21 930.297C1439.24 923.036 1439.69 907.013 1438.64 900.36C1437.93 895.638 1436.42 891.071 1434.17 886.859C1428.32 876.091 1421.01 872.318 1409.98 869.113C1363.59 861.781 1358.4 899.847 1360.46 933.963C1361.37 949.043 1360.57 967.432 1360.64 982.828L1335.04 982.929C1335.13 965.848 1333.6 908.989 1336.06 895.651C1337.61 886.798 1340.96 878.357 1345.9 870.85C1356.86 854.523 1371.46 847.028 1390.23 843.283Z"/><path d="M1485.12 792.397C1493.56 792.298 1502.59 792.5 1511.08 792.556L1511.01 901.933C1513.76 901.299 1520.08 899.709 1522.08 898.031C1538.4 884.318 1557.52 860.999 1571.45 844.824L1604.67 844.81C1589 861.751 1564.88 890.074 1550.22 907.945C1560.38 922.446 1575.91 940.912 1587.28 955.054C1594.72 964.513 1602.28 973.871 1609.97 983.126C1599.13 982.949 1588.29 982.966 1577.46 983.179C1570.58 974.664 1535.85 927.159 1528.52 926.65C1523.91 926.33 1517.38 928.335 1513.97 931.488C1508.59 936.469 1510.94 974.698 1510.98 982.849L1484.99 982.91L1485.12 792.397Z"/><path d="M1680.43 843.32C1697.26 841.762 1709.2 847.838 1722.33 857.244C1717.09 864.044 1712.14 871.774 1707.34 878.941C1682.76 862.584 1651.88 869.172 1646.85 898.965C1643.32 919.945 1645.03 952.045 1645.07 973.867C1645.2 976.921 1645.49 978.315 1644.41 981.209C1639.6 985.099 1627.27 983.243 1619.76 983.246L1619.92 844.992L1645.07 844.749L1645.02 861.189C1656.47 850.124 1664.75 845.917 1680.43 843.32Z"/></svg></span>
     </div>
-    <p class="wl-hi"><span class="wl-w">Welcome</span> <span class="wl-w">to</span> <span class="wl-w">Bunkr,</span> <b class="wl-name" id="wlName">friend</b></p>
-    <div class="wl-lines" id="wlLines" aria-hidden="true"></div>
-    <p class="wl-sub" id="wlSub">Your line is live.</p>
+    <p class="wl-greet" id="wlGreet">Welcome,</p>
+    <span class="wl-mask"><b class="wl-name" id="wlName">friend</b></span>
+    <div class="wl-rail" aria-hidden="true"><i class="wl-stop"></i></div>
+    <p class="wl-sub" id="wlSub"></p>
   </div>
 </div>
 
@@ -6311,18 +6318,20 @@ function welcome(p) {
   const still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!w) return Promise.resolve();
   const first = p && p.name ? p.name.trim().split(/\s+/)[0] : "friend";
+  const h = new Date().getHours();
+  document.getElementById("wlGreet").textContent =
+    h < 5 ? "Up late," : h < 12 ? "Good morning," : h < 17 ? "Good afternoon," : "Good evening,";
   document.getElementById("wlName").textContent = first;
   w.style.setProperty("--wl", "var(--l-" + (p ? LINE_KEYS[p.sno % LINE_KEYS.length] : "pps") + ")");
-  const lines = document.getElementById("wlLines");
-  if (!lines.children.length) LINE_KEYS.forEach((k, i) => { const e = el("i"); e.style.background = "var(--l-" + k + ")"; e.style.setProperty("--i", i); lines.appendChild(e); });
-  document.getElementById("wlSub").textContent = p && p.batch ? "Batch " + p.batch + " · your line is live" : "Your line is live";
+  const day = new Date().toLocaleDateString("en-IN", { weekday:"short", day:"numeric", month:"short" });
+  document.getElementById("wlSub").textContent = (p && p.batch ? "Batch " + p.batch + " · " : "") + day;
   w.classList.remove("play", "out");
   w.hidden = false; void w.offsetWidth;
   w.classList.add("play");
-  const hold = still ? 900 : 2700;
-  welcomeEnds = Date.now() + hold + 560;
+  const hold = still ? 900 : 1750, exit = 380;
+  welcomeEnds = Date.now() + hold + exit;
   setTimeout(() => { w.classList.add("out"); }, hold);
-  setTimeout(() => { w.hidden = true; w.classList.remove("play", "out"); }, hold + 560);
+  setTimeout(() => { w.hidden = true; w.classList.remove("play", "out"); }, hold + exit);
   return new Promise(res => setTimeout(res, still ? 60 : 380));
 }
 
