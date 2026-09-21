@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.2+f358314-->
+<!--secf-app--><!--build:1.1.2+74f236a-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -3966,6 +3966,10 @@ function demo() {                                   // run demo() in the console
      "catchup", "a returning account gets only what it has not answered");
   ok(seq({ first: false, batch: "both", untouched: true, caught: false, native: true, lockAsked: true }),
      "", "and no catch-up while the batch is unset — the marks would be counted against the wrong lab");
+  ok(seq({ first: false, batch: "F1", untouched: false, native: true, lockAsked: true, news: true }),
+     "news", "a returning account is told what changed");
+  ok(seq({ first: true, batch: "F1", untouched: false, native: false, news: true }),
+     "welcome", "...but a new one gets the tour, not a changelog");
   ok(classDays("2026-08-15", "2026-08-21").length, 5, "Saturday, Sunday and Independence Day hold no class");
   ok(classDays("2026-09-04", "2026-09-04").length, 0, "a gazetted holiday is not a class day");
   ok(classesIn("2026-08-17", "2026-08-17").total, 5, "Monday runs five classes");
@@ -7038,6 +7042,23 @@ async function offerLock() {
    asked once the student has seen the thing they are for.
    ============================================================ */
 const OB_KEY = "adgips-onboarded";
+
+/* What's new. Change id when a major feature ships and every returning account sees
+   this once; small fixes leave it alone, or people learn to tap it away unread. */
+const NEWS = {
+  id: "2026-09-arranged",
+  items: [
+    ['<path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/>',
+     "Arranged classes count for your subject",
+     "If Physics is arranged to Mechanics, the class still counts for Physics."],
+    ['<path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/>',
+     "Privacy, Terms and Delete account",
+     "All three now live in Your profile."],
+  ],
+};
+const NEWS_KEY = "bunkr-news-seen";
+const newsSeen = () => { try { return localStorage.getItem(NEWS_KEY) === NEWS.id; } catch (e) { return true; } };
+const markNewsSeen = () => { try { localStorage.setItem(NEWS_KEY, NEWS.id); } catch (e) {} };
 const obDone = () => { try { return !!localStorage.getItem(nsKey(OB_KEY)); } catch (e) { return true; } };
 
 /* An account already carrying marks, or already asked by the old flow, has met these
@@ -7056,6 +7077,7 @@ function obBackfill() {
    real state and drops out if it did not. */
 function obPlan(o) {
   const s = [];
+  if (!o.first && o.news) s.push("news");     /* a new account gets the tour, not a changelog */
   if (o.first) { s.push("welcome"); if (o.batch === "both") s.push("batch"); }
   if (o.untouched && !o.caught && (o.first || o.batch !== "both")) s.push("catchup");
   if (o.first && o.native) s.push("alerts");
@@ -7103,6 +7125,20 @@ function obPoint(path, head, note) {
 }
 
 /* what the app is for, in the student's own name — three lines, then out of the way */
+function obNews(i, n) {
+  return obStep((box, next) => {
+    box.appendChild(el("div", "grab"));
+    box.appendChild(obDots(i, n));
+    box.appendChild(el("div", "d-name", "What's new"));
+    const list = el("div", "d-rows");
+    NEWS.items.forEach(([icon, head, body]) => list.appendChild(obPoint(icon, head, body)));
+    box.appendChild(list);
+    const act = el("div", "d-act");
+    act.appendChild(obBtn("btn pri", "Got it", () => next("ok")));
+    box.appendChild(act);
+  });
+}
+
 function obWelcome(i, n) {
   const who = ((profile && profile.name) || "").trim().split(/\s+/)[0] || "";
   return obStep((box, next) => {
@@ -7217,13 +7253,15 @@ async function runOnboarding() {
   try { caught = localStorage.getItem(nsKey("adgips-caught")); } catch (e) {}
 
   const steps = obPlan({ first, batch, native: NATIVE, untouched: !!untouchedDays().length,
-                         caught: !!caught, lockAsked: !!lockAsked });
+                         caught: !!caught, lockAsked: !!lockAsked, news: !newsSeen() });
+  markNewsSeen();                             /* shown once, dismissed or not */
   if (first) { try { localStorage.setItem(nsKey(OB_KEY), "1"); } catch (e) {} }
 
   let want = null;
   for (let i = 0; i < steps.length; i++) {
     const s = steps[i];
-    const r = s === "welcome" ? await obWelcome(i, steps.length)
+    const r = s === "news"    ? await obNews(i, steps.length)
+            : s === "welcome" ? await obWelcome(i, steps.length)
             : s === "batch"   ? await obBatch(i, steps.length)
             : s === "catchup" ? await obCatchup()
             : s === "alerts"  ? await obAlerts(i, steps.length)
