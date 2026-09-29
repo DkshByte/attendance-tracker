@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.4+a34ee86-->
+<!--secf-app--><!--build:1.1.4+9974d19-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -3263,102 +3263,712 @@ input[type="date"] { padding:12px 14px; }
 
 <!--reel:start-->
 <style id="reelCss">
-/* STUB of the welcome reel. It implements the real API so the sign-in screen works end
-   to end; the reel's author replaces everything between the reel:start and reel:end
-   markers. A 1080x1920 design space, scaled to cover the stage, every frame a pure
-   function of t. */
-.rl-root { position:absolute; left:50%; top:50%; width:1080px; height:1920px; margin:-960px 0 0 -540px;
-           transform-origin:50% 50%; overflow:hidden; contain:strict; background:#000; color:#fff;
-           font-family:'Blinker', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
-.rl-root > * { position:absolute; }
-.rl-disc { left:330px; top:250px; width:420px; height:420px; border-radius:50%; background:#000;
-           box-shadow:inset 0 0 0 36px var(--rl-c, #FF4D40); }
-.rl-cap { left:0; right:0; top:760px; text-align:center; font-size:56px; font-weight:700; letter-spacing:.12em;
-          text-transform:uppercase; color:rgba(255,255,255,.74); }
-.rl-big { left:-100px; right:-100px; top:850px; text-align:center; font-weight:800; line-height:.98;
-          letter-spacing:-.02em; white-space:pre; transform-origin:50% 60%; }
-.rl-root:not(.rl-lite) .rl-big { text-shadow:0 0 90px currentColor; }
-.rl-sub { left:120px; right:120px; top:1110px; text-align:center; font-size:52px; font-weight:600; color:rgba(255,255,255,.82); }
-.rl-stripe { left:170px; right:170px; top:1210px; height:22px; display:flex; gap:10px; }
-.rl-stripe i { flex:1; border-radius:11px; transform-origin:0 50%; }
-.rl-bar { left:-60px; width:1200px; height:118px; border-radius:59px; }
+/* The Bunkr reel. Scoped to .rl so nothing here can reach the app, and nothing in the
+   app can reach it: it draws its own copies of the app's cards in the app's tokens. */
+.rl { position:absolute; left:0; top:0; width:1080px; height:1920px; transform-origin:0 0; overflow:hidden;
+      background:#000; color:#fff; font-family:'Blinker', system-ui, sans-serif; line-height:1;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-rendering:geometricPrecision;
+      user-select:none; -webkit-user-select:none; pointer-events:none; contain:strict; }
+.rl *, .rl *::before, .rl *::after { box-sizing:border-box; }
+.rl-cam, .rl-sc, .rl-fx { position:absolute; inset:0; }
+.rl-cam { transform-origin:540px 860px; }
+.rl-sc { display:none; }
+.rl-a { position:absolute; left:0; top:0; white-space:nowrap; }
+.rl-c { left:0; width:1080px; text-align:center; }
+.rl svg { display:block; overflow:visible; }
+
+/* type */
+.rl-h { font-weight:900; letter-spacing:-.035em; }
+.rl-k { font-family:'Barlow Condensed', 'Blinker', sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+.rl-mute { color:#A0A4B0; }
+.rl-dim { color:#8A8F9E; }
+
+/* a marker swipe behind a word: the <i> scales in from the left, the text sits on it */
+.rl-mk { position:relative; display:inline-block; padding:0 .1em .02em; margin:0 -.02em; }
+.rl-mk > i { position:absolute; left:0; right:0; top:.12em; bottom:.02em; border-radius:.08em; transform-origin:0 50%; z-index:0; }
+.rl-mk > b { position:relative; z-index:1; font-weight:inherit; }
+
+/* die-cut stickers */
+.rl-stk { position:absolute; left:0; top:0; display:inline-flex; align-items:center; gap:.28em; padding:.2em .5em .16em;
+          border-radius:999px; border:7px solid #fff; color:#000; line-height:1; white-space:nowrap;
+          font-family:'Barlow Condensed', 'Blinker', sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:.02em;
+          box-shadow:0 22px 46px rgba(0,0,0,.6); transform-origin:50% 50%; }
+.rl-stk svg { width:.8em; height:.8em; flex:none; }
+
+/* chromatic split: two tinted copies behind the main text */
+.rl-ca { position:absolute; left:0; top:0; white-space:nowrap; transform-origin:50% 55%; }
+.rl-ca > span { display:block; }
+.rl-ca > .r, .rl-ca > .g { position:absolute; left:0; top:0; mix-blend-mode:screen; opacity:0; }
+.rl-ca > .r { color:#FF1F5A; }
+.rl-ca > .g { color:#12E6FF; }
+.rl-ca > .m { position:relative; }
+.rl-lite .rl-ca > .r, .rl-lite .rl-ca > .g { display:none; }
+
+/* glass, like the app's plates */
+.rl-glass { background:linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.02)), #0F1016;
+            border:2px solid rgba(255,255,255,.2); box-shadow:0 40px 90px -30px rgba(0,0,0,1), inset 0 2px 0 rgba(255,255,255,.1); }
+
+/* S1: the bar that decides everything */
+.rl-bar { position:absolute; left:80px; top:990px; width:920px; height:22px; border-radius:11px; background:rgba(255,255,255,.14); }
+.rl-bar > i { position:absolute; left:0; top:0; bottom:0; border-radius:11px; background:#FF4D40; transform-origin:0 50%; }
+.rl-notch { position:absolute; top:-26px; width:6px; height:74px; margin-left:-3px; border-radius:3px; background:#fff; }
+.rl-notch > span { position:absolute; bottom:86px; left:50%; transform:translateX(-50%); font-size:40px; }
+.rl-caret { position:absolute; width:10px; height:96px; background:#fff; border-radius:2px; }
+
+/* S2: lines that sweep */
+.rl-sweep { position:absolute; left:-700px; top:-500px; width:2480px; height:2920px; transform:rotate(-24deg); transform-origin:50% 50%; }
+.rl-sweep > i { position:absolute; left:0; top:0; width:2400px; height:170px; border-radius:85px; }
+.rl-stripes { position:absolute; display:flex; gap:10px; }
+.rl-stripes > i { width:92px; height:16px; border-radius:8px; transform-origin:50% 50%; }
+
+/* the tapes along the bottom */
+.rl-tape { position:absolute; left:-300px; width:1680px; height:112px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.6); }
+.rl-tape > div { position:absolute; left:0; top:0; height:112px; display:flex; align-items:center; white-space:nowrap; will-change:transform; }
+.rl-tape span { font-family:'Barlow Condensed', 'Blinker', sans-serif; font-weight:700; font-size:66px; letter-spacing:.04em; text-transform:uppercase; padding-right:.5em; }
+
+/* S3: the Today plate */
+.rl-plate { position:absolute; left:80px; top:500px; width:920px; padding:40px 42px 0; border-radius:40px; overflow:hidden; transform-origin:50% 0; }
+.rl-prow { display:flex; align-items:center; justify-content:space-between; }
+.rl-badge { display:inline-block; padding:10px 20px 8px; border-radius:8px; font-size:31px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#000; }
+.rl-left { font-size:34px; color:#A0A4B0; }
+.rl-left b { display:inline-block; font-size:50px; color:#fff; font-weight:700; margin-right:6px; }
+.rl-pname { margin-top:30px; font-size:84px; font-weight:700; letter-spacing:-.015em; line-height:1.02; }
+.rl-who { margin-top:14px; font-size:36px; color:#A0A4B0; }
+.rl-who b { color:#fff; font-weight:600; }
+.rl-gauge { display:flex; align-items:center; gap:22px; margin-top:34px; }
+.rl-gauge > div { flex:1; height:10px; border-radius:5px; background:rgba(255,255,255,.2); overflow:hidden; }
+.rl-gauge > div > i { display:block; height:100%; border-radius:5px; transform-origin:0 50%; }
+.rl-gauge > span { font-size:31px; font-weight:600; color:#8A8F9E; }
+.rl-next { display:flex; align-items:center; gap:22px; margin:36px -42px 0; padding:30px 42px 32px; border-top:2px solid rgba(255,255,255,.1); }
+.rl-next .l { font-size:27px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#8A8F9E; }
+.rl-next .v { font-size:44px; font-weight:700; }
+.rl-next .f { flex:1; font-size:30px; color:#A0A4B0; }
+.rl-next .t { font-size:42px; font-weight:700; }
+.rl-stats { position:absolute; left:80px; top:1150px; width:920px; display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+.rl-stats > div { padding:26px 28px; background:#0D0D11; border:2px solid rgba(255,255,255,.12); border-radius:26px; }
+.rl-stats b { display:block; font-size:60px; font-weight:700; letter-spacing:-.01em; }
+.rl-stats span { display:block; margin-top:8px; font-size:24px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#8A8F9E; }
+
+/* S4: the board */
+.rl-board { position:absolute; left:80px; top:420px; width:920px; display:grid; gap:14px; }
+.rl-row { position:relative; display:grid; grid-template-columns:12px 1fr auto; gap:30px; align-items:center; padding:22px 36px; background:#0F1016;
+          border:2px solid rgba(255,255,255,.14); border-radius:30px; }
+.rl-row > .bar { width:12px; height:96px; border-radius:6px; }
+.rl-row .n { font-size:52px; font-weight:700; line-height:1.05; }
+.rl-row .st { margin-top:6px; font-size:30px; font-weight:600; letter-spacing:.02em; }
+.rl-row .trk { position:relative; height:9px; margin-top:16px; border-radius:5px; background:rgba(255,255,255,.2); }
+.rl-row .trk > i { position:absolute; left:0; top:0; bottom:0; border-radius:5px; transform-origin:0 50%; }
+.rl-row .trk > u { position:absolute; left:75%; top:-8px; width:3px; height:25px; background:#8A8F9E; }
+.rl-row .pct { font-size:84px; font-weight:700; letter-spacing:-.02em; text-align:right; }
+.rl-pill { position:absolute; left:80px; top:1236px; display:flex; align-items:center; gap:22px; padding:28px 40px 26px 34px;
+           border-radius:999px; background:#0D0D11; border:2px solid rgba(255,255,255,.22); font-size:46px; white-space:nowrap;
+           box-shadow:0 30px 70px -20px rgba(0,0,0,.9); transform-origin:20% 50%; }
+.rl-pill > i { width:20px; height:20px; border-radius:50%; background:#35D07F; flex:none; }
+.rl-pill > b { font-weight:700; }
+.rl-pill > span { color:#fff; font-weight:600; }
+.rl-pill > em { font-style:normal; font-size:54px; color:#8A8F9E; margin-left:4px; }
+.rl-stamp { position:absolute; left:0; top:0; display:inline-flex; align-items:center; gap:14px; padding:14px 28px 10px; border-radius:14px;
+            border:8px solid currentColor; background:rgba(0,0,0,.72); font-weight:800; font-size:70px; letter-spacing:.14em;
+            text-transform:uppercase; white-space:nowrap; transform-origin:50% 50%; }
+.rl-stamp svg { width:56px; height:56px; }
+
+/* S5: the date sheet */
+.rl-ds { position:absolute; left:80px; top:922px; width:920px; display:grid; gap:8px; }
+.rl-dsr { display:grid; grid-template-columns:120px 1fr auto; gap:24px; align-items:center; height:64px; padding:0 22px 0 28px; background:#0F1016;
+         border:2px solid rgba(255,255,255,.12); border-radius:18px; }
+.rl-dsr.nx { border-color:rgba(255,185,46,.55); }
+.rl-dsr.nx { background:#1E1A10; }
+.rl-dsr .w { font-size:34px; font-weight:700; }
+.rl-dsr .w small { font-size:24px; font-weight:600; color:#8A8F9E; margin-left:10px; }
+.rl-dsr .s { display:flex; align-items:center; gap:16px; font-size:38px; font-weight:700; }
+.rl-dsr .s i { width:16px; height:16px; border-radius:50%; flex:none; }
+.rl-dsr .s small { font-size:24px; font-weight:600; letter-spacing:.06em; color:#8A8F9E; }
+.rl-dsr .v { padding:6px 14px 4px; border-radius:6px; font-size:24px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+             color:#A0A4B0; box-shadow:inset 0 0 0 2px rgba(255,255,255,.22); }
+.rl-dsr.nx .v { color:#FFB92E; box-shadow:inset 0 0 0 2px #FFB92E; }
+.rl-flip { position:absolute; overflow:hidden; }
+.rl-flip > div { position:absolute; left:0; top:0; }
+
+/* S6: the travelcard */
+.rl-tc { position:absolute; left:90px; top:330px; width:900px; height:568px; border-radius:44px; overflow:hidden; padding:44px 48px 58px;
+         display:grid; grid-template-rows:auto 1fr auto; transform-origin:50% 50%; backface-visibility:hidden; }
+.rl-tc .top { display:flex; align-items:center; gap:16px; }
+.rl-tc .top span { font-weight:700; font-size:32px; letter-spacing:.18em; text-transform:uppercase; }
+.rl-tc .top em { font-style:normal; margin-left:auto; font-size:30px; font-weight:600; letter-spacing:.08em; color:#8A8F9E; }
+.rl-tc .disc { position:absolute; right:48px; top:128px; width:74px; height:74px; border-radius:50%; background:#000; }
+.rl-tc .who { align-self:end; }
+.rl-tc .nm { font-size:104px; font-weight:700; letter-spacing:-.02em; line-height:1; }
+.rl-tc .un { margin-top:10px; font-size:34px; font-weight:500; letter-spacing:.04em; color:#A0A4B0; }
+.rl-tc .meta { display:grid; grid-template-columns:auto auto 1fr; gap:48px; margin-top:28px; padding-top:22px; border-top:2px solid rgba(255,255,255,.1); }
+.rl-tc .meta small { display:block; font-size:22px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#8A8F9E; }
+.rl-tc .meta b { display:block; margin-top:6px; font-size:36px; font-weight:700; }
+.rl-tc .strp { position:absolute; left:0; right:0; bottom:0; height:16px; display:flex; }
+.rl-tc .strp i { flex:1; transform-origin:50% 100%; }
+.rl-tc .sheen { position:absolute; top:-40%; bottom:-40%; width:260px; background:linear-gradient(100deg, transparent, rgba(255,255,255,.16), transparent); }
+.rl-url { position:absolute; left:50%; top:930px; padding:22px 48px 18px; border-radius:999px; background:#fff; color:#000; font-weight:800; font-size:66px;
+          letter-spacing:-.01em; white-space:nowrap; transform-origin:50% 50%; }
+
+/* on top of everything */
+.rl-flash { position:absolute; inset:0; background:#fff; opacity:0; }
+.rl-vig { position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 42%, transparent 58%, rgba(0,0,0,.62) 100%); }
+.rl-grain { position:absolute; left:-128px; top:-128px; right:-128px; bottom:-128px; background-size:256px 256px; opacity:.085; mix-blend-mode:screen; }
+.rl-lite .rl-grain { opacity:.05; }
+.rl-bgl { position:absolute; left:-600px; top:-400px; width:2280px; height:2720px; transform:rotate(-24deg); transform-origin:50% 50%; }
+.rl-bgl > i { position:absolute; left:0; width:2280px; height:8px; border-radius:4px; opacity:.1; }
+.rl-hud { position:absolute; left:80px; top:92px; width:920px; display:flex; align-items:center; gap:18px; }
+.rl-hud em { margin-left:auto; font-style:normal; font-size:32px; color:#8A8F9E; }
 </style>
 <script id="reelJs">
-/* STUB: BunkrReel.mount(stage, { lite }) -> { duration, poster, seek(t), resize(), destroy() } */
+/* The Bunkr reel: 21.4 s at 140 BPM, drawn from the DOM as a pure function of time, so
+   the same code plays live behind the sign-in screen and renders frame by frame to video.
+   window.BunkrReel.mount(stage, { lite, fit }) → { duration, poster, seek(t), resize(), destroy() }
+   lite: no chromatic split, no motion blur, gentler grain (for phones). fit: cover | contain. */
 (function () {
   "use strict";
-  var W = 1080, H = 1920, B = 60 / 140, DUR = 21.428571, POSTER = 19.9;
-  var INK = ["#FF4D40", "#FFB92E", "#4E96FF", "#35D07F", "#B18CFF", "#FF6BB0", "#29D6CD", "#FF9147", "#93A3C0"];
-  var SCENES = [
-    { at: 0,      cap: "pov: you\u2019re at", big: "74.9%",              sub: "one more bunk = cooked", c: "#FF4D40", size: 220 },
-    { at: 6 * B,  cap: "meet",                big: "bunkr",              sub: "your timetable, live",   c: "#4E96FF", size: 230 },
-    { at: 22 * B, cap: "can i bunk?",         big: "75%",                sub: "the math, done for you", c: "#35D07F", size: 260 },
-    { at: 40 * B, cap: "bunkr.website",       big: "get on\nthe line.", sub: "",                       c: "#FFFFFF", size: 136 }
-  ];
-  var cl = function (x) { return x < 0 ? 0 : x > 1 ? 1 : x; };
-  var out3 = function (x) { x = cl(x); return 1 - Math.pow(1 - x, 3); };
-  var inOut = function (x) { x = cl(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
-  var pop = function (x) { x = cl(x); var c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
-  function add(parent, cls, tag) {
-    var n = document.createElement(tag || "div");
+  const W = 1080, H = 1920, BPM = 140, B = 60 / BPM, DUR = 50 * B, POSTER = 20.9;
+  const LOGO = {"emb":["M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z","M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"],"embBox":"695 770 252 245","word":[{"d":"M1025.47 792.342L1051.02 792.273L1050.99 858.999C1120.74 807.461 1202.53 885.964 1155.28 954.022C1128.47 987.525 1076.38 994.23 1045.47 963.425C1036.58 954.479 1030.33 943.245 1027.43 930.967C1024.1 917.108 1025.41 886.141 1025.47 870.814C1025.3 844.657 1025.3 818.499 1025.47 792.342Z M1092.19 867.65C1116.92 865.119 1139.03 883.076 1141.63 907.798C1144.23 932.521 1126.34 954.686 1101.62 957.355C1076.81 960.036 1054.54 942.054 1051.93 917.234C1049.32 892.413 1067.36 870.191 1092.19 867.65Z","evenodd":true},{"d":"M1294.84 844.521L1315.74 844.383L1315.85 891.106C1315.94 919.635 1318.81 942.075 1296.87 964.367C1284.28 977.153 1267.47 983.361 1249.6 983.341C1232.21 983.473 1215.49 976.63 1203.18 964.343C1181.53 942.508 1184.87 918.807 1185.05 890.499L1185.03 844.866L1210.77 844.731C1210.69 870.192 1209.05 902.522 1212.11 927.343C1216.04 959.216 1263.11 967.388 1281.86 942.914C1292.77 928.67 1290.76 913.463 1290.7 896.55L1290.61 858.678C1290.63 855.456 1290.19 847.38 1291.6 844.961L1294.84 844.521Z","evenodd":false},{"d":"M1390.23 843.283C1411.5 840.883 1431.44 845.708 1446.94 861.243C1468.1 882.449 1465.03 908.078 1464.99 935.594L1464.92 983.054L1438.97 983.301L1439.21 930.297C1439.24 923.036 1439.69 907.013 1438.64 900.36C1437.93 895.638 1436.42 891.071 1434.17 886.859C1428.32 876.091 1421.01 872.318 1409.98 869.113C1363.59 861.781 1358.4 899.847 1360.46 933.963C1361.37 949.043 1360.57 967.432 1360.64 982.828L1335.04 982.929C1335.13 965.848 1333.6 908.989 1336.06 895.651C1337.61 886.798 1340.96 878.357 1345.9 870.85C1356.86 854.523 1371.46 847.028 1390.23 843.283Z","evenodd":false},{"d":"M1485.12 792.397C1493.56 792.298 1502.59 792.5 1511.08 792.556L1511.01 901.933C1513.76 901.299 1520.08 899.709 1522.08 898.031C1538.4 884.318 1557.52 860.999 1571.45 844.824L1604.67 844.81C1589 861.751 1564.88 890.074 1550.22 907.945C1560.38 922.446 1575.91 940.912 1587.28 955.054C1594.72 964.513 1602.28 973.871 1609.97 983.126C1599.13 982.949 1588.29 982.966 1577.46 983.179C1570.58 974.664 1535.85 927.159 1528.52 926.65C1523.91 926.33 1517.38 928.335 1513.97 931.488C1508.59 936.469 1510.94 974.698 1510.98 982.849L1484.99 982.91L1485.12 792.397Z","evenodd":false},{"d":"M1680.43 843.32C1697.26 841.762 1709.2 847.838 1722.33 857.244C1717.09 864.044 1712.14 871.774 1707.34 878.941C1682.76 862.584 1651.88 869.172 1646.85 898.965C1643.32 919.945 1645.03 952.045 1645.07 973.867C1645.2 976.921 1645.49 978.315 1644.41 981.209C1639.6 985.099 1627.27 983.243 1619.76 983.246L1619.92 844.992L1645.07 844.749L1645.02 861.189C1656.47 850.124 1664.75 845.917 1680.43 843.32Z","evenodd":false}],"wordBox":"1020 780 710 215"};
+  const at = b => b * B;
+  const LC = { pps:"#FF4D40", bee:"#FFB92E", phy:"#4E96FF", smt:"#35D07F", em:"#B18CFF", csl:"#FF6BB0", evs:"#29D6CD", eg:"#FF9147", pd:"#93A3C0" };
+  const LK = Object.keys(LC);
+  const OK = "#35D07F", WARN = "#FFB92E", BAD = "#FF4D40", SVGNS = "http://www.w3.org/2000/svg";
+
+  /* ---------- time ---------- */
+  const clamp = (x, a, b) => x < (a == null ? 0 : a) ? (a == null ? 0 : a) : x > (b == null ? 1 : b) ? (b == null ? 1 : b) : x;
+  const lerp = (a, b, p) => a + (b - a) * p;
+  const prog = (t, a, b) => clamp((t - a) / (b - a));
+  const out3 = p => 1 - Math.pow(1 - p, 3);
+  const out5 = p => 1 - Math.pow(1 - p, 5);
+  const in3 = p => p * p * p;
+  const io3 = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+  const io2 = p => p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+  const outX = p => p >= 1 ? 1 : 1 - Math.pow(2, -10 * p);
+  const inX = p => p <= 0 ? 0 : Math.pow(2, 10 * p - 10);
+  /* a damped spring from 0 to 1, x seconds after it is let go */
+  function spring(x, f, z) {
+    if (x <= 0) return 0;
+    f = f || 3; z = z || .45;
+    const w = 2 * Math.PI * f, wd = w * Math.sqrt(1 - z * z);
+    return 1 - Math.exp(-z * w * x) * (Math.cos(wd * x) + (z * w / wd) * Math.sin(wd * x));
+  }
+  /* an impulse that dies away: 1 at the hit, 0 after len seconds */
+  const kick = (x, len) => x < 0 || x > len ? 0 : Math.pow(1 - x / len, 2);
+  const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+  const wob = (t, seed) => { const i = Math.floor(t), f = t - i, u = f * f * (3 - 2 * f);
+    return lerp(hash(i + seed * 97), hash(i + 1 + seed * 97), u) * 2 - 1; };
+
+  /* ---------- DOM ---------- */
+  function h(tag, cls, text, parent, css) {
+    const n = document.createElement(tag);
     if (cls) n.className = cls;
-    parent.appendChild(n);
+    if (text != null) n.textContent = text;
+    if (css) n.style.cssText = css;
+    if (parent) parent.appendChild(n);
     return n;
   }
-
-  function mount(stage, opts) {
-    var root = add(stage, "rl-root" + (opts && opts.lite ? " rl-lite" : ""));
-    var disc = add(root, "rl-disc"), cap = add(root, "rl-cap"), big = add(root, "rl-big"), sub = add(root, "rl-sub");
-    var stripe = add(root, "rl-stripe");
-    var stripes = INK.map(function (c) { var i = add(stripe, "", "i"); i.style.background = c; return i; });
-    var bars = INK.map(function (c, i) { var b = add(root, "rl-bar"); b.style.background = c; b.style.top = (40 + i * 146) + "px"; return b; });
-    var shown = -1;
-
-    function resize() {
-      var w = stage.clientWidth, h = stage.clientHeight;
-      root.style.transform = "scale(" + (w && h ? Math.max(w / W, h / H) : 0) + ")";
-    }
-    function seek(t) {
-      t = +t || 0; t = ((t % DUR) + DUR) % DUR;
-      var k = 0;
-      while (k + 1 < SCENES.length && t >= SCENES[k + 1].at) k++;
-      var sc = SCENES[k], last = k === SCENES.length - 1;
-      var local = t - sc.at, left = (last ? DUR : SCENES[k + 1].at) - t;
-      if (k !== shown) {
-        shown = k;
-        cap.textContent = sc.cap; big.textContent = sc.big; sub.textContent = sc.sub;
-        big.style.fontSize = sc.size + "px"; big.style.color = sc.c;
-        disc.style.setProperty("--rl-c", last ? INK[0] : sc.c);
-      }
-      var shownFor = cl(local / 0.12) * (last ? 1 : cl(left / 0.14));
-      var jitter = k === 0 ? Math.sin(t * 97) * 10 * (1 - cl((local - 1.7) / 0.5)) : 0;
-      big.style.opacity = shownFor.toFixed(3);
-      big.style.transform = "translateX(" + jitter.toFixed(1) + "px) scale(" + (0.76 + 0.24 * pop(local / 0.42)).toFixed(4) + ")";
-      cap.style.opacity = (cl((local - 0.08) / 0.2) * shownFor).toFixed(3);
-      cap.style.transform = "translateY(" + (22 * (1 - out3((local - 0.08) / 0.4))).toFixed(1) + "px)";
-      sub.style.opacity = (cl((local - 0.3) / 0.25) * shownFor).toFixed(3);
-      sub.style.transform = "translateY(" + (26 * (1 - out3((local - 0.3) / 0.45))).toFixed(1) + "px)";
-      var beat = (t % B) / B;
-      disc.style.transform = "scale(" + (out3(local / 0.5) * (1 + 0.06 * Math.max(0, 1 - beat * 3))).toFixed(4) + ")";
-      stripe.style.opacity = last ? "1" : "0";
-      stripes.forEach(function (s, i) { s.style.transform = "scaleX(" + (last ? out3((local - 0.35 - i * 0.05) / 0.4) : 0).toFixed(3) + ")"; });
-      /* the cut between scenes: nine lines whip across and take the frame with them */
-      bars.forEach(function (b, i) {
-        var p = -1;
-        for (var j = 1; j < SCENES.length; j++) {
-          var q = (t - SCENES[j].at + 0.28 - i * 0.022) / 0.56;
-          if (q >= 0 && q <= 1) p = q;
-        }
-        b.style.transform = "translateX(" + (p < 0 ? -1400 : -1400 + 2800 * inOut(p)).toFixed(1) + "px)";
-      });
-    }
-    function destroy() { if (root.parentNode) root.parentNode.removeChild(root); }
-
-    resize(); seek(0);
-    return { duration: DUR, poster: POSTER, seek: seek, resize: resize, destroy: destroy };
+  function svgLogo(which, fill, parent, css) {
+    const s = document.createElementNS(SVGNS, "svg");
+    s.setAttribute("viewBox", which === "emb" ? LOGO.embBox : LOGO.wordBox);
+    s.setAttribute("fill", fill || "#fff");
+    s.setAttribute("aria-hidden", "true");
+    (which === "emb" ? LOGO.emb.map(d => ({ d })) : LOGO.word).forEach(p => {
+      const e = document.createElementNS(SVGNS, "path");
+      e.setAttribute("d", p.d);
+      if (p.evenodd) e.setAttribute("fill-rule", "evenodd");
+      s.appendChild(e);
+    });
+    if (css) s.style.cssText = css;
+    if (parent) parent.appendChild(s);
+    return s;
+  }
+  function checkIcon(parent, color) {
+    const s = document.createElementNS(SVGNS, "svg");
+    s.setAttribute("viewBox", "0 0 24 24");
+    s.innerHTML = '<path d="M4.5 12.8l4.6 4.6L19.6 6.8" fill="none" stroke="' + (color || "currentColor") + '" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>';
+    parent.appendChild(s);
+    return s;
+  }
+  /* transform + opacity in one write; hidden when fully transparent */
+  function put(el, o) {
+    let s = "";
+    if (o.p) s += "perspective(" + o.p + "px) ";
+    s += "translate(" + (o.x || 0).toFixed(2) + "px," + (o.y || 0).toFixed(2) + "px)";
+    if (o.rx) s += " rotateX(" + o.rx.toFixed(3) + "deg)";
+    if (o.ry) s += " rotateY(" + o.ry.toFixed(3) + "deg)";
+    if (o.r) s += " rotate(" + o.r.toFixed(3) + "deg)";
+    if (o.k) s += " skewX(" + o.k.toFixed(3) + "deg)";
+    const sx = o.sx != null ? o.sx : o.s != null ? o.s : 1, sy = o.sy != null ? o.sy : o.s != null ? o.s : 1;
+    if (sx !== 1 || sy !== 1) s += " scale(" + sx.toFixed(4) + "," + sy.toFixed(4) + ")";
+    el.style.transform = s;
+    const op = o.o == null ? 1 : clamp(o.o);
+    el.style.opacity = op.toFixed(3);
+    el.style.visibility = op < .002 ? "hidden" : "visible";
+  }
+  const vis = (el, on) => { el.style.visibility = on ? "visible" : "hidden"; };
+  /* a word or number with a chromatic split behind it */
+  function caText(parent, cls, text, css) {
+    const w = h("div", "rl-ca " + (cls || ""), null, parent, css);
+    const r = h("span", "r", text, w), g = h("span", "g", text, w), m = h("span", "m", text, w);
+    return { w, r, g, m,
+      text(v) { if (m.textContent !== v) { m.textContent = v; r.textContent = v; g.textContent = v; } },
+      split(a, lite) {
+        if (lite) return;
+        const on = a > .4 ? Math.min(1, a / 6) : 0;
+        r.style.opacity = g.style.opacity = on.toFixed(3);
+        r.style.transform = "translate(" + (-a).toFixed(2) + "px," + (a * .18).toFixed(2) + "px)";
+        g.style.transform = "translate(" + a.toFixed(2) + "px," + (-a * .18).toFixed(2) + "px)";
+      } };
+  }
+  /* a marker swipe behind a word */
+  function mark(parent, text, color, ink) {
+    const s = h("span", "rl-mk", null, parent);
+    const i = h("i", null, null, s); i.style.background = color;
+    const b = h("b", null, text, s); if (ink) b.style.color = ink;
+    return { s, i, b };
+  }
+  function sticker(parent, text, bg, size, ink) {
+    const s = h("div", "rl-stk", null, parent);
+    s.style.background = bg; s.style.fontSize = size + "px";
+    if (ink) s.style.color = ink;
+    h("span", null, text, s);
+    return s;
   }
 
-  window.BunkrReel = { mount: mount };
+  /* ---------- the reel ---------- */
+  function mount(stage, opts) {
+    opts = opts || {};
+    const lite = !!opts.lite, fit = opts.fit || "screen";
+    const uid = "rl" + (mount.n = (mount.n || 0) + 1) + "x";
+    const root = h("div", "rl" + (lite ? " rl-lite" : ""), null, stage);
+    root.setAttribute("aria-hidden", "true");
+
+    /* motion blur, one filter per moving layer; off in lite */
+    const defs = document.createElementNS(SVGNS, "svg");
+    defs.setAttribute("width", "0"); defs.setAttribute("height", "0");
+    defs.style.cssText = "position:absolute;width:0;height:0";
+    root.appendChild(defs);
+    const blurs = {};
+    function blur(el, key, bx, by) {
+      if (lite || (bx < .6 && by < .6)) { el.style.filter = ""; return; }
+      let f = blurs[key];
+      if (!f) {
+        const fl = document.createElementNS(SVGNS, "filter");
+        fl.setAttribute("id", uid + key);
+        ["x", "y"].forEach(a => fl.setAttribute(a, "-30%"));
+        ["width", "height"].forEach(a => fl.setAttribute(a, "160%"));
+        const g = document.createElementNS(SVGNS, "feGaussianBlur");
+        fl.appendChild(g); defs.appendChild(fl);
+        f = blurs[key] = g;
+      }
+      f.setAttribute("stdDeviation", bx.toFixed(1) + " " + by.toFixed(1));
+      el.style.filter = "url(#" + uid + key + ")";
+    }
+
+    const bg = h("div", "rl-fx", null, root);
+    const bgl = h("div", "rl-bgl", null, bg);
+    const bgLines = LK.map((k, i) => { const l = h("i", null, null, bgl); l.style.background = LC[k]; l.style.top = (180 + i * 290) + "px"; return l; });
+    const cam = h("div", "rl-cam", null, root);
+    const sc = n => h("div", "rl-sc", null, cam);
+
+    /* ===== S1 · hook ===== */
+    const s1 = sc();
+    const pov = sticker(s1, "POV:", "#000", 64, "#fff");
+    pov.style.left = "80px"; pov.style.top = "290px";
+    const youre = h("div", "rl-a rl-h", "", s1, "left:80px;top:440px;font-size:112px;font-weight:800;letter-spacing:-.02em");
+    const caret = h("div", "rl-caret", null, s1, "top:448px");
+    const num = caText(s1, "rl-h", "74.9%", "left:62px;top:560px;font-size:318px;color:" + BAD + ";letter-spacing:-.05em");
+    const bar = h("div", "rl-bar", null, s1);
+    const barFill = h("i", null, null, bar);
+    const notch = h("div", "rl-notch", null, bar); notch.style.left = "75%";
+    h("span", "rl-k", "75%", notch);
+    const cooked = sticker(s1, "am I cooked?", WARN, 70);
+    cooked.style.left = "430px"; cooked.style.top = "1085px";
+
+    /* ===== S2 · reveal ===== */
+    const s2 = sc();
+    const sweep = h("div", "rl-sweep", null, s2);
+    const sweeps = LK.map((k, i) => { const b = h("i", null, null, sweep); b.style.background = LC[k]; b.style.top = (400 + i * 250) + "px"; return b; });
+    const emb = svgLogo("emb", "#fff", s2, "position:absolute;left:390px;top:330px;width:300px;height:292px;transform-origin:50% 50%");
+    const word = svgLogo("word", "#fff", s2, "position:absolute;left:215px;top:660px;width:650px;height:197px");
+    const stripes = h("div", "rl-stripes", null, s2, "left:" + ((W - (9 * 92 + 8 * 10)) / 2) + "px;top:900px");
+    const stripeEls = LK.map(k => { const i = h("i", null, null, stripes); i.style.background = LC[k]; return i; });
+    const tag = h("div", "rl-a rl-c rl-h", null, s2, "top:975px;font-size:96px;font-weight:800;letter-spacing:-.025em");
+    const tagWords = ["does", "the", null, "math."].map((w, i) => {
+      if (w === null) { const m = mark(tag, "75%", OK, "#000"); m.s.style.display = "inline-block"; return m.s; }
+      return h("span", null, w, tag, "display:inline-block");
+    });
+    tagWords.forEach((w, i) => { if (i) w.style.marginLeft = ".22em"; });
+    const tag2 = h("div", "rl-a rl-c rl-k rl-mute", "for Sec F · IT-I", s2, "top:1115px;font-size:52px;letter-spacing:.14em");
+    const smart = sticker(s2, "bunk smarter.", LC.csl, 84);
+    smart.style.left = "330px"; smart.style.top = "1215px";
+    const wipeY = h("div", "rl-a", null, cam, "left:-1560px;top:-240px;width:4200px;height:2400px;background:" + LC.bee + ";transform-origin:50% 50%");
+
+    /* ===== HUD for S3–S5 ===== */
+    const hud = h("div", "rl-hud", null, cam);
+    svgLogo("emb", "#fff", hud, "width:46px;height:45px");
+    svgLogo("word", "#fff", hud, "width:150px;height:46px");
+    h("em", "rl-k", "Sec F · IT-I", hud);
+
+    /* ===== S3 · what's next ===== */
+    const s3 = sc();
+    const q3 = h("div", "rl-a rl-h", null, s3, "left:80px;top:230px;font-size:150px");
+    const q3a = h("span", null, "what's", q3, "display:inline-block");
+    const q3b = mark(q3, "next?", WARN, "#000"); q3b.s.style.marginLeft = ".2em";
+    const plate = h("div", "rl-plate rl-glass", null, s3);
+    const prow = h("div", "rl-prow", null, plate);
+    const badge = h("span", "rl-badge", "In class", prow); badge.style.background = LC.csl;
+    const left = h("span", "rl-left", null, prow);
+    const leftN = h("b", null, "12", left); left.appendChild(document.createTextNode("min left"));
+    h("div", "rl-pname", "Communication Skills", plate);
+    const who = h("div", "rl-who", null, plate);
+    h("b", null, "Ms. Isha", who); who.appendChild(document.createTextNode(" · Room 2311"));
+    const gauge = h("div", "rl-gauge", null, plate);
+    const gTrack = h("div", null, null, gauge);
+    const gFill = h("i", null, null, gTrack); gFill.style.background = LC.csl;
+    h("span", null, "till 9:10", gauge);
+    const nx = h("div", "rl-next", null, plate);
+    h("span", "l", "Next", nx);
+    const nxv = h("span", "v", "EVS Lab", nx); nxv.style.color = LC.evs;
+    h("span", "f", "Dr. Kavita Gupta", nx);
+    h("span", "t", "9:10", nx);
+    const stats = h("div", "rl-stats", null, s3);
+    const statEls = [["82%", "Overall", OK], ["3", "Skips left", "#fff"], ["0", "Below 75%", "#fff"]].map(([v, k, c]) => {
+      const d = h("div", null, null, stats); const b = h("b", null, v, d); b.style.color = c; h("span", null, k, d); return d; });
+    const glance = sticker(s3, "1 glance. done.", OK, 64);
+    glance.style.left = "540px"; glance.style.top = "975px";
+
+    /* ===== S4 · can I bunk ===== */
+    const s4 = sc();
+    const q4 = h("div", "rl-a rl-h", null, s4, "left:80px;top:215px;font-size:150px");
+    const q4a = h("span", null, "can I", q4, "display:inline-block");
+    const q4b = mark(q4, "bunk?", LC.csl, "#000"); q4b.s.style.marginLeft = ".2em";
+    const board = h("div", "rl-board", null, s4);
+    const rows = [["PPS", "pps", 82, "can miss 4 more", OK], ["BEE", "bee", 76, "can miss 1 more", WARN], ["Physics", "phy", 91, "can miss 7 more", OK]].map(([n, k, p, st, c]) => {
+      const r = h("div", "rl-row", null, board);
+      const b = h("i", "bar", null, r); b.style.background = LC[k];
+      const m = h("div", null, null, r);
+      const nn = h("div", "n", n, m); nn.style.color = LC[k];
+      const s = h("div", "st", st, m); s.style.color = c;
+      const trk = h("div", "trk", null, m);
+      const fi = h("i", null, null, trk); fi.style.background = LC[k]; fi.style.width = p + "%";
+      h("u", null, null, trk);
+      const pc = h("div", "pct", p + "%", r); pc.style.color = c;
+      return { r, fi };
+    });
+    const still = h("div", "rl-a rl-h", null, s4, "left:80px;top:975px;font-size:80px;font-weight:800;line-height:1.02;letter-spacing:-.02em");
+    h("div", null, "you can", still); h("div", null, "still miss", still);
+    const three = caText(s4, "rl-h", "3", "left:560px;top:880px;font-size:370px;color:" + OK);
+    const pill = h("div", "rl-pill", null, s4);
+    h("i", null, null, pill); h("b", null, "Best day to bunk", pill); h("span", null, "Mon 12 Oct", pill); h("em", null, "›", pill);
+    const safe = h("div", "rl-stamp", null, s4);
+    safe.style.color = OK;
+    checkIcon(safe); h("span", null, "Safe", safe);
+    safe.style.left = "742px"; safe.style.top = "1010px";
+    const wipeM = h("div", "rl-a", null, cam, "left:-1560px;top:-240px;width:4200px;height:2400px;background:" + LC.csl + ";transform-origin:50% 50%");
+
+    /* ===== S5 · mid-sems ===== */
+    const s5 = sc();
+    const q5 = h("div", "rl-a rl-h", null, s5, "left:80px;top:200px;font-size:140px");
+    const q5a = h("span", null, "mid-sems?", q5, "display:inline-block");
+    const q5b = h("div", "rl-a rl-h", "countdown's on.", s5, "left:84px;top:350px;font-size:76px;font-weight:800;letter-spacing:-.02em;color:" + WARN);
+    const flip = h("div", "rl-flip", null, s5, "left:70px;top:455px;width:330px;height:420px");
+    const flipIn = h("div", null, null, flip);
+    const digits = ["9", "8", "7", "6"].map((d, i) => h("div", "rl-h", d, flipIn, "position:absolute;left:0;top:" + (i * 420) + "px;width:330px;height:420px;font-size:460px;line-height:420px;color:" + WARN));
+    const six = caText(s5, "rl-h", "6", "left:70px;top:455px;font-size:460px;line-height:420px;color:" + WARN);
+    const daysTo = h("div", "rl-a", null, s5, "left:420px;top:560px");
+    h("div", "rl-h", "days to", daysTo, "font-size:84px;font-weight:800;letter-spacing:-.02em");
+    const smtWord = h("div", "rl-h", "SMT", daysTo, "font-size:150px;margin-top:6px;color:" + LC.smt);
+    const ds = h("div", "rl-ds", null, s5);
+    const dsRows = [["Mon", "5 Oct", "SMT", "ICT 107", "smt", "6 days"], ["Tue", "6 Oct", "PPS", "ICT 101 T", "pps", "7 days"],
+      ["Wed", "7 Oct", "Physics", "ICT 111 T", "phy", "8 days"], ["Thu", "8 Oct", "BEE", "ICT 103 T", "bee", "9 days"],
+      ["Fri", "9 Oct", "Mechanics", "ICT 119", "em", "10 days"], ["Sat", "10 Oct", "Comm Skills", "ICT 113", "csl", "11 days"]]
+      .map(([d, dt, n, code, k, v], i) => {
+        const r = h("div", "rl-dsr" + (i ? "" : " nx"), null, ds);
+        const w = h("div", "w", d, r); h("small", null, dt.split(" ")[0], w);
+        const s = h("div", "s", null, r); const dot = h("i", null, null, s); dot.style.background = LC[k];
+        s.appendChild(document.createTextNode(n)); h("small", null, code, s);
+        h("span", "v", v, r);
+        return r;
+      });
+    const withAI = sticker(s5, "study with AI", LC.phy, 64);
+    withAI.style.left = "470px"; withAI.style.top = "815px";
+
+    /* ===== S6 · the card, the line ===== */
+    const s6 = sc();
+    const tc = h("div", "rl-tc rl-glass", null, s6);
+    const tcTop = h("div", "top", null, tc);
+    svgLogo("emb", "#fff", tcTop, "width:40px;height:39px");
+    h("span", null, "Travelcard", tcTop); h("em", null, "2026–27", tcTop);
+    const disc = h("div", "disc", null, tc);
+    const tcWho = h("div", "who", null, tc);
+    const tcName = h("div", "nm", "", tcWho);
+    const tcUser = h("div", "un", "@you · Sec F · IT-I", tcWho);
+    const meta = h("div", "meta", null, tc);
+    const metaVal = [["No.", "your roll"], ["Batch", "F1 / F2"], ["Status", "Waiting"]].map(([k, v]) => {
+      const s = h("span", null, null, meta); h("small", null, k, s); return h("b", null, v, s); });
+    const strp = h("div", "strp", null, tc);
+    const strpEls = LK.map(k => { const i = h("i", null, null, strp); i.style.background = LC[k]; return i; });
+    const sheen = h("div", "sheen", null, tc);
+    const issued = h("div", "rl-stamp", null, tc);
+    issued.style.color = OK; issued.style.fontSize = "52px"; issued.style.left = "455px"; issued.style.top = "118px";
+    h("span", null, "Issued", issued);
+    const line = h("div", "rl-a rl-c rl-h", null, s6, "top:740px;font-size:128px");
+    const lineA = h("span", null, "get on", line, "display:inline-block");
+    const lineB = h("span", null, "the line.", line, "display:inline-block;margin-left:.22em;position:relative");
+    const lineUnder = h("div", "rl-stripes", null, lineB, "left:4px;right:4px;bottom:-26px;gap:6px");
+    const lineUEls = LK.map(k => { const i = h("i", null, null, lineUnder); i.style.cssText = "flex:1;width:auto;height:12px;background:" + LC[k]; return i; });
+    lineUnder.style.display = "flex";
+    const url = h("div", "rl-url", "bunkr.website", s6);
+    const small6 = h("div", "rl-a rl-c rl-k rl-dim", "Sec F · IT-I · ADGIPS · 2026–27", s6, "top:1085px;font-size:40px;letter-spacing:.16em");
+
+    /* ===== tapes, flash, grain ===== */
+    const tapeA = h("div", "rl-tape", null, cam, "top:1585px;background:#fff;transform:rotate(-6deg)");
+    const tapeAIn = h("div", null, null, tapeA);
+    const tapeB = h("div", "rl-tape", null, cam, "top:1705px;background:" + WARN + ";transform:rotate(4deg)");
+    const tapeBIn = h("div", null, null, tapeB);
+    const TAPE_A = ["bunk smarter", "75% or cooked?", "what's next", "no cap", "mid-sems loading"];
+    const TAPE_B = ["is it safe to bunk", "1 glance", "sec f it-i", "get on the line"];
+    const fillTape = (box, words, ink) => { for (let r = 0; r < 4; r++) words.forEach(w => { const s = h("span", null, w + "  •", box); s.style.color = ink; }); };
+    fillTape(tapeAIn, TAPE_A, "#000"); fillTape(tapeBIn, TAPE_B, "#000");
+    let tapeAW = 1, tapeBW = 1;
+
+    const flash = h("div", "rl-flash", null, root);
+    const vig = h("div", "rl-vig", null, root);
+    const grain = h("div", "rl-grain", null, root);
+    try {
+      const cv = document.createElement("canvas"); cv.width = cv.height = 256;
+      const cx = cv.getContext("2d"), im = cx.createImageData(256, 256);
+      let seed = 7;
+      for (let i = 0; i < im.data.length; i += 4) {
+        seed = (seed * 16807) % 2147483647;
+        const v = seed % 256;
+        im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255;
+      }
+      cx.putImageData(im, 0, 0);
+      grain.style.backgroundImage = "url(" + cv.toDataURL() + ")";
+    } catch (e) { grain.remove(); }
+
+    const scenes = [s1, s2, s3, s4, s5, s6];
+    let fontsIn = 0;
+    const WIN = [[0, at(6.05)], [at(5.4), at(13.85)], [at(13.75), at(22.05)], [at(21.7), at(31.66)], [at(31.55), at(40.1)], [at(39.6), DUR + 1]];
+
+    function resize() {
+      const sw = stage.clientWidth || W, sh = stage.clientHeight || H;
+      /* "screen" (the default): a phone taller than 9:16 would crop the sides under cover,
+         so fit the width and sit a little high, where the sign-in panel doesn't reach */
+      const tall = fit === "screen" && sh / sw > H / W;
+      const k = tall ? sw / W : fit === "contain" ? Math.min(sw / W, sh / H) : Math.max(sw / W, sh / H);
+      const oy = tall ? (sh - H * k) * .35 : (sh - H * k) / 2;
+      root.style.transform = "translate(" + ((sw - W * k) / 2).toFixed(2) + "px," + oy.toFixed(2) + "px) scale(" + k.toFixed(5) + ")";
+      /* one repetition of each tape's words, measured, so the loop is seamless */
+      const rep = (box, n) => { let w = 0; for (let i = 0; i < n; i++) w += box.children[i].offsetWidth; return w || 1; };
+      tapeAW = rep(tapeAIn, TAPE_A.length); tapeBW = rep(tapeBIn, TAPE_B.length);
+    }
+
+    /* the beat pulse: every kick of a drop nudges the camera */
+    const drop = t => (t >= at(6) && t < at(30)) || (t >= at(32) && t < at(48));
+    const hits = [[1, 1], [7, .55], [26, .6], [29, .45], [32, 1], [44, .6], [48, .9]];
+    const flashes = [[1, .55, .09], [6, .35, .12], [7, .3, .1], [26, .28, .09], [32, .6, .12], [40, .45, .14], [48, .7, .2]];
+
+    function seek(t) {
+      t = clamp(t, 0, DUR);
+      /* a scene outside its window is display:none: visibility would let its children back in */
+      scenes.forEach((s, i) => { const on = t >= WIN[i][0] && t < WIN[i][1]; s.style.display = on ? "block" : "none"; });
+
+      /* camera: shake on hits, a bounce on each beat of a drop, a slow push in the hook */
+      let sx = 0, sy = 0, sr = 0, zoom = 1;
+      hits.forEach(([b, amp]) => {
+        const x = t - at(b), k = kick(x, .45) * amp;
+        if (k) { sx += Math.sin(x * 83) * 30 * k; sy += Math.cos(x * 71) * 22 * k; sr += Math.sin(x * 61) * 1.4 * k; zoom += .05 * k; }
+      });
+      if (drop(t)) { const bx = (t / B) % 1; zoom += .014 * kick(bx * B, .22); }
+      if (t < at(6.05)) zoom += .07 * io3(prog(t, at(2.4), at(5.4))) * (1 - prog(t, at(5.5), at(6)));
+      put(cam, { x: sx, y: sy, r: sr, s: zoom });
+
+      let fl = 0;
+      flashes.forEach(([b, amp, len]) => { fl = Math.max(fl, amp * kick(t - at(b), len)); });
+      flash.style.opacity = (lite ? fl * .6 : fl).toFixed(3);
+
+      /* background metro lines drift behind the product scenes */
+      const bgOn = t > at(13.8);
+      vis(bgl, bgOn);
+      if (bgOn) bgLines.forEach((l, i) => { l.style.transform = "translateX(" + (((t * (40 + i * 7) + i * 180) % 400) - 200).toFixed(1) + "px)"; });
+
+      /* grain: new noise twelve (lite) or twenty-four times a second */
+      if (grain.parentNode) {
+        const f = Math.floor(t * (lite ? 12 : 24));
+        grain.style.transform = "translate(" + Math.floor(hash(f) * 128) + "px," + Math.floor(hash(f + 999) * 128) + "px)";
+      }
+
+      /* ===== S1 ===== */
+      if (t < WIN[0][1]) {
+        put(pov, { r: -6 + (1 - spring(t, 3, .4)) * -24, s: lerp(.2, 1, spring(t, 3.2, .42)), o: t < .01 ? 1 : 1 });
+        const txt = "you're at", n = Math.round(prog(t, at(.45), at(.95)) * txt.length);
+        youre.textContent = txt.slice(0, n);
+        caret.style.left = (80 + youre.offsetWidth + 10) + "px";
+        vis(caret, t < at(1.2) && (Math.floor(t * 6) % 2 === 0 || t < at(.95)));
+        const x1 = t - at(1);
+        const slam = spring(x1, 3.6, .38);
+        const jit = t > at(1.4) && t < at(5.6) ? 1 : 0;
+        const glitch = kick(t - at(3.5), .18) + kick(t - at(4.25), .12);
+        put(num.w, { x: jit * wob(t * 22, 1) * 4 + glitch * 26 * Math.sin(t * 190), y: jit * wob(t * 22, 2) * 4,
+          s: x1 < 0 ? 0 : lerp(2.8, 1, slam), sy: x1 < 0 ? 0 : lerp(2.8, 1, slam) * (1 + .22 * kick(x1, .12)),
+          k: glitch * 14, o: x1 < 0 ? 0 : 1 });
+        num.split(38 * kick(x1, .5) + 24 * glitch + (jit ? 2.5 : 0), lite);
+        const bIn = out5(prog(t, at(1.2), at(1.9)));
+        put(bar, { x: lerp(-1100, 0, bIn), o: bIn });
+        barFill.style.transform = "scaleX(" + lerp(.83, .749, out3(prog(t, at(1.5), at(2.6)))).toFixed(4) + ")";
+        const ck = t - at(2.5);
+        put(cooked, { s: ck < 0 ? 0 : lerp(1.9, 1, spring(ck, 3.4, .42)), r: ck < 0 ? 0 : 5 + (1 - spring(ck, 3, .45)) * 18, o: ck < 0 ? 0 : 1 });
+        /* whip out to the left */
+        const wp = prog(t, at(5.5), at(6));
+        put(s1, { x: -1500 * inX(wp), o: 1 });
+        blur(s1, "s1", 70 * Math.sin(Math.PI * wp), 0);
+      }
+
+      /* ===== S2 ===== */
+      if (t >= WIN[1][0] && t < WIN[1][1]) {
+        sweeps.forEach((b, i) => {
+          const st = at(6) - .42 + i * .018, p = io2(prog(t, st, st + .8));
+          const dir = i % 2 ? -1 : 1;
+          put(b, { x: dir > 0 ? lerp(-2500, 2500, p) : lerp(2500, -2500, p), o: p > 0 && p < 1 ? 1 : 0 });
+        });
+        const e = t - at(7);
+        put(emb, { s: e < 0 ? 0 : spring(e, 2.8, .42), r: e < 0 ? 0 : (1 - spring(e, 2.4, .5)) * -60, o: e < 0 ? 0 : 1 });
+        stripeEls.forEach((s, i) => { const x = t - at(7.25) - i * .03; put(s, { sx: x < 0 ? 0 : spring(x, 3.2, .5), o: x < 0 ? 0 : 1 }); });
+        const wp = out5(prog(t, at(8), at(8.7)));
+        word.style.clipPath = "inset(0 " + ((1 - wp) * 100).toFixed(2) + "% 0 0)";
+        put(word, { x: (1 - wp) * -60, o: wp > 0 ? 1 : 0 });
+        tagWords.forEach((w, i) => { const x = t - at(8.75) - i * .075; put(w, { y: x < 0 ? 0 : lerp(80, 0, spring(x, 3, .55)), o: x < 0 ? 0 : clamp(x / .12) }); });
+        const hx = t - at(8.75) - 2 * .075 - .08;
+        tagWords[2].firstChild.style.transform = "scaleX(" + out5(clamp(hx / .3)).toFixed(3) + ")";
+        const t2 = t - at(9.5);
+        put(tag2, { y: t2 < 0 ? 0 : lerp(40, 0, out5(clamp(t2 / .5))), o: clamp(t2 / .35) });
+        const sm = t - at(11.5);
+        put(smart, { s: sm < 0 ? 0 : lerp(2.1, 1, spring(sm, 3.4, .4)), r: sm < 0 ? 0 : -6 + (1 - spring(sm, 3, .45)) * -20, o: sm < 0 ? 0 : 1 });
+      }
+      /* the Yellow Line takes us out */
+      const wy = prog(t, at(13.3), at(14.3));
+      put(wipeY, { x: lerp(-3400, 3400, io2(wy)), r: -24, o: wy > 0 && wy < 1 ? 1 : 0 });
+      blur(wipeY, "wy", 90 * Math.sin(Math.PI * wy), 0);
+
+      /* ===== HUD ===== */
+      const hIn = out3(prog(t, at(14), at(14.6))), hOut = prog(t, at(39.4), at(39.9));
+      put(hud, { y: (1 - hIn) * -30, o: hIn * (1 - hOut) });
+
+      /* ===== S3 ===== */
+      if (t >= WIN[2][0] && t < WIN[2][1]) {
+        const a = t - at(14), b2 = t - at(14.5);
+        put(q3a, { y: a < 0 ? 0 : lerp(120, 0, spring(a, 3, .55)), o: clamp(a / .1) });
+        put(q3b.s, { y: b2 < 0 ? 0 : lerp(120, 0, spring(b2, 3, .55)), o: clamp(b2 / .1) });
+        q3b.i.style.transform = "scaleX(" + out5(clamp((b2 - .1) / .3)).toFixed(3) + ")";
+        const p = t - at(15);
+        put(plate, { p: 1600, y: p < 0 ? 0 : lerp(760, 0, spring(p, 2.4, .6)), rx: p < 0 ? 0 : lerp(38, 0, spring(p, 2.2, .62)),
+          s: p < 0 ? 0 : lerp(.84, 1, spring(p, 2.4, .6)), o: clamp(p / .15) });
+        gFill.style.transform = "scaleX(" + lerp(.58, .86, prog(t, at(15.3), at(21.5))).toFixed(4) + ")";
+        leftN.textContent = t < at(16.5) ? "12" : t < at(18.5) ? "11" : "10";
+        const lk = Math.min(kick(t - at(16.5), .25), 1) + kick(t - at(18.5), .25);
+        leftN.style.transform = "translateY(" + (-lk * 18).toFixed(1) + "px)";
+        nxv.style.textShadow = kick(t - at(20), .6) ? "0 0 " + (30 * kick(t - at(20), .6)).toFixed(1) + "px " + LC.evs : "none";
+        statEls.forEach((d, i) => { const x = t - at(16.25) - i * .08; put(d, { y: x < 0 ? 0 : lerp(60, 0, spring(x, 3, .6)), o: clamp(x / .15) }); });
+        const g = t - at(18);
+        put(glance, { s: g < 0 ? 0 : lerp(2, 1, spring(g, 3.4, .42)), r: g < 0 ? 0 : 7 + (1 - spring(g, 3, .45)) * 20, o: g < 0 ? 0 : 1 });
+        const out = prog(t, at(21.5), at(22));
+        put(s3, { y: -2100 * inX(out), o: 1 });
+        blur(s3, "s3", 0, 80 * Math.sin(Math.PI * out));
+      }
+
+      /* ===== S4 ===== */
+      if (t >= WIN[3][0] && t < WIN[3][1]) {
+        const inn = prog(t, at(21.75), at(22.3));
+        put(s4, { y: 2100 * (1 - outX(inn)), o: 1 });
+        blur(s4, "s4", 0, 70 * (1 - outX(inn)) * (inn > 0 ? 1 : 0));
+        const a = t - at(22.1), b2 = t - at(22.5);
+        put(q4a, { y: a < 0 ? 0 : lerp(110, 0, spring(a, 3, .55)), o: clamp(a / .1) });
+        put(q4b.s, { y: b2 < 0 ? 0 : lerp(110, 0, spring(b2, 3, .55)), o: clamp(b2 / .1) });
+        q4b.i.style.transform = "scaleX(" + out5(clamp((b2 - .1) / .3)).toFixed(3) + ")";
+        rows.forEach((r, i) => {
+          const x = t - at(23 + i);
+          put(r.r, { x: x < 0 ? 0 : lerp(1000, 0, spring(x, 2.8, .58)), o: clamp(x / .1) });
+          r.fi.style.transform = "scaleX(" + out5(clamp((x - .1) / .5)).toFixed(3) + ")";
+        });
+        const s = t - at(25.6);
+        put(still, { x: s < 0 ? 0 : lerp(-80, 0, out5(clamp(s / .4))), o: clamp(s / .2) });
+        const x3 = t - at(26);
+        put(three.w, { s: x3 < 0 ? 0 : lerp(2.6, 1, spring(x3, 3.4, .38)), o: x3 < 0 ? 0 : 1 });
+        three.split(34 * kick(x3, .45), lite);
+        const pp = t - at(27.5);
+        put(pill, { s: pp < 0 ? 0 : lerp(.5, 1, spring(pp, 3.2, .45)), y: pp < 0 ? 0 : lerp(50, 0, spring(pp, 3, .6)), o: clamp(pp / .1) });
+        const sf = t - at(29);
+        put(safe, { s: sf < 0 ? 0 : lerp(2.4, 1, spring(sf, 4, .5)), r: -10, o: sf < 0 ? 0 : 1 });
+      }
+      const wm = prog(t, at(31.1), at(32.1));
+      put(wipeM, { x: lerp(3400, -3400, io2(wm)), r: 24, o: wm > 0 && wm < 1 ? 1 : 0 });
+      blur(wipeM, "wm", 90 * Math.sin(Math.PI * wm), 0);
+
+      /* ===== S5 ===== */
+      if (t >= WIN[4][0] && t < WIN[4][1]) {
+        const a = t - at(32.5), b2 = t - at(33);
+        put(q5a, { y: a < 0 ? 0 : lerp(110, 0, spring(a, 3, .55)), o: clamp(a / .1) });
+        put(q5b, { y: b2 < 0 ? 0 : lerp(60, 0, spring(b2, 3, .6)), o: clamp(b2 / .15) });
+        /* the odometer rolls 9 → 6, then the 6 lands and splits */
+        const fp = prog(t, at(31.68), at(32));
+        const land = t >= at(32);
+        vis(flip, !land && t >= at(31.62));
+        flipIn.style.transform = "translateY(" + (-3 * 420 * out3(fp)).toFixed(1) + "px)";
+        const x6 = t - at(32);
+        put(six.w, { s: land ? lerp(1.35, 1, spring(x6, 3.6, .4)) : 1, o: land ? 1 : 0 });
+        six.split(28 * kick(x6, .4) + 30 * kick(t - at(32), .3), lite);
+        const d = t - at(32.4);
+        put(daysTo, { x: d < 0 ? 0 : lerp(120, 0, out5(clamp(d / .45))), o: clamp(d / .2) });
+        dsRows.forEach((r, i) => { const x = t - at(34 + i * .5); put(r, { x: x < 0 ? 0 : lerp(1000, 0, spring(x, 3, .58)), o: clamp(x / .1) }); });
+        const ai = t - at(37.5);
+        put(withAI, { s: ai < 0 ? 0 : lerp(2, 1, spring(ai, 3.4, .42)), r: ai < 0 ? 0 : -5 + (1 - spring(ai, 3, .45)) * -18, o: ai < 0 ? 0 : 1 });
+        const z = prog(t, at(39.5), at(40.05));
+        put(s5, { s: 1 + 2.2 * inX(z), y: -300 * inX(z), o: 1 - in3(z) });
+      }
+
+      /* ===== S6 ===== */
+      if (t >= WIN[5][0]) {
+        const c = t - at(40);
+        const lift = spring(t - at(45), 2.6, .62);
+        put(tc, { p: 2200, ry: c < 0 ? -110 : lerp(-110, 0, spring(c, 1.9, .5)), y: lerp(c < 0 ? 240 : lerp(240, 0, spring(c, 2.2, .6)), -170, lift),
+          s: lerp(c < 0 ? .7 : lerp(.7, 1, spring(c, 2.2, .6)), .8, lift), o: c < 0 ? 0 : clamp(c / .12) });
+        const nm = "You.", n = Math.round(prog(t, at(41), at(41.8)) * nm.length);
+        tcName.textContent = nm.slice(0, n);
+        put(tcUser, { o: clamp((t - at(42)) / .3), y: lerp(20, 0, out3(prog(t, at(42), at(42.6)))) });
+        const iss = t - at(44);
+        metaVal[2].textContent = iss < 0 ? "Waiting" : "Issued";
+        metaVal[2].style.color = iss < 0 ? "#fff" : OK;
+        disc.style.boxShadow = "inset 0 0 0 " + (iss < 0 ? 6 : lerp(6, 37, out5(clamp(iss / .3)))).toFixed(1) + "px " + (iss < 0 ? "rgba(255,255,255,.3)" : OK);
+        strpEls.forEach((s, i) => put(s, { sy: iss < 0 ? 1 : 1 + .9 * spring(iss - i * .02, 3, .5) }));
+        put(sheen, { x: lerp(-400, 1200, io3(prog(t, at(42.5), at(43.6)))) });
+        put(issued, { s: iss < 0 ? 0 : lerp(2.6, 1, spring(iss, 4, .5)), r: -9, o: iss < 0 ? 0 : 1 });
+        const la = t - at(45.5), lb = t - at(45.75);
+        put(lineA, { y: la < 0 ? 0 : lerp(110, 0, spring(la, 3, .55)), o: clamp(la / .1) });
+        put(lineB, { y: lb < 0 ? 0 : lerp(110, 0, spring(lb, 3, .55)), o: clamp(lb / .1) });
+        lineUEls.forEach((s, i) => put(s, { sx: out5(clamp((lb - .2 - i * .025) / .3)), sy: 1 + .8 * kick(t - at(48) - i * .015, .5) }));
+        if (!url.dataset.w || url.dataset.f !== String(fontsIn)) { url.dataset.w = url.offsetWidth; url.dataset.f = String(fontsIn); url.style.left = ((W - url.offsetWidth) / 2) + "px"; }
+        const u = t - at(46.5);
+        put(url, { s: u < 0 ? 0 : lerp(.4, 1, spring(u, 3.2, .45)), o: clamp(u / .08) });
+        put(small6, { o: clamp((t - at(47)) / .4) });
+      }
+
+      /* ===== tapes ride along the bottom from the reveal on ===== */
+      const tp = out5(prog(t, at(6.4), at(7.4)));
+      put(tapeA, { y: lerp(400, 0, tp), r: -6, o: tp });
+      put(tapeB, { y: lerp(400, 0, out5(prog(t, at(6.6), at(7.6)))), r: 4, o: tp });
+      const speed = t > at(48) ? 1 + 1.5 * kick(t - at(48), 1.2) : 1;
+      tapeAIn.style.transform = "translateX(" + (-((t * 230) % tapeAW)).toFixed(1) + "px)";
+      tapeBIn.style.transform = "translateX(" + (((t * 190 * speed) % tapeBW) - tapeBW).toFixed(1) + "px)";
+    }
+
+    resize();
+    seek(0);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fontsIn++; if (root.isConnected) resize(); });
+    return { duration: DUR, poster: POSTER, beat: B, seek, resize, destroy() { root.remove(); } };
+  }
+
+  window.BunkrReel = { mount, duration: DUR, poster: POSTER };
 })();
 </script>
 <!--reel:end-->
