@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.4+9974d19-->
+<!--secf-app--><!--build:1.1.4+b38e14d-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1244,6 +1244,21 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
             transition:transform .6s var(--sp-card), opacity .42s var(--ease), border-radius .5s var(--ease); }
 /* the reel's box: it mounts into this, reads its size, and covers it */
 .rw-stage { position:absolute; inset:0; overflow:hidden; isolation:isolate; pointer-events:none; }
+/* the rendered reel, when the network can afford it. It lands exactly where the code reel
+   draws (width-fit, a third of the spare height above it), so the hand-over is invisible */
+.rw-video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 35%; background:#000;
+            opacity:0; transition:opacity .3s var(--ease); pointer-events:none; }
+.rw-frame.vid .rw-video { opacity:1; }
+.rw-sound { position:absolute; z-index:2; top:calc(14px + max(env(safe-area-inset-top), var(--sa-top))); right:14px;
+            display:inline-flex; align-items:center; gap:7px; min-height:44px; padding:0 14px 0 11px; border-radius:999px;
+            border:1px solid rgba(255,255,255,.28); background:rgba(0,0,0,.55); color:#fff; cursor:pointer;
+            font:700 12px/1 'Blinker', sans-serif; letter-spacing:.1em; text-transform:uppercase;
+            backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+.rw-sound svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.rw-sound svg path:first-child { fill:currentColor; stroke:none; }
+.rw-sound .on, .rw-sound[aria-pressed="true"] .off { display:none; }
+.rw-sound[aria-pressed="true"] .on { display:inline; }
+.rw-sound:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
 .rw-panel { position:relative; padding:96px 20px calc(22px + max(env(safe-area-inset-bottom), var(--sa-bottom)));
             background:linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.9) 50%, rgba(0,0,0,.6) 76%, rgba(0,0,0,0) 100%);
             transition:transform .45s var(--ease), opacity .28s var(--ease); }
@@ -3065,8 +3080,8 @@ input[type="date"] { padding:12px 14px; }
        Shown when the gate opens on sign-in for someone signed out. The reel mounts
        into #reelStage; its code lives between the reel:start and reel:end markers. -->
   <div class="rw" id="reelWelcome" role="region" aria-labelledby="rwHead" hidden>
-    <div class="rw-frame"><div class="rw-stage" id="reelStage" aria-hidden="true"></div></div>
-    <p class="sr" id="reelDesc">Behind this screen a short muted animation loops: an attendance of 74.9% flips to safe, then Bunkr shows the next class, how many classes you can still miss, and the mid-sem countdown.</p>
+    <div class="rw-frame"><div class="rw-stage" id="reelStage" aria-hidden="true"></div><video class="rw-video" id="reelVideo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><button class="rw-sound" id="reelSound" type="button" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.2v13.6l-4.8-4.3H4z"/><path class="on" d="M15.6 8.6a4.6 4.6 0 0 1 0 6.8M18.2 6a8.3 8.3 0 0 1 0 12"/><path class="off" d="M16 9.4l5 5.2M21 9.4l-5 5.2"/></svg><span>Sound</span></button></div>
+    <p class="sr" id="reelDesc">Behind this screen a short muted animation loops: an attendance of 74.9%, then Bunkr shows the next class, how many classes you can still miss, the best day to bunk and the mid-sem countdown.</p>
     <div class="rw-panel">
       <div class="rw-copy">
         <span class="rw-logo" id="reelLogo"></span>
@@ -7613,6 +7628,62 @@ const reelGate = (() => {
   const covered = () => (splashOn() && !document.getElementById("bunkr-splash").classList.contains("splash-out")) || frontOn();
   const settled = () => !splashOn() && !frontOn();
   function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; }
+
+  /* ---- the rendered reel, when the network can afford it ----
+     The code reel draws at once and costs nothing, so it always starts. A good network
+     also fetches the video of the same reel, 1080p (720p on a middling connection); once
+     it can play through, it takes over at the same moment of the loop. Data Saver, 2G,
+     offline, a copy opened from disk and reduced motion never download it, and anything
+     that goes wrong (too slow, autoplay refused, a 404) leaves the code reel playing. */
+  const video = document.getElementById("reelVideo"), snd = document.getElementById("reelSound");
+  const frame = rw.querySelector(".rw-frame");
+  const REEL_V = "v1";                           /* bump with new files: they are cached for a year */
+  const reelSrc = q => (NATIVE ? "https://www.bunkr.website/" : "") + "reel/bunkr-reel-" + q + "-" + REEL_V + ".mp4";
+  function reelQuality() {
+    if (still() || navigator.onLine === false || location.protocol === "file:") return null;
+    const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (!c) return "1080";
+    if (c.saveData) return null;
+    const et = String(c.effectiveType || "4g");
+    if (et === "slow-2g" || et === "2g") return null;
+    if (et === "3g" || (c.downlink && c.downlink < 3)) return "720";
+    return "1080";
+  }
+  let vq, vready = false, vlive = false, vwait = 0;
+  function vload() {
+    if (vq !== undefined) return;
+    vq = reelQuality();
+    if (!vq) return;
+    video.preload = "auto";
+    video.src = reelSrc(vq);
+    try { video.load(); } catch (e) {}
+    vwait = setTimeout(vdrop, 12000);
+  }
+  function vdrop() {
+    clearTimeout(vwait);
+    vready = vlive = false; vq = null;
+    frame.classList.remove("vid"); snd.hidden = true;
+    video.pause(); video.removeAttribute("src");
+    try { video.load(); } catch (e) {}
+    sync();
+  }
+  function vplay() {
+    if (!video.paused) return;
+    if (!vlive) try { video.currentTime = (played + .06) % r.duration; } catch (e) {}
+    const pr = video.play();
+    if (pr && pr.catch) pr.catch(() => { if (vlive) played = video.currentTime; vdrop(); });
+  }
+  const vpause = () => { if (!video.paused) video.pause(); };
+  video.addEventListener("canplaythrough", () => { clearTimeout(vwait); if (vq && !vready) { vready = true; sync(); } });
+  video.addEventListener("playing", () => { vlive = true; frame.classList.add("vid"); snd.hidden = false; stop(); });
+  video.addEventListener("pause", () => { if (vlive) played = video.currentTime; });
+  video.addEventListener("error", () => { if (!vq) return; if (vlive) played = video.currentTime || played; vdrop(); });
+  snd.addEventListener("click", () => {
+    video.muted = !video.muted;
+    snd.setAttribute("aria-pressed", String(!video.muted));
+    snd.setAttribute("aria-label", video.muted ? "Turn the reel's sound on" : "Turn the reel's sound off");
+  });
+  snd.setAttribute("aria-label", "Turn the reel's sound on");
   function tick(now) {
     raf = requestAnimationFrame(tick);
     played = Math.max(0, (now - t0) / 1000);
@@ -7625,8 +7696,9 @@ const reelGate = (() => {
       focusDue = false;
       if (!rw.contains(document.activeElement)) go.focus({ preventScroll: true });
     }
-    if (!up || !r || broken || document.hidden || cover) { stop(); wasCovered = wasCovered || cover; return; }
-    if (still()) { stop(); if (!held) { held = true; seek(r.poster); } return; }
+    if (!up || !r || broken || document.hidden || cover) { stop(); vpause(); wasCovered = wasCovered || cover; return; }
+    if (still()) { stop(); vpause(); frame.classList.remove("vid"); if (!held) { held = true; seek(r.poster); } return; }
+    if (vready) { vplay(); if (vlive) return; }   /* until the video is really playing, the code reel keeps time */
     if (raf) return;
     if (wasCovered && played < 2) played = 0;      /* the hook plays from the top once it can be seen */
     wasCovered = false;
@@ -7654,6 +7726,8 @@ const reelGate = (() => {
     clearTimeout(gone);
     rw.hidden = false;                             /* before mounting: the reel reads the stage's size */
     if (!mount()) { rw.hidden = true; paintBack(); return false; }
+    vload();
+    if (vlive) try { video.currentTime = 0; } catch (e) {}
     rw.classList.remove("out");
     form.inert = true;
     if (animate && !still()) {

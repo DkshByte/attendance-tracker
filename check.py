@@ -377,6 +377,23 @@ check("the profile survives a database without the enrolment column",
       'e.code === "42703"' in html and "PROFILE_COLS" in html,
       "until supabase/15 runs, asking for enrolment 400s the profile and nobody can sign in")
 
+# 23. The sign-in reel's video is an upgrade, never a cost: it is fetched only when the
+#     network can afford it, it must be able to autoplay (muted, inline), and every file
+#     the app can ask for has to exist, or phones on a good network get a 404 and a fallback.
+m = re.search(r'const REEL_V = "(v\d+)"', html)
+check("the reel video is versioned", bool(m), "REEL_V names the files; without it a new cut is stuck behind a year of cache")
+if m:
+    for q in ("1080", "720"):
+        f = root / "deploy" / "reel" / f"bunkr-reel-{q}-{m.group(1)}.mp4"
+        check(f"deploy/reel/{f.name} exists", f.exists(), "the app asks for it on a good network")
+rq = html[html.find("function reelQuality()"):][:700]
+check("the reel video respects Data Saver, 2G, offline and reduced motion",
+      all(k in rq for k in ("c.saveData", '"2g"', "still()", "navigator.onLine === false")),
+      "a login screen must not burn a slow or metered connection on a video")
+check("the reel video can autoplay", re.search(r'<video[^>]*id="reelVideo"[^>]*>', html) is not None
+      and all(a in re.search(r'<video[^>]*id="reelVideo"[^>]*>', html).group(0) for a in ("muted", "playsinline")),
+      "without muted + playsinline, phones refuse to start it")
+
 print()
 if fail:
     print(f"{len(fail)} check(s) failed.")
