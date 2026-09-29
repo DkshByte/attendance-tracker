@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.4+b38e14d-->
+<!--secf-app--><!--build:1.1.4+f95285f-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -3080,7 +3080,7 @@ input[type="date"] { padding:12px 14px; }
        Shown when the gate opens on sign-in for someone signed out. The reel mounts
        into #reelStage; its code lives between the reel:start and reel:end markers. -->
   <div class="rw" id="reelWelcome" role="region" aria-labelledby="rwHead" hidden>
-    <div class="rw-frame"><div class="rw-stage" id="reelStage" aria-hidden="true"></div><video class="rw-video" id="reelVideo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><button class="rw-sound" id="reelSound" type="button" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.2v13.6l-4.8-4.3H4z"/><path class="on" d="M15.6 8.6a4.6 4.6 0 0 1 0 6.8M18.2 6a8.3 8.3 0 0 1 0 12"/><path class="off" d="M16 9.4l5 5.2M21 9.4l-5 5.2"/></svg><span>Sound</span></button></div>
+    <div class="rw-frame"><div class="rw-stage" id="reelStage" aria-hidden="true"></div><video class="rw-video" id="reelVideo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><button class="rw-sound" id="reelSound" type="button" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.2v13.6l-4.8-4.3H4z"/><path class="on" d="M15.6 8.6a4.6 4.6 0 0 1 0 6.8M18.2 6a8.3 8.3 0 0 1 0 12"/><path class="off" d="M16 9.4l5 5.2M21 9.4l-5 5.2"/></svg><span>Tap for sound</span></button></div>
     <p class="sr" id="reelDesc">Behind this screen a short muted animation loops: an attendance of 74.9%, then Bunkr shows the next class, how many classes you can still miss, the best day to bunk and the mid-sem countdown.</p>
     <div class="rw-panel">
       <div class="rw-copy">
@@ -7678,12 +7678,15 @@ const reelGate = (() => {
   video.addEventListener("playing", () => { vlive = true; frame.classList.add("vid"); snd.hidden = false; stop(); });
   video.addEventListener("pause", () => { if (vlive) played = video.currentTime; });
   video.addEventListener("error", () => { if (!vq) return; if (vlive) played = video.currentTime || played; vdrop(); });
-  snd.addEventListener("click", () => {
-    video.muted = !video.muted;
+  /* always starts silent: sound is the student's choice, one tap, never the default */
+  video.defaultMuted = true; video.muted = true;
+  const sndSay = () => {
     snd.setAttribute("aria-pressed", String(!video.muted));
-    snd.setAttribute("aria-label", video.muted ? "Turn the reel's sound on" : "Turn the reel's sound off");
-  });
-  snd.setAttribute("aria-label", "Turn the reel's sound on");
+    snd.setAttribute("aria-label", video.muted ? "Turn the reel's sound on" : "Mute the reel");
+    snd.querySelector("span").textContent = video.muted ? "Tap for sound" : "Sound on";
+  };
+  snd.addEventListener("click", () => { video.muted = !video.muted; sndSay(); });
+  sndSay();
   function tick(now) {
     raf = requestAnimationFrame(tick);
     played = Math.max(0, (now - t0) / 1000);
