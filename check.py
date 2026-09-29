@@ -296,6 +296,41 @@ check("the APK loader fetches www, not the apex",
       '"https://www.bunkr.website/app.html"' in loader,
       "bunkr.website 308s to www with no CORS header, so OTA fails and phones stay old")
 
+# 22. An enrolment number is for its own student only, and this repo is public, as is
+#     everything deploy/ serves. Committed anywhere, the numbers are published; a view
+#     naming the column runs as its owner and hands all of them to the section; an
+#     update grant lets a student put someone else's on their row.
+enrol_re = re.compile(r"\b\d{3}156\d{5}\b")          # roll, ADGIPS (156), branch, batch
+try:
+    tracked = subprocess.run(["git", "ls-files", "-z"], cwd=root, capture_output=True,
+                             text=True, check=True).stdout.split("\0")
+except Exception:
+    tracked = [str(p.relative_to(root)) for p in root.rglob("*")
+               if p.is_file() and not {".git", "node_modules"} & set(p.parts)]
+binary = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".ico", ".woff", ".woff2", ".ttf", ".apk", ".jar"}
+leaks = []
+for rel in filter(None, tracked):
+    p = root / rel
+    if p.suffix.lower() in binary or not p.is_file(): continue
+    if enrol_re.search(p.read_text(errors="ignore")): leaks.append(rel)
+check("no enrolment number is committed anywhere", not leaks,
+      f"{leaks}: the repo is public; the numbers go in from the private data script only")
+sqls = {f.name: f.read_text() for f in sorted((root / "supabase").glob("*.sql"))}
+views = [v for t in sqls.values() for v in re.findall(r"create\s+(?:or\s+replace\s+)?view\b[\s\S]*?;", t, re.I)]
+check("no view over students exposes enrolment",
+      bool(views) and not any("enrolment" in v or re.search(r"select\s+(\w+\.)?\*", v, re.I) for v in views),
+      "a view bypasses RLS: every student's number would reach whoever the view is granted to")
+check("a student cannot write an enrolment number",
+      not any(re.search(r"grant\s+update\s*\([^)]*\benrolment\b", t, re.I) for t in sqls.values()),
+      "an update grant lets a student rewrite theirs or copy a classmate's")
+check("students stays readable by its own row only",
+      [n for n, t in sqls.items() if re.search(r"create policy[^;]*on public\.students\s+for (select|all)", t, re.I)]
+      == ["01-students-setup.sql"] and "for select using (auth.uid() = claimed_by)" in sqls["01-students-setup.sql"],
+      "a second select policy on students would show classmates each other's enrolment numbers")
+check("the profile survives a database without the enrolment column",
+      'e.code === "42703"' in html and "PROFILE_COLS" in html,
+      "until supabase/15 runs, asking for enrolment 400s the profile and nobody can sign in")
+
 print()
 if fail:
     print(f"{len(fail)} check(s) failed.")
