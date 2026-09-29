@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.4+f95285f-->
+<!--secf-app--><!--build:1.1.4+59a00aa-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -6856,14 +6856,16 @@ async function signUp(email, password) {
   if (!out.access_token) throw new Error("Check your email to confirm the account, then sign in.");
   sess = out; saveSess();
 }
+/* a network that never answers must not keep anyone signed in: each call gets 4 s */
+const within = (pr, ms) => Promise.race([pr.catch(() => {}), new Promise(r => setTimeout(r, ms))]);
 async function signOut() {
   const t = sess && sess.access_token;
-  if (t) await releaseThisDevice(t).catch(() => {});
+  if (t) await within(releaseThisDevice(t), 4000);
   sess = null; profile = null; saveSess(); saveProfile();
   att = {}; plan = {}; uid = null;                 /* the records stay in their own bucket */
   /* a shared phone is the normal case here: the refresh token has to die on the
      server too, or the next person can still be signed in as you */
-  if (t) await call("/auth/v1/logout", { method:"POST" }, t).catch(() => {});
+  if (t) await within(call("/auth/v1/logout", { method:"POST" }, t), 4000);
   location.hash = ""; location.reload();
 }
 
