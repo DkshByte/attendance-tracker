@@ -19,6 +19,7 @@ When setting up a new Supabase project, execute these scripts in **Supabase SQL 
 | **12** | [`12-announcements.sql`](./12-announcements.sql) | "What's new" popup, posted from the dashboard | `public.announcements`, read-only to the app |
 | **13** | [`13-syllabus-progress.sql`](./13-syllabus-progress.sql) | Syllabus topics ticked, synced across devices | `public.syllabus_progress`, own rows only |
 | **14** | [`14-syllabus-covered.sql`](./14-syllabus-covered.sql) | What the class has covered, marked by the CR | `public.syllabus_covered`, CR writes, everyone reads |
+| **15** | [`15-enrolment.sql`](./15-enrolment.sql) | Each student's enrolment number, then the private data script (kept off GitHub) | `students.enrolment`, readable on your own row only |
 | **Reset** | [`production-reset.sql`](./production-reset.sql) | Clean production launch reset | Truncates marks and resets roster claims |
 
 ---

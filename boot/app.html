@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.4+7af570b-->
+<!--secf-app--><!--build:1.1.4+05c38e8-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1580,9 +1580,44 @@ dialog .btn { margin-top:8px; }
 @property --p { syntax:"<percentage>"; inherits:false; initial-value:0%; }
 .syl-plate { margin-bottom:14px; }
 /* mid-sems: the one date on this page with a deadline attached */
-.syl-mid { display:flex; align-items:center; gap:16px; margin-bottom:14px; padding:14px 16px;
+.syl-mid { margin-bottom:14px; padding:14px 16px;
            background:var(--plate); border:1px solid var(--rule); border-radius:14px; }
 .syl-mid.on { border-color:var(--warn); }
+.syl-mid-top { display:flex; align-items:center; gap:16px; }
+/* the date sheet: a row a paper, the next one lit, the written ones faded */
+.ds-list { display:grid; gap:1px; margin-top:14px; background:var(--rule-soft); border:1px solid var(--rule-soft); border-radius:12px; overflow:hidden; }
+.ds-row { display:grid; grid-template-columns:44px minmax(0,1fr) auto; gap:12px; align-items:center; width:100%; min-height:56px; padding:10px 12px;
+          background:var(--plate); border:0; color:inherit; font:inherit; text-align:left; cursor:pointer; transition:background-color .2s var(--ease); }
+.ds-row:hover { background:var(--plate-2); }
+.ds-row.next { background:color-mix(in srgb, var(--warn) 8%, var(--plate)); }
+.ds-row.done { opacity:.55; }
+.ds-when b { display:block; font-family:'Blinker', sans-serif; font-size:16px; font-weight:700; line-height:1.1; color:var(--ink); }
+.ds-when span { display:block; margin-top:1px; font-size:12px; font-weight:600; color:var(--ink-3); white-space:nowrap; }
+.ds-n { display:flex; align-items:baseline; gap:7px; font-size:14.5px; font-weight:700; color:var(--ink); }
+.ds-n i { width:8px; height:8px; flex:none; align-self:center; border-radius:50%; background:var(--line); }
+.ds-n small { font-size:11px; font-weight:600; letter-spacing:.05em; color:var(--ink-3); white-space:nowrap; }
+.ds-full { margin-top:1px; font-size:12.5px; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ds-cov { margin-top:3px; font-size:11.5px; color:var(--ink-3); }
+.ds-v { padding:3px 8px; border-radius:3px; font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap;
+        color:var(--ink-2); box-shadow:inset 0 0 0 1px var(--rule); }
+.ds-row.next .ds-v { color:var(--warn); box-shadow:inset 0 0 0 1px var(--warn); }
+.ds-row.now .ds-v, .ds-row.today .ds-v { background:var(--warn); color:var(--badge-ink); box-shadow:none; }
+.ds-row.done .ds-v { box-shadow:none; }
+/* on the Syllabus tab the sheet is the card's lower half, edge to edge */
+.syl-mid > .ds-list { margin:14px -16px -14px; border-width:1px 0 0; border-radius:0 0 13px 13px; }
+.syl-mid.ds-hero { margin:16px 0 0; }
+.ds-hero .m b { color:var(--line); }
+.ds-hero .link { display:inline-block; margin-top:4px; padding:8px 0; }
+/* your enrolment number: yours alone, so it sits apart from what the section sees */
+.enrol { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:12px 0; padding:12px 14px;
+         background:var(--plate); border:1px solid var(--rule-soft); border-radius:14px; }
+.enrol .m { min-width:0; }
+.enrol .k { display:block; font-size:11px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3); }
+.enrol b { display:block; margin-top:2px; font-family:'Blinker', sans-serif; font-size:23px; font-weight:700; line-height:1.15;
+           letter-spacing:.06em; font-variant-numeric:tabular-nums; color:var(--ink); -webkit-user-select:text; user-select:text; }
+.enrol b.none { font-size:16px; letter-spacing:0; color:var(--ink-2); }
+.enrol small { display:block; margin-top:2px; font-size:11.5px; color:var(--ink-3); }
+.enrol .link { flex:none; padding:12px 2px; }
 #midBox { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
 #midBox:empty { display:none; }
 #midBox .mid-pill { margin-top:0; }
@@ -3209,15 +3244,51 @@ const SYL = {
 };
 
 /* Mid-semester exams, as announced for the section. ponytail: written in here, so the
-   end-sem needs a deploy; a CR-set exam row (like term.sem_end) if exams start moving. */
-const MIDSEM = { from:"2026-10-05", to:"2026-10-10", units:[0, 1] };
-const isMid = u => MIDSEM.units.includes(u);
-/* before (with days to go), on, or over — asked of a date so demo() can pin it */
-function midState(iso) {
-  if (iso > MIDSEM.to) return { s:"over" };
+   end-sem needs a deploy; a CR-set exam row (like term.sem_end) if exams start moving.
+   papers is the date sheet (Dr. Tanuja Nautiyal, Incharge Examinations, 29 Sep 2026),
+   IT's row only: CSE and ECE share every paper but Thursday's, and the Civil/ME and
+   AIML rows are other branches' subjects. EVS is internal-only, so it has no paper. */
+const MIDSEM = { from:"2026-10-05", to:"2026-10-10", units:[0, 1], start:600, end:690,
+  papers:[
+    { iso:"2026-10-05", k:"SMT" },
+    { iso:"2026-10-06", k:"PPS" },
+    { iso:"2026-10-07", k:"PHL" },
+    { iso:"2026-10-08", k:"BEE" },
+    { iso:"2026-10-09", k:"EM"  },
+    { iso:"2026-10-10", k:"CSL" },
+  ] };
+const MID_HOURS = "10:00–11:30";
+const paperOf = k => MIDSEM.papers.find(p => p.k === k) || null;
+/* a unit is on the mid-sem if the exam covers it and, asked of a subject, that subject sits a paper */
+const isMid = (u, k) => MIDSEM.units.includes(u) && (k == null || !!paperOf(k));
+/* before (with days to go), on, or over — asked of a date, and optionally a minute of
+   that day, so demo() can pin it. Over means the last paper has been written. */
+function midState(iso, min) {
+  if (iso > MIDSEM.to || iso === MIDSEM.to && min != null && min >= MIDSEM.end) return { s:"over" };
   if (iso >= MIDSEM.from) return { s:"on" };
   return { s:"before", days: Math.round((fromISO(MIDSEM.from) - fromISO(iso)) / 864e5) };
 }
+/* where one paper stands at a moment: done, now (being written), today (still to
+   start), or later with whole days to go */
+function paperState(p, iso, min) {
+  if (iso > p.iso || iso === p.iso && min >= MIDSEM.end) return { s:"done" };
+  if (iso === p.iso) return min >= MIDSEM.start ? { s:"now", left: MIDSEM.end - min } : { s:"today", left: MIDSEM.start - min };
+  return { s:"later", days: Math.round((fromISO(p.iso) - fromISO(iso)) / 864e5) };
+}
+/* the paper that decides what to revise: the one being written, else the next. null once all are done */
+function nextPaper(iso, min) {
+  for (const p of MIDSEM.papers) { const st = paperState(p, iso, min); if (st.s !== "done") return Object.assign({ p }, st); }
+  return null;
+}
+const hm = m => m < 60 ? m + "m" : Math.floor(m / 60) + "h" + (m % 60 ? " " + m % 60 + "m" : "");
+/* how long until a paper, in words that fit a pill: "in 6 days", "tomorrow", "10:00, in 1h 20m" */
+function paperWhen(st) {
+  if (st.s === "now") return "till 11:30";
+  if (st.s === "today") return "10:00, in " + hm(st.left);
+  if (st.s === "later") return st.days === 1 ? "tomorrow" : "in " + st.days + " days";
+  return "done";
+}
+const paperDay = iso => fromISO(iso).toLocaleDateString("en-IN", { weekday:"short", day:"numeric", month:"short" });
 
 /* period index 0-6; lunch sits between period 2 and period 3 */
 const TIMES = ["8:15","9:10","10:05","11:00","11:30","12:25","1:20","2:15","3:10"];
@@ -4402,6 +4473,20 @@ function demo() {                                   // run demo() in the console
   ok(midState("2026-09-21").days, 14, "mid-sems are 14 days out on 21 Sep");
   ok(midState("2026-10-07").s, "on", "...running on 7 Oct");
   ok(midState("2026-10-11").s, "over", "...and over after the 10th");
+  ok(midState("2026-10-10", 700).s, "over", "...or once Saturday's paper is handed in");
+  /* the date sheet: IT's papers only, one a day, each a subject we actually have */
+  ok(MIDSEM.papers.map(p => p.k).join(), "SMT,PPS,PHL,BEE,EM,CSL", "the date sheet is IT's row: SMT, PPS, Physics, BEE, Mechanics, Comm Skills");
+  ok(MIDSEM.papers.every(p => SUB[p.k] && SYL[p.k] && !SUB[p.k].lab), true, "every paper is a theory subject with a syllabus");
+  ok(new Set(MIDSEM.papers.map(p => p.iso)).size, 6, "...one a day, 5 to 10 Oct");
+  ok(paperOf("EVSL"), null, "EVS is internal-only, so it sits no mid-sem");
+  ok(isMid(0, "EVSL") || !isMid(1, "PPS"), false, "...and only subjects with a paper get their units tagged");
+  ok(nextPaper("2026-09-29", 600).days, 6, "on 29 Sep the first paper is 6 days out");
+  ok(nextPaper("2026-09-29", 600).p.k, "SMT", "...and it is SMT");
+  ok(nextPaper("2026-10-06", 540).s + nextPaper("2026-10-06", 540).left, "today60", "an hour before PPS it is today, 60 minutes out");
+  ok(nextPaper("2026-10-06", 630).s, "now", "at 10:30 PPS is being written");
+  ok(nextPaper("2026-10-06", 700).p.k, "PHL", "after 11:30 the next paper is Physics");
+  ok(nextPaper("2026-10-10", 690), null, "and after the last one there is nothing left to count down to");
+  ok(aiPrompt("SMT", "mid", "notes").includes("5 October"), true, "the mid-sem AI question carries the paper's date");
   /* best day to bunk: a Friday joins the weekend, exams are never offered */
   ok(freeDay("2026-09-26"), true, "a Saturday holds no class");
   ok(bestDays("2026-10-05", 6).length, 0, "mid-sem week offers no day to bunk");
@@ -5954,11 +6039,16 @@ async function signOut() {
   location.hash = ""; location.reload();
 }
 
-/* your own roster row. RLS means this can only ever return yours. */
+/* your own roster row. RLS means this can only ever return yours — which is the only
+   reason the enrolment number may ride along. Until supabase/15 has run the column
+   does not exist, and asking for it would 400 the whole profile and sign-in with it,
+   so a missing column (42703) is asked again without it. */
+const PROFILE_COLS = "sno,name,batch,username,role,present,held,on_leaderboard,github,linkedin,instagram,mobile,email,active_device_id,active_device_name,active_device_at";
 async function loadProfile() {
   const t = await token();
   if (!t) { profile = null; saveProfile(); return null; }
-  const rows = await call("/rest/v1/students?select=sno,name,batch,username,role,present,held,on_leaderboard,github,linkedin,instagram,mobile,email,active_device_id,active_device_name,active_device_at", {}, t);
+  const rows = await call("/rest/v1/students?select=" + PROFILE_COLS + ",enrolment", {}, t)
+    .catch(e => { if (e.code === "42703") return call("/rest/v1/students?select=" + PROFILE_COLS, {}, t); throw e; });
   profile = rows && rows.length ? rows[0] : null;
   saveProfile();
   return profile;
@@ -7970,17 +8060,75 @@ function sylStations(k) {
   return line;
 }
 
-/* The mid-sem card on the Syllabus tab. null once the exams are over. */
+/* Units I and II of one subject, as the CR has ticked them: what its paper covers */
+function midCover(k) {
+  let d = 0, n = 0;
+  MIDSEM.units.forEach(u => { const x = sylUnit(k, u); d += x.d; n += x.n; });
+  return { d, n };
+}
+
+/* The countdown to the paper that matters now, as a big number and what it counts to */
+function paperCount(nx) {
+  const r = el("div", "r"), s = SUB[nx.p.k].short;
+  const [big, small] = nx.s === "now" ? ["Now", s + " till 11:30"]
+    : nx.s === "today" ? [hm(nx.left), "to " + s + " at 10:00"]
+    : [String(nx.days), (nx.days === 1 ? "day to " : "days to ") + s];
+  r.appendChild(el("b", null, big));
+  r.appendChild(el("span", null, small));
+  return r;
+}
+
+/* The date sheet: a row a paper, in the order they are written. Each row opens that
+   subject's syllabus on Unit I. cover: show how much of Units I–II the class has done. */
+function paperList(iso, min, cover) {
+  const nx = nextPaper(iso, min);
+  const list = el("div", "ds-list");
+  MIDSEM.papers.forEach(p => {
+    const st = paperState(p, iso, min), s = SUB[p.k];
+    const row = el("button", "ds-row " + st.s + (nx && nx.p === p ? " next" : ""));
+    row.type = "button"; row.dataset.line = s.line;
+    const when = el("div", "ds-when");
+    when.appendChild(el("b", null, fromISO(p.iso).toLocaleDateString("en-IN", { weekday:"short" })));
+    when.appendChild(el("span", null, fromISO(p.iso).toLocaleDateString("en-IN", { day:"numeric", month:"short" })));
+    row.appendChild(when);
+    const m = el("div", "ds-m");
+    const n = el("div", "ds-n");
+    n.appendChild(el("i"));
+    n.appendChild(el("span", null, s.short));
+    n.appendChild(el("small", null, s.code));
+    m.appendChild(n);
+    m.appendChild(el("div", "ds-full", s.name));
+    let say = "";
+    if (cover) {
+      const c = midCover(p.k);
+      say = c.d + " of " + c.n + " covered";
+      m.appendChild(el("div", "ds-cov", "Units I–II · " + say));
+    }
+    row.appendChild(m);
+    const v = st.s === "done" ? "Done" : st.s === "now" ? "Now" : st.s === "today" ? "Today"
+      : st.days === 1 ? "Tomorrow" : st.days + " days";
+    row.appendChild(el("span", "ds-v", v));
+    row.setAttribute("aria-label", s.name + ", " + paperDay(p.iso) + ", " + MID_HOURS + ", " + v
+      + (say ? ", " + say : "") + ". Open the syllabus");
+    row.addEventListener("click", () => openSyllabus(p.k, MIDSEM.units[0]));
+    list.appendChild(row);
+  });
+  return list;
+}
+
+/* The mid-sem card on the Syllabus tab: the countdown, then the whole date sheet.
+   null once the last paper is written. */
 function midCard() {
-  const st = midState(nowISO());
-  if (st.s === "over") return null;
+  const iso = nowISO(), min = nowMin(), st = midState(iso, min), nx = nextPaper(iso, min);
+  if (st.s === "over" || !nx) return null;
   const card = el("div", "syl-mid" + (st.s === "on" ? " on" : ""));
+  const top = el("div", "syl-mid-top");
   const m = el("div", "m");
   m.appendChild(el("b", null, st.s === "on" ? "Mid-sems are on" : "Mid-sems"));
-  m.appendChild(el("span", null, "5–10 Oct · Units I and II"));
+  m.appendChild(el("span", null, "5–10 Oct · " + MID_HOURS + " · Units I and II"));
   if (!reading()) {
     let d = 0, n = 0;
-    Object.keys(SYL).forEach(k => MIDSEM.units.forEach(u => { const x = sylUnit(k, u); d += x.d; n += x.n; }));
+    MIDSEM.papers.forEach(p => { const x = midCover(p.k); d += x.d; n += x.n; });
     const g = el("div", "gauge");
     const tr = el("div", "track"), fill = el("i");
     fill.style.width = (d / n * 100).toFixed(1) + "%";
@@ -7988,16 +8136,10 @@ function midCard() {
     g.appendChild(el("span", null, d + " of " + n + " topics covered"));
     m.appendChild(g);
   }
-  card.appendChild(m);
-  const r = el("div", "r");
-  if (st.s === "before") {
-    r.appendChild(el("b", null, String(st.days)));
-    r.appendChild(el("span", null, st.days === 1 ? "day to go" : "days to go"));
-  } else {
-    r.appendChild(el("b", null, "Now"));
-    r.appendChild(el("span", null, "until Sat 10"));
-  }
-  card.appendChild(r);
+  top.appendChild(m);
+  top.appendChild(paperCount(nx));
+  card.appendChild(top);
+  card.appendChild(paperList(iso, min, !reading()));
   return card;
 }
 function renderMidsem() {
@@ -8006,25 +8148,91 @@ function renderMidsem() {
   const c = midCard();
   if (c) box.appendChild(c);
 }
-/* On Today the mid-sem is one line: a pill that says when, and opens the syllabus */
+/* On Today the mid-sem is one line: a pill that names the next paper, and opens the date sheet */
 function midPill() {
-  const st = midState(nowISO());
-  if (st.s === "over") return null;
-  const pill = el("button", "mid-pill" + (st.s === "on" ? " on" : ""));
+  const iso = nowISO(), min = nowMin(), nx = nextPaper(iso, min);
+  if (!nx) return null;
+  const week = midState(iso, min).s === "on", s = SUB[nx.p.k].short;
+  const pill = el("button", "mid-pill" + (nx.s === "now" || nx.s === "today" ? " on" : ""));
   pill.type = "button";
   pill.appendChild(el("i"));
-  pill.appendChild(el("b", null, st.s === "on" ? "Mid-sems on" : "Mid-sems"));
-  pill.appendChild(el("span", null, st.s === "on" ? "until Sat 10"
-    : st.days === 0 ? "start today" : st.days === 1 ? "tomorrow" : "in " + st.days + " days"));
-  pill.appendChild(el("span", "u", "Units I–II"));
+  pill.appendChild(el("b", null, nx.s === "now" ? "Paper on now" : nx.s === "today" ? "Paper today"
+    : week ? "Next paper" : "Mid-sems"));
+  pill.appendChild(el("span", null, s + (week ? "" : " first") + " · " + paperWhen(nx)));
   pill.appendChild(el("span", "chev", "›"));
-  pill.setAttribute("aria-label", pill.textContent.replace("›", "") + ", view syllabus");
-  pill.addEventListener("click", () => {
-    const s = document.getElementById("sylSearch");
-    if (s) s.value = "";
+  pill.setAttribute("aria-label", pill.textContent.replace("›", "") + ", open the date sheet");
+  pill.addEventListener("click", openDatesheet);
+  return pill;
+}
+
+/* Your enrolment number, from your own roster row: RLS lets nobody else read it
+   (supabase/15), and it is never in this file, which is public. undefined means the
+   database has not got the column yet, so there is nothing to say; null means the
+   college list we were given does not have you on it. */
+function enrolRow() {
+  if (!profile || profile.enrolment === undefined) return null;
+  const row = el("div", "enrol");
+  const m = el("div", "m");
+  m.appendChild(el("span", "k", "Enrolment no."));
+  m.appendChild(el("b", profile.enrolment ? null : "none", profile.enrolment || "Not on the list yet"));
+  m.appendChild(el("small", null, profile.enrolment ? "Only you can see this" : "The college list we have doesn't include you. Tell your CR."));
+  row.appendChild(m);
+  if (profile.enrolment) {
+    const copy = el("button", "link", "Copy");
+    copy.type = "button";
+    copy.setAttribute("aria-label", "Copy your enrolment number");
+    copy.addEventListener("click", () => copyText(profile.enrolment).then(ok => { copy.textContent = ok ? "Copied" : "Couldn't copy"; }));
+    row.appendChild(copy);
+  }
+  return row;
+}
+
+/* The date sheet as a sheet: open from Today's pill. Same for everyone; the one
+   personal line is your own enrolment number, for the answer sheet. */
+function openDatesheet() {
+  const iso = nowISO(), min = nowMin(), nx = nextPaper(iso, min);
+  const box = document.getElementById("dlgIn");
+  box.textContent = ""; box.dataset.line = "";
+  box.appendChild(el("div", "grab"));
+  const top = el("div", "d-top");
+  top.appendChild(el("span", "badge", "Mid-sems"));
+  top.appendChild(el("span", "plate-when", "5–10 Oct · " + MID_HOURS));
+  box.appendChild(top);
+  box.appendChild(el("div", "d-name", "Date sheet"));
+  box.appendChild(el("div", "d-full", "B.Tech first semester, IT. Every paper is " + MID_HOURS + " and covers Units I and II. Tap one for its syllabus."));
+
+  if (nx) {
+    const s = SUB[nx.p.k];
+    const hero = el("div", "syl-mid ds-hero" + (nx.s === "now" || nx.s === "today" ? " on" : ""));
+    hero.dataset.line = s.line;
+    const ht = el("div", "syl-mid-top");
+    const m = el("div", "m");
+    m.appendChild(el("b", null, s.short));
+    m.appendChild(el("span", null, paperDay(nx.p.iso) + " · " + MID_HOURS));
+    const ask = el("button", "link", "Study it with AI");
+    ask.type = "button";
+    ask.addEventListener("click", () => openAskAI(nx.p.k));
+    m.appendChild(ask);
+    ht.appendChild(m);
+    ht.appendChild(paperCount(nx));
+    hero.appendChild(ht);
+    box.appendChild(hero);
+  }
+  const me = enrolRow();
+  if (me && profile.enrolment) box.appendChild(me);
+  box.appendChild(paperList(iso, min, true));
+  box.appendChild(el("div", "d-note", "Be in the hall at least 15 minutes before 10:00. Unfair means are not allowed."));
+
+  const syl = el("button", "btn", "Syllabus");
+  syl.type = "button";
+  syl.addEventListener("click", () => {
+    document.getElementById("dlg").close();
+    const f = document.getElementById("sylSearch");
+    if (f) f.value = "";
     go("syllabus");
   });
-  return pill;
+  box.appendChild(actions(syl));
+  openDlg(true);
 }
 
 /* The class the timetable says is on now, or next — today, else the next day that runs.
@@ -8243,6 +8451,8 @@ function openSyllabus(k, focusU, focusI) {
   const foot = el("div", "d-rows");
   const row = (a, b) => { const r = el("div", "d-row"); r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b)); foot.appendChild(r); };
   row("Paper", syl.scheme === "std" ? "60 end-term · 40 internal" : syl.scheme === "nues" ? "No end-term · 100 internal" : "Not in our copy");
+  const mp = paperOf(k);
+  if (mp && midState(nowISO(), nowMin()).s !== "over") row("Mid-sem", paperDay(mp.iso) + " · " + MID_HOURS + " · Units I–II");
 
   if (reading()) {
     const doc = el("div", "syl-read");
@@ -8251,7 +8461,7 @@ function openSyllabus(k, focusU, focusI) {
       head.id = "syl-u" + u;
       head.appendChild(el("h3", null, "Unit " + ROMAN[u]));
       if (syl.scheme === "std") head.appendChild(el("span", "syl-marks", "12 marks"));
-      if (isMid(u) && midState(nowISO()).s !== "over") head.appendChild(el("span", "syl-midtag", "Mid-sem"));
+      if (isMid(u, k) && midState(nowISO(), nowMin()).s !== "over") head.appendChild(el("span", "syl-midtag", "Mid-sem"));
       doc.appendChild(head);
       const ul = el("ul");
       topics.forEach((t, i) => {
@@ -8294,7 +8504,7 @@ function openSyllabus(k, focusU, focusI) {
     const ring = el("i", "syl-ring");
     b.appendChild(ring);
     b.appendChild(el("b", null, ROMAN[u]));
-    if (isMid(u) && midState(nowISO()).s !== "over") b.classList.add("mid");
+    if (isMid(u, k) && midState(nowISO(), nowMin()).s !== "over") b.classList.add("mid");
     const c = el("span");
     b.appendChild(c);
     b.addEventListener("click", () => { cur = u; paint(true); });
@@ -8333,7 +8543,7 @@ function openSyllabus(k, focusU, focusI) {
     const head = el("div", "syl-uhead");
     head.appendChild(el("h3", null, "Unit " + ROMAN[cur]));
     if (syl.scheme === "std") head.appendChild(el("span", "syl-marks", "12 marks"));
-    if (isMid(cur) && midState(nowISO()).s !== "over") head.appendChild(el("span", "syl-midtag", "Mid-sem"));
+    if (isMid(cur, k) && midState(nowISO(), nowMin()).s !== "over") head.appendChild(el("span", "syl-midtag", "Mid-sem"));
     const cr = isCR();
     const all = el("button", "link syl-all");
     all.type = "button";
@@ -8442,8 +8652,10 @@ function webQuery(k, scope) {
 function aiPrompt(k, scope, goal, web) {
   const s = SUB[k], syl = SYL[k];
   const units = scope === "all" ? [0, 1, 2, 3] : scope === "mid" ? MIDSEM.units : [scope];
+  const mp = paperOf(k);
   const lines = ["I'm a first-year B.Tech student at a GGSIPU-affiliated college in Delhi, studying " + s.name + " (" + s.code + ").",
-                 "", scope === "mid" ? "My mid-semester exam covers:" : units.length > 1 ? "The full syllabus:" : "This is the unit I'm studying:"];
+                 "", scope === "mid" ? "My mid-semester exam" + (mp ? " is on " + fromISO(mp.iso).toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"long" }) + ", " + MID_HOURS + " (90 minutes). It" : "") + " covers:"
+                   : units.length > 1 ? "The full syllabus:" : "This is the unit I'm studying:"];
   units.forEach(u => {
     lines.push("", "Unit " + ROMAN[u] + ":");
     syl.units[u].forEach(x => lines.push("- " + x));
@@ -8472,7 +8684,9 @@ const aiLogo = a => {
 
 function openAskAI(k, unit) {
   const s = SUB[k];
-  let scope = unit == null ? "mid" : unit, goal = "notes", web = false;
+  /* a subject with no mid-sem paper (EVS) is never offered as one */
+  const hasMid = !!paperOf(k);
+  let scope = unit == null ? (hasMid ? "mid" : "all") : unit, goal = "notes", web = false;
   const Q = () => aiPrompt(k, scope, goal, web);
   const box = document.getElementById("dlgIn");
   box.textContent = ""; box.dataset.line = s.line;
@@ -8497,7 +8711,7 @@ function openAskAI(k, unit) {
     return { wrap, g, get };
   };
   const unitOpt = typeof scope === "number" ? [[scope, "Unit " + ROMAN[scope]]] : [];
-  const pickScope = seg("Study", unitOpt.concat([["mid", "Mid-sem"], ["all", "Whole subject"]]), () => scope, v => { scope = v === "mid" || v === "all" ? v : +v; });
+  const pickScope = seg("Study", unitOpt.concat(hasMid ? [["mid", "Mid-sem"]] : [], [["all", "Whole subject"]]), () => scope, v => { scope = v === "mid" || v === "all" ? v : +v; });
   const pickGoal = seg("I want", [["explain", "Explain"], ["notes", "Exam notes"], ["practice", "Practice Qs"], ["pdf", "Full PDF"]], () => goal, v => { goal = v; });
   box.appendChild(pickScope.wrap); box.appendChild(pickGoal.wrap);
   const webRow = el("label", "ai-web");
@@ -9036,6 +9250,8 @@ function openProfile() {
   });
   card.appendChild(stripes);
   box.appendChild(card);
+  const me = enrolRow();
+  if (me) box.appendChild(me);
 
   /* practical batch switcher in profile */
   const bRow = el("div", "pbatch-row");
@@ -9633,7 +9849,10 @@ if (profile && obDone()) syncAlerts();
 /* the line keeps moving whether or not you are looking at it */
 setInterval(() => {
   renderToday(); renderNetwork();
-  if (!document.getElementById("syllabus").hidden && !reading() && !document.getElementById("sylSearch").value.trim()) renderSylNext();
+  if (!document.getElementById("syllabus").hidden && !document.getElementById("sylSearch").value.trim()) {
+    renderMidsem();                              /* the countdown, and a written paper fading out */
+    if (!reading()) renderSylNext();
+  }
   if (NATIVE) dropStaleCards(Capacitor.Plugins.LocalNotifications || {}).catch(() => {});
   heartbeatDevice();
 }, 30000);

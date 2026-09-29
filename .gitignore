@@ -17,6 +17,13 @@ yarn-error.log*
 .impeccable/
 *.log
 
+# Student data. The repo is public: enrolment numbers live only in the
+# database, loaded by hand from a data script that never comes here.
+*enrolment-data*.sql
+supabase/private/
+*.xlsx
+*.xls
+
 # Scratch & Temporary Test Files
 test-*.html
 
