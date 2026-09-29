@@ -1246,13 +1246,8 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 .rw-stage { position:absolute; inset:0; overflow:hidden; isolation:isolate; pointer-events:none; }
 /* the rendered reel, when the network can afford it. It lands exactly where the code reel
    draws (width-fit, a third of the spare height above it), so the hand-over is invisible */
-/* blurred background fill: covers the full frame so no black bars on any aspect ratio */
-.rw-video-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 35%;
-               filter:blur(28px) brightness(.45) saturate(1.2); transform:scale(1.15);
-               opacity:0; transition:opacity .3s var(--ease); pointer-events:none; }
-.rw-frame.vid .rw-video-bg { opacity:1; }
-.rw-video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 35%;
-            opacity:0; transition:opacity .3s var(--ease); pointer-events:none; z-index:1; }
+.rw-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 35%;
+            opacity:0; transition:opacity .3s var(--ease); pointer-events:none; }
 .rw-frame.vid .rw-video { opacity:1; }
 .rw-sound { position:absolute; z-index:2; top:calc(14px + max(env(safe-area-inset-top), var(--sa-top))); right:14px;
             display:inline-flex; align-items:center; gap:7px; min-height:44px; padding:0 14px 0 11px; border-radius:999px;
@@ -3085,7 +3080,7 @@ input[type="date"] { padding:12px 14px; }
        Shown when the gate opens on sign-in for someone signed out. The reel mounts
        into #reelStage; its code lives between the reel:start and reel:end markers. -->
   <div class="rw" id="reelWelcome" role="region" aria-labelledby="rwHead" hidden>
-    <div class="rw-frame"><div class="rw-stage" id="reelStage" aria-hidden="true"></div><video class="rw-video-bg" id="reelVideoBg" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><video class="rw-video" id="reelVideo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><button class="rw-sound" id="reelSound" type="button" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.2v13.6l-4.8-4.3H4z"/><path class="on" d="M15.6 8.6a4.6 4.6 0 0 1 0 6.8M18.2 6a8.3 8.3 0 0 1 0 12"/><path class="off" d="M16 9.4l5 5.2M21 9.4l-5 5.2"/></svg><span>Tap for sound</span></button></div>
+    <div class="rw-frame"><div class="rw-stage" id="reelStage" aria-hidden="true"></div><video class="rw-video" id="reelVideo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><button class="rw-sound" id="reelSound" type="button" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.2v13.6l-4.8-4.3H4z"/><path class="on" d="M15.6 8.6a4.6 4.6 0 0 1 0 6.8M18.2 6a8.3 8.3 0 0 1 0 12"/><path class="off" d="M16 9.4l5 5.2M21 9.4l-5 5.2"/></svg><span>Tap for sound</span></button></div>
     <p class="sr" id="reelDesc">Behind this screen a short muted animation loops: an attendance of 74.9%, then Bunkr shows the next class, how many classes you can still miss, the best day to bunk and the mid-sem countdown.</p>
     <div class="rw-panel">
       <div class="rw-copy">
@@ -7642,7 +7637,7 @@ const reelGate = (() => {
      it can play through, it takes over at the same moment of the loop. Data Saver, 2G,
      offline, a copy opened from disk and reduced motion never download it, and anything
      that goes wrong (too slow, autoplay refused, a 404) leaves the code reel playing. */
-  const video = document.getElementById("reelVideo"), videoBg = document.getElementById("reelVideoBg"), snd = document.getElementById("reelSound");
+  const video = document.getElementById("reelVideo"), snd = document.getElementById("reelSound");
   const frame = rw.querySelector(".rw-frame");
   const REEL_V = "v1";                           /* bump with new files: they are cached for a year */
   const reelSrc = q => (NATIVE ? "https://www.bunkr.website/" : "") + "reel/bunkr-reel-" + q + "-" + REEL_V + ".mp4";
@@ -7664,10 +7659,6 @@ const reelGate = (() => {
     video.preload = "auto";
     video.src = reelSrc(vq);
     try { video.load(); } catch (e) {}
-    videoBg.preload = "auto";
-    videoBg.src = reelSrc(vq);
-    videoBg.defaultMuted = true; videoBg.muted = true;
-    try { videoBg.load(); } catch (e) {}
     vwait = setTimeout(vdrop, 12000);
   }
   function vdrop() {
@@ -7676,18 +7667,15 @@ const reelGate = (() => {
     frame.classList.remove("vid"); snd.hidden = true;
     video.pause(); video.removeAttribute("src");
     try { video.load(); } catch (e) {}
-    videoBg.pause(); videoBg.removeAttribute("src");
-    try { videoBg.load(); } catch (e) {}
     sync();
   }
   function vplay() {
     if (!video.paused) return;
-    if (!vlive) try { video.currentTime = (played + .06) % r.duration; videoBg.currentTime = video.currentTime; } catch (e) {}
+    if (!vlive) try { video.currentTime = (played + .06) % r.duration; } catch (e) {}
     const pr = video.play();
     if (pr && pr.catch) pr.catch(() => { if (vlive) played = video.currentTime; vdrop(); });
-    try { videoBg.play(); } catch (e) {}
   }
-  const vpause = () => { if (!video.paused) video.pause(); if (!videoBg.paused) videoBg.pause(); };
+  const vpause = () => { if (!video.paused) video.pause(); };
   video.addEventListener("canplaythrough", () => { clearTimeout(vwait); if (vq && !vready) { vready = true; sync(); } });
   video.addEventListener("playing", () => { vlive = true; frame.classList.add("vid"); snd.hidden = false; stop(); });
   video.addEventListener("pause", () => { if (vlive) played = video.currentTime; });
@@ -7744,7 +7732,7 @@ const reelGate = (() => {
     rw.hidden = false;                             /* before mounting: the reel reads the stage's size */
     if (!mount()) { rw.hidden = true; paintBack(); return false; }
     vload();
-    if (vlive) try { video.currentTime = 0; videoBg.currentTime = 0; } catch (e) {}
+    if (vlive) try { video.currentTime = 0; } catch (e) {}
     rw.classList.remove("out");
     form.inert = true;
     if (animate && !still()) {
