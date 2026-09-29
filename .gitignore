@@ -59,3 +59,4 @@ keystore.properties
 
 # /brag renders: 4K video is far too big for git. Delivered by hand.
 brag-output*/
+.vercel
