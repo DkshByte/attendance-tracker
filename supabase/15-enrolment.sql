@@ -14,8 +14,8 @@
 
 
 -- ---------- STEP 1 · the column ----------
--- The university's 11 digits, leading zero kept: 05515603126 is roll
--- 055, college 156, branch 031, batch of 26. Text, not a number, or
+-- The university's 11 digits, leading zero kept: RRR 156 BBB YY is
+-- roll, college 156, branch, batch year. Text, not a number, or
 -- the zero goes (a spreadsheet already dropped it once). It belongs
 -- to the roster row, not the account, so a released claim leaves it
 -- where it is for whoever claims that name properly.

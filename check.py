@@ -219,6 +219,52 @@ check("signed-out boot shows the sign-in gate",
 check("no way past the gate without signing in",
       "liSkip" not in html,
       "a skip link on the sign-in form lets anyone read the app")
+
+# 10b. The welcome reel. Its code is replaced wholesale by another hand, so it lives in one
+#      marked block and nothing else may sit between the markers; the stage it draws into
+#      is part of the way in, so it stays inside #gate; and the player that drives it must
+#      never loop at someone who asked for less motion or burn a phone in a background tab.
+n_start, n_end = html.count("<!--reel:start-->"), html.count("<!--reel:end-->")
+check("the reel block is marked exactly once", n_start == 1 and n_end == 1,
+      f"{n_start} <!--reel:start--> and {n_end} <!--reel:end-->")
+reel_blk = (html[html.index("<!--reel:start-->") + len("<!--reel:start-->"):html.index("<!--reel:end-->")]
+            if n_start == 1 and n_end == 1 and html.index("<!--reel:start-->") < html.index("<!--reel:end-->") else "")
+leftover = re.sub(r'<style id="reelCss">[\s\S]*?</style>|<script id="reelJs">[\s\S]*?</script>', "", reel_blk)
+check("the reel block holds exactly #reelCss and #reelJs",
+      reel_blk.count('<style id="reelCss">') == 1 and reel_blk.count('<script id="reelJs">') == 1 and not leftover.strip(),
+      "anything else between the markers is lost the next time the reel is dropped in")
+check("the reel is parsed before the app script that plays it",
+      bool(reel_blk) and html.index("<!--reel:end-->") < html.find("const reelGate"),
+      "window.BunkrReel would not exist yet when the gate opens")
+reel_js = re.search(r'<script id="reelJs">([\s\S]*?)</script>', reel_blk)
+if shutil.which("node") and reel_js:
+    with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as f:
+        f.write(reel_js.group(1))
+    r = subprocess.run(["node", "--check", f.name], capture_output=True, text=True)
+    check("the reel script parses", r.returncode == 0,
+          (r.stderr.strip().splitlines() or ["?"])[-1] if r.returncode else "")
+stage_line = next((i for i, l in enumerate(html.split("\n"), 1) if 'id="reelStage"' in l), None)
+check("the reel stage lives inside #gate",
+      bool(stage_line and gate_close and gate_open < stage_line < gate_close),
+      "outside the gate it would outlive sign-in, or sit behind it")
+player = html[html.find("/* ---------- reel player ----------"):html.find("/* ---------- /reel player ---------- */")]
+check("the reel stage is hidden from screen readers and the form behind it is inert",
+      bool(re.search(r'<div class="rw-stage" id="reelStage" aria-hidden="true">', html))
+      and 'id="reelDesc"' in html and "form.inert = true" in player,
+      "a reader would walk the reel's shapes, and the keyboard would walk into the form under it")
+check("the reel player holds a still frame under reduced motion",
+      len(player) > 500 and "prefers-reduced-motion: reduce" in player and "r.poster" in player,
+      "the reel would loop at someone who asked the phone for less motion")
+check("the reel player stops when the tab is hidden",
+      '"visibilitychange"' in player and "document.hidden" in player and "cancelAnimationFrame" in player,
+      "a rAF loop in a background tab drains the battery for nothing")
+check("the reel player waits out the splash and the APK prompt",
+      "bunkr-splash" in player and "front-visible" in player,
+      "the hook would play to nobody underneath them")
+gate_fn = html[html.find("function gateShow("):html.find("function gateClose(")]
+check("the signed-out boot still opens the gate, and the reel hangs off it",
+      'if (!t) { renderAll(); return gateShow("login"); }' in html and "reelGate.onGate(view, opening)" in gate_fn,
+      "the reel must greet a signed-out start from inside gateShow, never replace the wall")
 check("no tap overlay covers the profile button",
       ".user-pill::after" not in html,
       "a ::after on .user-pill sits over #pillBtn and swallows taps, so the menu never opens")
@@ -330,6 +376,23 @@ check("students stays readable by its own row only",
 check("the profile survives a database without the enrolment column",
       'e.code === "42703"' in html and "PROFILE_COLS" in html,
       "until supabase/15 runs, asking for enrolment 400s the profile and nobody can sign in")
+
+# 23. The sign-in reel's video is an upgrade, never a cost: it is fetched only when the
+#     network can afford it, it must be able to autoplay (muted, inline), and every file
+#     the app can ask for has to exist, or phones on a good network get a 404 and a fallback.
+m = re.search(r'const REEL_V = "(v\d+)"', html)
+check("the reel video is versioned", bool(m), "REEL_V names the files; without it a new cut is stuck behind a year of cache")
+if m:
+    for q in ("1080", "720"):
+        f = root / "deploy" / "reel" / f"bunkr-reel-{q}-{m.group(1)}.mp4"
+        check(f"deploy/reel/{f.name} exists", f.exists(), "the app asks for it on a good network")
+rq = html[html.find("function reelQuality()"):][:700]
+check("the reel video respects Data Saver, 2G, offline and reduced motion",
+      all(k in rq for k in ("c.saveData", '"2g"', "still()", "navigator.onLine === false")),
+      "a login screen must not burn a slow or metered connection on a video")
+check("the reel video can autoplay", re.search(r'<video[^>]*id="reelVideo"[^>]*>', html) is not None
+      and all(a in re.search(r'<video[^>]*id="reelVideo"[^>]*>', html).group(0) for a in ("muted", "playsinline")),
+      "without muted + playsinline, phones refuse to start it")
 
 print()
 if fail:
