@@ -190,7 +190,7 @@
   function planBig() {
     var s = summary(), planned = Object.keys(plan).reduce(function (n, k) { return n + plan[k]; }, 0);
     return '<div class="ui-big"><b>' + Math.max(0, s.tb) + '</b><span>classes you can skip in ' + esc(SUB[s.tight].n) +
-      ", your tightest subject — " + (s.spread - planned) + " across all subjects if spread as listed</span></div>";
+      ", your tightest subject. " + (s.spread - planned) + " across all subjects if spread as listed.</span></div>";
   }
   function planScreen() {
     return top() + '<div class="ui-body">' +
@@ -441,7 +441,7 @@
     { line: "pps", d: .5,  x: 58, y: 8,  w: 0,  h: 70, stops: [18, 52] },
     { line: "phy", d: .25, x: 40, y: 30, w: 58, h: 0,  stops: [30, 72] },
     { line: "smt", d: .75, x: 86, y: 4,  w: 0,  h: 88, stops: [40] },
-    { line: "bee", d: .38, x: 50, y: 82, w: 46, h: 0,  stops: [20, 64] },
+    { line: "bee", d: .38, x: 50, y: 90, w: 46, h: 0,  stops: [20, 64] },      /* below the stage note, not through it */
     { line: "em",  d: .9,  x: 72, y: 56, w: 26, h: 0,  stops: [50] }
   ];
   net.innerHTML = NET.map(function (n) {
@@ -541,6 +541,12 @@
   }, { passive: true });
   measure();
   if (reduce) requestAnimationFrame(frame); else wake();
+
+  /* Choosing the web here is the same answer the app's Android offer asks for, so that
+     offer is not put to them a second time (same key its own "continue on the web" writes). */
+  $$('a[href="app.html"]').forEach(function (a) {
+    a.addEventListener("click", function () { try { localStorage.setItem("bunkr_dismiss_apk_prompt", "1"); } catch (e) {} });
+  });
 
   /* the two doors lean toward the pointer */
   if (fine && !reduce) $$("[data-tilt]").forEach(function (card) {

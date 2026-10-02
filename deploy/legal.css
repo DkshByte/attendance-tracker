@@ -5,6 +5,17 @@
   --ink:#fff; --ink-2:#A0A4B0; --ink-3:#8A8F9E; --l-pps:#FF4D40; --l-phy:#4E96FF; --focus:#4E96FF; --badge-ink:#08101F;
   --gut:clamp(16px, 4vw, 56px);
 }
+/* the app's light set: once for the system's choice, once for the student's own */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:#EEF1F7; --plate:#FFFFFF; --plate-2:#F5F7FC; --rule:#D3DAE8; --rule-soft:#E4E9F2; --rail:#C3CCDE;
+    --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580; --l-pps:#D62B1F; --l-phy:#1560D8; --focus:#1560D8; --badge-ink:#FFFFFF;
+  }
+}
+:root[data-theme="light"] {
+  --bg:#EEF1F7; --plate:#FFFFFF; --plate-2:#F5F7FC; --rule:#D3DAE8; --rule-soft:#E4E9F2; --rail:#C3CCDE;
+  --ink:#0A1024; --ink-2:#46516B; --ink-3:#5A6580; --l-pps:#D62B1F; --l-phy:#1560D8; --focus:#1560D8; --badge-ink:#FFFFFF;
+}
 *, *::before, *::after { box-sizing:border-box; }
 html { background:var(--bg); scroll-behavior:smooth; scroll-padding-top:88px; scrollbar-color:var(--rail) var(--bg); scrollbar-width:thin; }
 body { margin:0; background:var(--bg); color:var(--ink-2); font:400 17px/1.65 Blinker, ui-sans-serif, system-ui, sans-serif;

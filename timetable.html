@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.4+b496383-->
+<!--secf-app--><!--build:1.1.4+2be5338-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1057,7 +1057,8 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 
 /* ============ travelcard (first run) ============ */
 /* ============ the way in ============
-   One field and one card. The card is a physical object on its own 3D stage; every
+   Two doors and one card: a name finds a new student's card, an email and password
+   bring a returning one back. The card is a physical object on its own 3D stage; every
    step of getting in changes what is printed on it, and a spring moves it. */
 .gate { --sp-rise:linear(0, 0.022, 0.079, 0.159, 0.241, 0.334, 0.426, 0.505, 0.585, 0.657, 0.715, 0.771, 0.818, 0.854, 0.887, 0.915, 0.935, 0.953, 0.967, 0.977, 0.985, 0.991, 0.996, 0.999, 1.001, 1.003, 1.004, 1.004, 1.004, 1.004, 1.004, 1.004, 1.003, 1.003, 1.002, 1.002, 1.002, 1.001, 1.001, 1.001, 1);
         --sp-card:linear(0, 0.021, 0.075, 0.147, 0.234, 0.321, 0.413, 0.496, 0.578, 0.648, 0.714, 0.769, 0.819, 0.859, 0.894, 0.921, 0.945, 0.962, 0.977, 0.988, 0.996, 1.001, 1.006, 1.008, 1.01, 1.01, 1.01, 1.01, 1.009, 1.009, 1.008, 1.007, 1.006, 1.005, 1.004, 1.003, 1.003, 1.002, 1.002, 1.001, 1);
@@ -1142,16 +1143,24 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
 .of-box input { flex:1; min-width:0; height:56px; border:0; background:none; color:var(--ink); font:600 17px/1 'Blinker', sans-serif; letter-spacing:.005em; }
 .of-box input:focus { outline:none; }
 .of-box input::placeholder { color:var(--ink-3); font-weight:500; }
-.of-mode { flex:none; padding:5px 9px 4px; border-radius:999px; background:var(--plate-3); color:var(--ink-2);
-           font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
-.of-mode:empty { display:none; }
-#liHint { margin-top:8px; font-size:13px; }
-#liHint:empty { display:none; }
+#liHint, #pkHint { margin-top:8px; font-size:13px; }
+#liHint:empty, #pkHint:empty { display:none; }
 
-.of-pass, .of-results, .of-start { margin-top:14px; }
-.gate .of-pass:not([hidden]), .gate .of-results:not([hidden]), .gate .of-start:not([hidden]) { animation:gRise .55s var(--sp-rise) both; }
+.of-results, .of-start { margin-top:14px; }
+.gate .of-results:not([hidden]), .gate .of-start:not([hidden]) { animation:gRise .55s var(--sp-rise) both; }
 @keyframes gRise { from { opacity:0; transform:translateY(12px); } }
-.of-pass .field { margin-top:0; }
+
+/* the password, with a way to read back what was typed on a phone keyboard */
+.pw { position:relative; }
+.gate .pw input { padding-right:76px; }
+.pw-see { position:absolute; right:4px; top:50%; min-width:64px; min-height:44px; margin-top:-22px; padding:0 12px; border:0; border-radius:8px;
+          background:none; color:var(--ink-2); cursor:pointer; font:700 11px/1 'Blinker', sans-serif; letter-spacing:.12em; text-transform:uppercase;
+          transition:color .18s var(--ease); }
+.pw-see:hover { color:var(--ink); }
+.gate .field input[aria-invalid="true"] { border-color:var(--bad); }
+#vLogin .go { margin-top:14px; }
+#vLogin .authlinks { justify-content:space-between; }
+#vLogin .gsign .gor { margin:18px 0 14px; }
 
 .gate .pcount { margin:4px 0 8px; }
 .gate .picker { max-height:min(42vh, 380px); border-radius:14px; }
@@ -1190,7 +1199,7 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
   .gate { padding-left:18px; padding-right:18px; }
   .tc-stage { max-width:min(340px, 88vw); }
   .gate[data-typing] .tc-stage { max-width:250px; margin:12px auto 0; }
-  .gate[data-typing] #vLogin > h1, .gate[data-typing] #vLogin > .sub, .gate[data-typing] #vClaim > .sub { display:none; }
+  .gate[data-typing] #vJoin > h1, .gate[data-typing] #vJoin > .sub, .gate[data-typing] #vClaim > .sub { display:none; }
   .gate[data-typing] #vClaim > h1 { font-size:26px; }
   .gate[data-typing] .gate-views { margin-top:14px; }
   .gate[data-typing] .gate-brand .hero-mark em { opacity:0; }
@@ -2306,295 +2315,68 @@ input[type="date"] { padding:12px 14px; }
 
 /* Reduced motion should mean less motion, not no feedback: the global
    rule above kills animation, this keeps colour and opacity legible. */
-/* ============================================================
-   Bunkr Web Interstitial: Native APK Download Front
-   Only shown on web browsers after splash animation finishes
-   ============================================================ */
-.apk-front-glow-1, .apk-front-glow-2 { display:none !important; }
-.apk-front-badge-dot, .apk-front-emblem { box-shadow:none !important; }
-#bunkr-apk-front {
-  position: fixed;
-  inset: 0;
-  z-index: 999990;
-  background: #000000;
-  display: none;
-  opacity: 0;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+/* ---- the Android offer ----
+   Put once to an Android browser that came straight to the app, after the splash; the
+   native app, every other browser and anyone who chose the web on the landing page
+   never see it. One column in the app's own language, in either theme: what the app
+   adds is four stops on the Red Line rather than four cards, and the way past it sits
+   under the way in, at the thumb. */
+#bunkr-apk-front { position:fixed; inset:0; z-index:999990; display:none; opacity:0; overflow-y:auto; overscroll-behavior:contain;
+                   padding:calc(28px + max(env(safe-area-inset-top), var(--sa-top))) 20px calc(22px + max(env(safe-area-inset-bottom), var(--sa-bottom)));
+                   background:var(--bg); color:var(--ink); font-family:'Blinker', sans-serif; transition:opacity .4s var(--ease); }
+#bunkr-apk-front.front-visible { opacity:1; }
+#bunkr-apk-front.front-leaving { opacity:0; pointer-events:none; transition:opacity .3s var(--ease); }
+.apk-front-col { display:flex; flex-direction:column; width:100%; max-width:440px; min-height:100%; margin:0 auto; }
+.apk-front-logo { display:block; line-height:0; }
+.apk-front-title { margin:36px 0 10px; font-size:clamp(30px, 8.4vw, 40px); line-height:1.02; font-weight:700; letter-spacing:-.012em; text-wrap:balance; }
+.apk-front-desc { margin:0 0 30px; max-width:34ch; font-size:17px; line-height:1.45; color:var(--ink-2); text-wrap:pretty; }
+.apk-front-line { --gap:18px; list-style:none; display:grid; gap:var(--gap); margin:0 0 32px; padding:0 0 0 30px; }
+.apk-front-line li { position:relative; }
+.apk-front-line li::before { content:""; position:absolute; left:-30px; top:3px; width:14px; height:14px; border-radius:50%;
+                             background:var(--bg); box-shadow:inset 0 0 0 3px var(--l-pps); }
+.apk-front-line li:not(:last-child)::after { content:""; position:absolute; left:-24px; top:19px; bottom:calc(-1px - var(--gap)); width:2px; border-radius:1px; background:var(--l-pps); }
+.apk-front-line b { display:block; font-size:17px; line-height:1.2; font-weight:700; }
+.apk-front-line span { display:block; margin-top:2px; font-size:15px; line-height:1.4; color:var(--ink-2); }
+.apk-front-actions { display:grid; gap:10px; margin-top:auto; }
+.apk-front-btn-download, .apk-front-btn-continue { border-radius:14px; font-family:inherit; cursor:pointer;
+                                                    transition:transform .2s var(--ease), filter .18s var(--ease), background-color .18s var(--ease); }
+.apk-front-btn-download { display:flex; flex-direction:column; justify-content:center; gap:3px; min-height:64px; padding:12px 18px;
+                          background:var(--l-pps); color:var(--badge-ink); text-decoration:none; }
+.apk-front-btn-main { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:17px; line-height:1.1; font-weight:700; }
+.apk-front-btn-main svg { width:20px; height:20px; flex:none; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.apk-front-btn-note { font-size:12.5px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
+.apk-front-btn-continue { min-height:56px; padding:0 18px; border:1px solid var(--rule); background:var(--plate-2); color:var(--ink); font-size:16px; font-weight:600; }
+@media (hover:hover) {
+  .apk-front-btn-download:hover { filter:brightness(1.07); }
+  .apk-front-btn-continue:hover { background:var(--plate-3); }
 }
-
-#bunkr-apk-front.front-visible {
-  opacity: 1;
+.apk-front-btn-download:active, .apk-front-btn-continue:active { transform:scale(.97); }
+.apk-front-btn-download:focus-visible, .apk-front-btn-continue:focus-visible, .apk-front-meta a:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+.apk-front-meta { margin:14px 0 0; font-size:13px; line-height:1.45; color:var(--ink-3); text-wrap:pretty; }
+.apk-front-meta a { color:var(--ink-2); text-decoration:underline; text-decoration-color:var(--rail); text-underline-offset:3px; }
+/* a short screen keeps both ways out above the fold: each stop says its name and no more */
+@media (max-height:700px) {
+  .apk-front-title { margin-top:26px; }
+  .apk-front-desc { margin-bottom:22px; }
+  .apk-front-line { --gap:14px; margin-bottom:22px; }
+  .apk-front-line span { display:none; }
+  .apk-front-btn-download { min-height:58px; }
+  .apk-front-btn-continue { min-height:50px; }
 }
-
-#bunkr-apk-front.front-leaving {
-  opacity: 0;
-  transform: scale(0.97);
-  pointer-events: none;
-  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+/* room to spare (a tablet): the column stands as one block instead of stretching to the thumb */
+@media (min-width:700px) and (min-height:760px) {
+  #bunkr-apk-front { align-items:center; }
+  .apk-front-col { min-height:0; }
+  .apk-front-actions { margin-top:0; }
 }
-
-.apk-front-backdrop {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.apk-front-glow-1 {
-  position: absolute;
-  top: -12%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 460px;
-  height: 460px;
-  background: radial-gradient(circle, rgba(255, 77, 64, 0.18) 0%, rgba(255, 77, 64, 0) 70%);
-  filter: blur(48px);
-}
-
-.apk-front-glow-2 {
-  position: absolute;
-  bottom: -15%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 500px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(78, 150, 255, 0.14) 0%, rgba(78, 150, 255, 0) 70%);
-  filter: blur(55px);
-}
-
-.apk-front-card {
-  position: relative;
-  z-index: 1;
-  max-width: 420px;
-  width: 100%;
-  margin: auto;
-  background: linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.018) 100%), rgba(13,13,17,0.92);
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 20px 50px -12px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.05) inset;
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  border-radius: 24px;
-  padding: 32px 24px 28px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transform: translateY(14px) scale(0.97);
-  transition: transform 0.45s var(--ease);
-}
-
-#bunkr-apk-front.front-visible .apk-front-card {
-  transform: translateY(0) scale(1);
-}
-
-.apk-front-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: rgba(255, 77, 64, 0.12);
-  border: 1px solid rgba(255, 77, 64, 0.28);
-  color: var(--l-pps, #FF4D40);
-  font-family: "Blinker", sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 18px;
-}
-
-.apk-front-badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #FF4D40;
-  box-shadow: 0 0 8px #FF4D40;
-}
-
-.apk-front-emblem {
-  width: 68px;
-  height: 68px;
-  border-radius: 20px;
-  background: linear-gradient(145deg, #181922, #0e0f14);
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 24px rgba(255,77,64,0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 18px;
-}
-
-.apk-front-emblem svg {
-  width: 42px;
-  height: 42px;
-  fill: #FFFFFF;
-}
-
-.apk-front-title {
-  font-family: "Blinker", sans-serif;
-  font-size: 26px;
-  font-weight: 700;
-  color: #FFFFFF;
-  line-height: 1.15;
-  margin: 0 0 8px;
-  letter-spacing: -0.01em;
-}
-
-.apk-front-desc {
-  font-family: "Blinker", sans-serif;
-  font-size: 13.5px;
-  color: #9DA3B4;
-  line-height: 1.45;
-  margin: 0 0 22px;
-  max-width: 320px;
-}
-
-.apk-front-perks {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 26px;
-  text-align: left;
-}
-
-.apk-front-perk {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 10px 13px;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 14px;
-}
-
-.apk-front-perk-icon {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #FF4D40;
-}
-
-.apk-front-perk-icon svg {
-  width: 16px;
-  height: 16px;
-}
-
-.apk-front-perk-text {
-  flex: 1;
-}
-
-.apk-front-perk-title {
-  font-family: "Blinker", sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: #FFFFFF;
-  line-height: 1.2;
-  margin-bottom: 2px;
-}
-
-.apk-front-perk-sub {
-  font-family: "Blinker", sans-serif;
-  font-size: 11.5px;
-  color: #848A9C;
-  line-height: 1.3;
-}
-
-.apk-front-actions {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.apk-front-btn-download {
-  width: 100%;
-  min-height: 48px;
-  padding: 12px 20px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #FF4D40 0%, #D82F24 100%);
-  color: #FFFFFF;
-  font-family: "Blinker", sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  box-shadow: 0 4px 20px rgba(255, 77, 64, 0.35), 0 1px 0 rgba(255,255,255,0.2) inset;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-}
-
-.apk-front-btn-download:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.08);
-  box-shadow: 0 6px 26px rgba(255, 77, 64, 0.48), 0 1px 0 rgba(255,255,255,0.3) inset;
-}
-
-.apk-front-btn-download:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 10px rgba(255, 77, 64, 0.3);
-}
-
-.apk-front-btn-continue {
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 20px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: #C2C8D8;
-  font-family: "Blinker", sans-serif;
-  font-size: 13.5px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-
-.apk-front-btn-continue:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.22);
-  color: #FFFFFF;
-}
-
-.apk-front-meta {
-  margin-top: 14px;
-  font-size: 11px;
-  color: #63697B;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.apk-front-meta a {
-  color: #8A92A6;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.apk-front-meta a:hover {
-  color: #FFFFFF;
+/* arriving: the copy rises, then the line is travelled a stop at a time */
+@media (prefers-reduced-motion: no-preference) {
+  #bunkr-apk-front.front-visible .apk-front-col > :not(.apk-front-line) { animation:gRise .6s var(--ease) both; }
+  #bunkr-apk-front.front-visible .apk-front-title { animation-delay:.05s; }
+  #bunkr-apk-front.front-visible .apk-front-desc { animation-delay:.1s; }
+  #bunkr-apk-front.front-visible .apk-front-line li { animation:gRise .5s var(--ease) both; animation-delay:calc(.16s + var(--i) * .07s); }
+  #bunkr-apk-front.front-visible .apk-front-actions { animation-delay:.46s; }
+  #bunkr-apk-front.front-visible .apk-front-meta { animation-delay:.52s; }
 }
 </style>
 </head>
@@ -2627,94 +2409,26 @@ input[type="date"] { padding:12px 14px; }
   </div>
 </div>
 
-<!-- Bunkr Web Interstitial: Native APK Download Prompt (Only for Web Browser users) -->
+<!-- The Android offer: an Android browser that came straight to the app, once. The logo is cloned in from the gate. -->
 <div id="bunkr-apk-front" class="apk-front" style="display:none;" aria-modal="true" role="dialog" aria-labelledby="apkFrontTitle">
-  <div class="apk-front-backdrop" aria-hidden="true">
-    <div class="apk-front-glow-1"></div>
-    <div class="apk-front-glow-2"></div>
-  </div>
-
-  <div class="apk-front-card">
-    <div class="apk-front-badge">
-      <span class="apk-front-badge-dot"></span>
-      <span>Android App Available</span>
-    </div>
-
-    <div class="apk-front-emblem" aria-hidden="true">
-      <svg viewBox="695 770 252 245">
-        <path d="M769.119 783.374C801.482 782.046 834.665 783.717 867.098 782.914C873.607 782.753 881.268 782.805 887.684 783.511C893.382 784.159 898.975 785.532 904.326 787.597C919.541 793.52 930.429 804.049 936.798 819.072C939.425 825.314 941.075 831.923 941.692 838.667C942.186 843.864 942.165 849.532 942.077 854.779C941.513 888.634 942.996 922.658 941.565 956.46C941.287 963.029 938.415 970.345 935.944 976.325L924.944 965.346C910.057 950.635 886.67 929.381 874.403 912.638C865.902 901.034 877.437 871.168 863.377 858.307C843.385 840.019 817.171 858.526 794.682 847.056C776.344 832.961 755.715 810.175 738.745 793.242C749.511 786.444 756.502 784.618 769.119 783.374Z"/>
-        <path d="M714.733 821.405C726.064 830.507 775.118 879.666 779.078 890.324C782.722 900.13 780.324 910.836 782.251 920.903C789.314 957.801 833.722 932.249 855.023 947.798C867.881 957.184 881.39 974.162 892.732 985.853C897.024 990.277 902.253 994.121 906.234 998.753C907.146 999.813 907.433 1000.78 907.627 1002.14C905.57 1005.28 904.219 1005.04 900.245 1006.69C896.159 1008.29 889.906 1009.72 885.464 1009.83C851.906 1010.69 814.667 1009.54 781.501 1010.09C731.649 1010.92 707.594 983.252 709.99 934.658C711.502 903.989 708.526 869.529 710.335 838.458C710.694 832.292 712.488 827.032 714.733 821.405Z"/>
-      </svg>
-    </div>
-
-    <h1 id="apkFrontTitle" class="apk-front-title">Download Bunkr APK</h1>
-    <p class="apk-front-desc">Get the full native experience built specifically for your device with features not available in browsers.</p>
-
-    <div class="apk-front-perks">
-      <div class="apk-front-perk">
-        <div class="apk-front-perk-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        </div>
-        <div class="apk-front-perk-text">
-          <div class="apk-front-perk-title">Instant 4 PM & Class Alerts</div>
-          <div class="apk-front-perk-sub">Background notifications so you never forget to log attendance.</div>
-        </div>
-      </div>
-
-      <div class="apk-front-perk">
-        <div class="apk-front-perk-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-        </div>
-        <div class="apk-front-perk-text">
-          <div class="apk-front-perk-title">Mark from the notification</div>
-          <div class="apk-front-perk-sub">Present or Absent straight from the class reminder.</div>
-        </div>
-      </div>
-
-      <div class="apk-front-perk">
-        <div class="apk-front-perk-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
-        <div class="apk-front-perk-text">
-          <div class="apk-front-perk-title">Biometric App Lock</div>
-          <div class="apk-front-perk-sub">Keep attendance logs secure with fingerprint or Face Unlock.</div>
-        </div>
-      </div>
-
-      <div class="apk-front-perk">
-        <div class="apk-front-perk-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-        </div>
-        <div class="apk-front-perk-text">
-          <div class="apk-front-perk-title">100% Offline Capability</div>
-          <div class="apk-front-perk-sub">Never get blocked in basements or labs with zero mobile connectivity.</div>
-        </div>
-      </div>
-    </div>
-
+  <div class="apk-front-col">
+    <span class="apk-front-logo" id="apkFrontLogo"></span>
+    <h1 id="apkFrontTitle" class="apk-front-title">There's an Android app.</h1>
+    <p class="apk-front-desc">Same account, same marks. It adds what a browser tab can't do.</p>
+    <ol class="apk-front-line">
+      <li style="--i:0"><b>Reminders at 4 PM and for classes</b><span>So you never forget to mark the day.</span></li>
+      <li style="--i:1"><b>Mark from the notification</b><span>Present or Absent, straight from the class reminder.</span></li>
+      <li style="--i:2"><b>Fingerprint lock</b><span>Fingerprint or Face Unlock keeps your attendance yours.</span></li>
+      <li style="--i:3"><b>Works with no signal</b><span>Basements and labs included.</span></li>
+    </ol>
     <div class="apk-front-actions">
       <a href="https://github.com/DkshByte/attendance-tracker/releases/latest/download/bunkr.apk" class="apk-front-btn-download" id="apkFrontDownloadBtn" download>
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        <span>Download Bunkr APK</span>
+        <span class="apk-front-btn-main">Download for Android <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12.6M6.6 11.4 12 16.8l5.4-5.4M5 20.2h14"/></svg></span>
+        <span class="apk-front-btn-note">APK · 7.3 MB</span>
       </a>
-
-      <button type="button" class="apk-front-btn-continue" id="apkFrontContinueWeb">
-        <span>Continue on Web</span>
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
-      </button>
+      <button type="button" class="apk-front-btn-continue" id="apkFrontContinueWeb">Continue on the web</button>
     </div>
-
-    <div class="apk-front-meta">
-      <span>Latest release · ~7 MB</span>
-      <span>•</span>
-      <a href="https://github.com/DkshByte/attendance-tracker/releases/latest" target="_blank" rel="noopener noreferrer">GitHub Release</a>
-    </div>
+    <p class="apk-front-meta">The first time, Android asks you to allow installs from your browser. <a href="https://github.com/DkshByte/attendance-tracker/releases/latest" target="_blank" rel="noopener noreferrer">Release notes on GitHub</a></p>
   </div>
 </div>
 
@@ -3093,7 +2807,7 @@ input[type="date"] { padding:12px 14px; }
   </section>
 
   <footer class="app-footer">
-    <span>made with <span class="heart" aria-hidden="true">♥</span> by <a href="https://github.com/DkshByte" target="_blank" rel="noopener noreferrer">daksh sharma</a></span>
+    <span>made with <svg class="heart" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M12 20.3 4.7 13.2a4.6 4.6 0 0 1 0-6.6 4.7 4.7 0 0 1 6.6 0l.7.7.7-.7a4.7 4.7 0 0 1 6.6 0 4.6 4.6 0 0 1 0 6.6z"/></svg> by <a href="https://github.com/DkshByte" target="_blank" rel="noopener noreferrer">daksh sharma</a></span>
     <span class="build-stamp" id="buildStamp"></span>
     <button class="link build-refresh" id="buildRefresh" type="button" hidden>Check for update</button>
   </footer>
@@ -3153,28 +2867,40 @@ input[type="date"] { padding:12px 14px; }
 
     <div class="gate-views">
 
-    <!-- ---------- one field: a name finds your card, an email signs you in ---------- -->
-    <div id="vLogin" class="gate-view">
-      <h1 id="ofTitle">Get on the line</h1>
-      <div class="sub" id="ofSub">Type your name to find your card, or your email to sign in.</div>
-      <div class="of">
-        <label for="liEmail">Your name or email</label>
-        <div class="of-box">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.4 15.4 4.8 4.8"/></svg>
-          <input id="liEmail" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Your full name, or email" enterkeyhint="next">
-          <span class="of-mode" id="ofMode"></span>
+    <!-- ---------- sign in: for someone whose card is already theirs ---------- -->
+    <form id="vLogin" class="gate-view" name="signin" novalidate>
+      <h1>Back on the line</h1>
+      <div class="sub">Sign in with the email you used for your card.</div>
+      <div class="field">
+        <label for="liEmail">Email</label>
+        <input id="liEmail" name="email" type="email" inputmode="email" autocomplete="username" required aria-describedby="liHint" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="you@gmail.com" enterkeyhint="next">
+      </div>
+      <div class="field">
+        <label for="liPass">Password</label>
+        <div class="pw">
+          <input id="liPass" name="password" type="password" autocomplete="current-password" required aria-describedby="liHint" enterkeyhint="go">
+          <button class="pw-see" id="liSee" type="button" aria-label="Show password" aria-controls="liPass">Show</button>
         </div>
       </div>
       <div class="hint" id="liHint" role="status" aria-live="polite"></div>
+      <button class="go" id="liGo" type="submit">Sign in</button>
+      <div class="authlinks"><button class="link" type="button" data-goto="forgot">Forgot password?</button><button class="link" type="button" data-goto="join">New here? Find your card</button></div>
+      <div class="gsign" hidden><div class="gor">or</div><button class="gbtn" type="button" data-google><svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continue with Google</span></button></div>
+      <p class="legal">By continuing you agree to the <a href="https://www.bunkr.website/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="https://www.bunkr.website/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>
+    </form>
 
-      <div class="of-pass" id="ofPass" hidden>
-        <div class="field">
-          <label for="liPass">Password</label>
-          <input id="liPass" type="password" autocomplete="current-password" placeholder="••••••••" enterkeyhint="go">
+    <!-- ---------- join: a name finds your card on the roster ---------- -->
+    <div id="vJoin" class="gate-view" hidden>
+      <h1 id="ofTitle">Get on the line</h1>
+      <div class="sub" id="ofSub">Type your name to find your card.</div>
+      <div class="of">
+        <label for="pkName">Your name</label>
+        <div class="of-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.4 15.4 4.8 4.8"/></svg>
+          <input id="pkName" type="text" autocomplete="name" autocapitalize="words" autocorrect="off" spellcheck="false" placeholder="Your full name" enterkeyhint="search">
         </div>
-        <button class="go" id="liGo" type="button">Sign in</button>
-        <div class="authlinks"><button class="link" type="button" data-goto="forgot">Forgot password?</button></div>
       </div>
+      <div class="hint" id="pkHint" role="status" aria-live="polite"></div>
 
       <div class="of-results" id="ofResults" hidden>
         <div class="pcount" id="pkCount" role="status" aria-live="polite"></div>
@@ -3185,64 +2911,65 @@ input[type="date"] { padding:12px 14px; }
         <div class="gsign" hidden><button class="gbtn" type="button" data-google><svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continue with Google</span></button></div>
       </div>
       <p class="legal">By continuing you agree to the <a href="https://www.bunkr.website/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="https://www.bunkr.website/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>
+      <div class="authlinks" id="pkSwitch"><button class="link" type="button" data-goto="login">I have an account</button></div>
     </div>
 
     <!-- ---------- claim: the card is found, make it yours ---------- -->
-    <div id="vClaim" class="gate-view" hidden>
+    <form id="vClaim" class="gate-view" name="claim" novalidate hidden>
       <h1>This card is yours</h1>
       <div class="sub">Pick a username for it. Once you claim it, nobody else can take this name.</div>
       <div class="field">
         <label for="clUser">Username</label>
-        <input id="clUser" type="text" maxlength="16" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="riya" enterkeyhint="next">
+        <input id="clUser" name="handle" type="text" autocomplete="nickname" required aria-describedby="clUserHint" maxlength="16" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="riya" enterkeyhint="next">
         <div class="hint" id="clUserHint">3–16 characters: lowercase letters, numbers, underscore.</div>
       </div>
       <div class="field" data-account>
         <label for="clEmail">Email</label>
-        <input id="clEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com" enterkeyhint="next">
-        <div class="hint">Only used to sign in and reset your password. Never shown to your section.</div>
+        <input id="clEmail" name="email" type="email" autocomplete="email" required aria-describedby="clEmailHint" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com" enterkeyhint="next">
+        <div class="hint" id="clEmailHint">Only used to sign in and reset your password. Never shown to your section.</div>
       </div>
       <div class="field" data-account>
         <label for="clPass">Password</label>
-        <input id="clPass" type="password" autocomplete="new-password" placeholder="at least 8 characters" enterkeyhint="go">
+        <input id="clPass" name="new-password" type="password" autocomplete="new-password" required aria-describedby="clHint" placeholder="at least 8 characters" enterkeyhint="go">
         <div class="hint" id="clHint" role="status" aria-live="polite"></div>
       </div>
       <div class="hint" id="clHint2" role="status" aria-live="polite" hidden></div>
-      <button class="go" id="clGo" type="button" disabled>Claim my card</button>
+      <button class="go" id="clGo" type="submit">Claim my card</button>
       <p class="legal">By claiming a name you agree to the <a href="https://www.bunkr.website/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="https://www.bunkr.website/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</p>
       <div class="authlinks">
         <button class="link" type="button" data-goto="pick">Not you? Find another name</button>
       </div>
-    </div>
+    </form>
 
     <!-- ---------- the link in the reset email lands here ---------- -->
-    <div id="vReset" class="gate-view" hidden>
+    <form id="vReset" class="gate-view" name="reset" novalidate hidden>
       <h1>Set a new password</h1>
       <div class="sub">You came in from the link in your email. Pick a new password and you're straight back on.</div>
       <div class="field">
         <label for="rsPass">New password</label>
-        <input id="rsPass" type="password" autocomplete="new-password" placeholder="at least 8 characters" enterkeyhint="go">
+        <input id="rsPass" name="new-password" type="password" autocomplete="new-password" required aria-describedby="rsHint" placeholder="at least 8 characters" enterkeyhint="go">
         <div class="hint" id="rsHint" role="status" aria-live="polite"></div>
       </div>
-      <button class="go" id="rsGo" type="button">Save and sign in</button>
+      <button class="go" id="rsGo" type="submit">Save and sign in</button>
       <div class="authlinks">
         <button class="link" type="button" data-goto="login">Back to sign in</button>
       </div>
-    </div>
+    </form>
 
     <!-- ---------- forgot ---------- -->
-    <div id="vForgot" class="gate-view" hidden>
+    <form id="vForgot" class="gate-view" name="forgot" novalidate hidden>
       <h1>Reset your password</h1>
       <div class="sub">We'll email you a link. Use the address you signed up with.</div>
       <div class="field">
         <label for="fgEmail">Email</label>
-        <input id="fgEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com" enterkeyhint="go">
+        <input id="fgEmail" name="email" type="email" autocomplete="email" required aria-describedby="fgHint" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com" enterkeyhint="go">
         <div class="hint" id="fgHint" role="status" aria-live="polite"></div>
       </div>
-      <button class="go" id="fgGo" type="button">Email me a reset link</button>
+      <button class="go" id="fgGo" type="submit">Email me a reset link</button>
       <div class="authlinks">
         <button class="link" type="button" data-goto="login">Back to sign in</button>
       </div>
-    </div>
+    </form>
 
     <!-- ---------- conflict: this card is in use on another device ---------- -->
     <div id="vConflict" class="gate-view" hidden>
@@ -7566,8 +7293,9 @@ function recoveryFromHash() {
 let recovery = null;
 
 let picked = null;
-/* "pick" is the same one field as sign-in, opened for an account that is signed in but has no name */
-const VIEWS = { login:"vLogin", pick:"vLogin", claim:"vClaim", forgot:"vForgot", reset:"vReset", conflict:"vConflict" };
+/* "login" is email and password. "join" is the name search for a new student; "pick" is that
+   same search, opened for an account that is signed in but has no name yet */
+const VIEWS = { login:"vLogin", join:"vJoin", pick:"vJoin", claim:"vClaim", forgot:"vForgot", reset:"vReset", conflict:"vConflict" };
 let gateMode = "login";
 
 /* an overlay that covers the app has to take it out of the tab order too, or the
@@ -7585,9 +7313,17 @@ function gateShow(view) {
   gate.dataset.view = view;
   const target = VIEWS[view];
   new Set(Object.values(VIEWS)).forEach(id => { document.getElementById(id).hidden = id !== target; });
-  if (view === "login" || view === "pick") {
-    if (view === "pick") document.getElementById("liEmail").value = "";
-    oneField();
+  if (view === "login") {
+    /* an email typed where a name was asked for comes along to where it belongs */
+    const typed = document.getElementById("pkName");
+    if (typed.value.includes("@")) { document.getElementById("liEmail").value = typed.value.trim(); typed.value = ""; }
+    seePass(false);
+    signInCard();
+  }
+  if (view === "join" || view === "pick") {
+    if (view === "pick") document.getElementById("pkName").value = "";
+    say("pkHint", "");
+    joinField();
     if (!roster.length || Date.now() - rosterAt > 60000) loadRoster();
   }
   if (view === "claim") {
@@ -7605,12 +7341,16 @@ function gateShow(view) {
   /* On a phone the keyboard covers the CTA and hides the copy the student has not
      read yet. On a desktop the focus is a convenience, so keep it there. (Under the
      reel the form is not drawn, so this quietly does nothing and the reel keeps it.) */
-  const first = document.querySelector("#" + target + " input");
+  const first = view === "login" && document.getElementById("liEmail").value ? document.getElementById("liPass")
+    : document.querySelector("#" + target + " input");
   if (first && !NATIVE) setTimeout(() => first.focus({ preventScroll: true }), 60);
 }
 function gateClose() {
   reelGate.hideNow();
   document.getElementById("gate").hidden = true;
+  /* the forms are gone and the page has "moved on": the two things a browser's password
+     manager waits for before it offers to save what was just typed */
+  if (!NATIVE) try { history.replaceState(history.state, "", location.href); } catch (e) {}
   document.body.style.overflow = "";
   behind(false);
 }
@@ -7626,15 +7366,14 @@ const reelGate = (() => {
   const gate = document.getElementById("gate"), rw = document.getElementById("reelWelcome");
   const stage = document.getElementById("reelStage"), form = gate.querySelector(".gate-in");
   const go = document.getElementById("reelGo"), have = document.getElementById("reelHave");
-  const back = document.getElementById("reelBack"), sub = document.getElementById("ofSub");
+  const back = document.getElementById("reelBack");
   const logo = document.getElementById("reelLogo"), mark = gate.querySelector(".gate-logo");
   if (logo && mark && !logo.firstChild) logo.appendChild(mark.cloneNode(true));
   const rm = window.matchMedia ? matchMedia("(prefers-reduced-motion: reduce)") : null;
   const still = () => !!(rm && rm.matches);
   const signedOut = () => !(sess && sess.access_token);
-  const ASK = "Type the email you signed up with, then your password.";
   let r = null, broken = false, raf = 0, t0 = 0, played = 0, up = false, held = false;
-  let focusDue = false, wasCovered = false, gone = 0, subWas = null;
+  let focusDue = false, wasCovered = false, gone = 0;
 
   const usable = () => !broken && !!(window.BunkrReel && typeof BunkrReel.mount === "function");
   function mount() {
@@ -7741,12 +7480,10 @@ const reelGate = (() => {
       else paintStatusBar();
     } catch (e) {}
   }
-  function restoreSub() {
-    if (subWas !== null && sub.textContent === ASK) sub.textContent = subWas;
-    subWas = null;
-  }
+  /* the two pages the reel can stand in front of */
+  const underReel = () => gateMode === "login" || gateMode === "join";
   function paintBack() {
-    back.hidden = (up && !rw.classList.contains("out")) || !usable() || gateMode !== "login" || !signedOut();
+    back.hidden = (up && !rw.classList.contains("out")) || !usable() || !underReel() || !signedOut();
   }
 
   function show(animate) {
@@ -7766,20 +7503,21 @@ const reelGate = (() => {
     up = true; played = 0; focusDue = true;
     held = still();
     seek(held ? r.poster : 0);
-    restoreSub(); statusBar(true); paintBack();
+    statusBar(true); paintBack();
     sync();
     return true;
   }
-  /* into the sign-in view: the reel keeps playing while it folds away, then stops */
-  function leave(email) {
+  /* into the page that button asked for, "join" or "login": the reel keeps playing while
+     it folds away, then stops */
+  function leave(view) {
     if (!up || rw.classList.contains("out")) return;
     clearTimeout(gone);
+    gateShow(view);
     rw.classList.add("out");
     gate.removeAttribute("data-reel");             /* the form is drawn again, so its own entrance replays */
     form.inert = false;
     gate.scrollTop = 0;
-    if (email) { subWas = sub.textContent; sub.textContent = ASK; }
-    document.getElementById("liEmail").focus({ preventScroll: true });
+    document.querySelector("#" + VIEWS[view] + " input").focus({ preventScroll: true });
     statusBar(false); paintBack();
     gone = setTimeout(() => {
       rw.hidden = true; rw.classList.remove("out");
@@ -7792,7 +7530,7 @@ const reelGate = (() => {
     up = false; focusDue = false;
     rw.hidden = true; rw.classList.remove("out");
     gate.removeAttribute("data-reel"); form.inert = false;
-    stop(); restoreSub();
+    stop();
     if (was) statusBar(false);
   }
   /* gateShow calls this. The reel greets a signed-out visitor when the gate opens on
@@ -7800,7 +7538,7 @@ const reelGate = (() => {
      link, a sign-out from another phone), goes straight to the form. The callers set
      that message right after gateShow returns, so look once they have. */
   function onGate(view, opening) {
-    if (view !== "login") hideNow();
+    if (view !== "login" && view !== "join") hideNow();
     paintBack();
     if (view !== "login" || !opening || !signedOut()) return;
     queueMicrotask(() => {
@@ -7809,10 +7547,10 @@ const reelGate = (() => {
     });
   }
 
-  go.addEventListener("click", () => leave(false));
-  have.addEventListener("click", () => leave(true));
+  go.addEventListener("click", () => leave("join"));
+  have.addEventListener("click", () => leave("login"));
   back.addEventListener("click", () => show(true));
-  rw.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); leave(false); } });
+  rw.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); leave(gateMode === "join" ? "join" : "login"); } });
   document.addEventListener("visibilitychange", sync);
   if (rm) {
     const again = () => { held = false; sync(); };
@@ -7842,7 +7580,7 @@ const reelGate = (() => {
   return {
     onGate, hideNow,
     /* Android's back key on the sign-in form goes back to the reel, then out */
-    back: () => !up && !document.getElementById("gate").hidden && gateMode === "login" && signedOut() && show(true),
+    back: () => !up && !document.getElementById("gate").hidden && underReel() && signedOut() && show(true),
   };
 })();
 /* ---------- /reel player ---------- */
@@ -7871,7 +7609,7 @@ async function loadRoster() {
 }
 const signedPick = () => gateMode === "pick" && !!(sess && sess.access_token) && !profile;
 function drawRoster() {
-  const q = document.getElementById("liEmail").value.trim().toLowerCase();
+  const q = document.getElementById("pkName").value.trim().toLowerCase();
   const box = document.getElementById("pkList"), count = document.getElementById("pkCount");
   if (q.includes("@")) return;
   box.textContent = ""; unbusy(box);
@@ -7905,8 +7643,7 @@ function drawRoster() {
     b.addEventListener("click", () => {
       if (r.claimed) {
         previewCard(r);
-        say("liHint", r.name.split(" ")[0] + " is already on Bunkr. If that's you, type your email to sign in.");
-        document.getElementById("liEmail").focus();
+        say("pkHint", r.name.split(" ")[0] + " is already on Bunkr. If that's you, tap I have an account.");
         return;
       }
       picked = r;
@@ -7938,25 +7675,30 @@ function previewCard(r) {
 }
 const tcBlank = () => tcSet({ state: "blank", name: "Your name", user: "@you", no: "––", batch: "––", status: "Not issued", line: "", stamp: "" });
 
-/* One field: an @ means sign in, anything else is a name on the roster. */
-function oneField() {
-  const input = document.getElementById("liEmail");
-  const v = input.value.trim(), pickOnly = signedPick();
+/* The name field: what is typed is looked up on the roster. An email does not belong
+   here, so it is pointed at sign-in, and Enter takes it there. */
+function joinField() {
+  const v = document.getElementById("pkName").value.trim(), pickOnly = signedPick();
   const email = !pickOnly && v.includes("@");
   const name = !email && (v.length >= 1 || pickOnly);
-  document.getElementById("ofPass").hidden = !email;
   document.getElementById("ofResults").hidden = !name;
   document.getElementById("ofStart").hidden = !!v || pickOnly;
-  document.getElementById("ofMode").textContent = email ? "Sign in" : v ? "Name" : "";
+  document.getElementById("pkSwitch").hidden = pickOnly;
   document.getElementById("gate").toggleAttribute("data-typing", !!v || pickOnly);
   document.getElementById("ofTitle").textContent = pickOnly ? "Now find your name" : "Get on the line";
   document.getElementById("ofSub").textContent = pickOnly
     ? "You're signed in. Type your name to claim your card."
-    : "Type your name to find your card, or your email to sign in.";
-  input.placeholder = pickOnly ? "Your full name" : "Your full name, or email";
-  if (email) tcSet({ state: "returning", name: "Welcome back", user: v, no: "––", batch: "––", status: "Tap in", line: "phy", stamp: "" });
-  else if (name) drawRoster();
-  else tcBlank();
+    : "Type your name to find your card.";
+  if (email) say("pkHint", "That's an email. Tap I have an account to sign in with it.");
+  if (name) drawRoster(); else tcBlank();
+}
+/* The sign-in page prints the email on the card as it is typed; on a phone the card
+   steps back once there is something in either field, as it does for the name search. */
+function signInCard() {
+  const email = document.getElementById("liEmail").value.trim();
+  document.getElementById("gate").toggleAttribute("data-typing", !!email || !!document.getElementById("liPass").value);
+  tcSet({ state: "returning", name: "Welcome back", user: email || "@you",
+          no: "––", batch: "––", status: "Tap in", line: "phy", stamp: "" });
 }
 
 const LINE_KEYS = Object.keys(LINES);
@@ -8161,7 +7903,7 @@ function renderBunk() {
   const state = g.lost.length ? "bad" : tight.left > 3 ? "ok" : "warn";
   head.appendChild(el("div", "bk-big " + state, String(tight.left)));
   head.appendChild(el("div", "bk-cap", (tight.left === 1 ? "class" : "classes") + " you can skip in "
-    + SUB[tight.k].short + ", your tightest subject — " + g.left + " across all subjects if spread as listed"));
+    + SUB[tight.k].short + ", your tightest subject. " + g.left + " across all subjects if spread as listed."));
   box.appendChild(head);
 
   /* the one number the old headline got wrong is worth naming, not hiding */
@@ -9986,9 +9728,15 @@ if (NATIVE && Capacitor.Plugins.App) {
   App.addListener("pause", () => { if (locked && profile) showLock(true); });
 }
 
-/* ---------- auth wiring ---------- */
+/* ---------- auth wiring ----------
+   Sign in, claim, reset and forgot are each a real <form>, so a password manager can tell
+   them apart and Enter in any field presses that form's own button. The button's click
+   does the work; the submit that follows has nowhere to go. */
+document.getElementById("gate").addEventListener("submit", e => e.preventDefault());
 document.querySelectorAll("[data-goto]").forEach(b =>
   b.addEventListener("click", () => gateShow(b.dataset.goto)));
+/* an error names its field: marked for a screen reader, outlined, and given the cursor */
+const fieldBad = (input, hint, msg) => { input.setAttribute("aria-invalid", "true"); say(hint, msg, true); input.focus(); };
 
 const busy = (btn, txt) => { btn.disabled = true; btn.setAttribute("aria-busy", "true"); btn.dataset.was = btn.textContent; btn.textContent = txt; };
 const idle = btn => { btn.disabled = false; btn.removeAttribute("aria-busy"); btn.textContent = btn.dataset.was || btn.textContent; };
@@ -10034,10 +9782,11 @@ function holdOff(btn, what) {
 
 const liGo = document.getElementById("liGo");
 liGo.addEventListener("click", async () => {
-  const email = document.getElementById("liEmail").value.trim();
-  const pass = document.getElementById("liPass").value;
+  const liEmail = document.getElementById("liEmail"), liPass = document.getElementById("liPass");
+  const email = liEmail.value.trim(), pass = liPass.value;
   if (holdOff(liGo, "in")) return;
-  if (!email || !pass) return say("liHint", "Enter your email and password.", true);
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fieldBad(liEmail, "liHint", email ? "That doesn't look like an email address." : "Enter your email.");
+  if (!pass) return fieldBad(liPass, "liHint", "Enter your password.");
   say("liHint", ""); busy(liGo, "Signing in…");
   try {
     await signIn(email, pass);
@@ -10048,6 +9797,7 @@ liGo.addEventListener("click", async () => {
     if (err.status) failed("in");
     const [what, fix] = explain(err);
     say("liHint", what + " — " + fix, true);
+    if (err.status === 400) [liEmail, liPass].forEach(i => i.setAttribute("aria-invalid", "true"));
   } finally { idle(liGo); holdOff(liGo, "in"); }
 });
 
@@ -10070,7 +9820,6 @@ async function enterAccount() {
   await welcome(profile);
   gateClose(); afterSignIn();
 }
-document.getElementById("liPass").addEventListener("keydown", e => { if (e.key === "Enter") liGo.click(); });
 
 /* ---------- Sign in with Google ----------
    A plain redirect to Google's own page, not Google's embedded script: nothing loads
@@ -10151,21 +9900,33 @@ if (GOOGLE_CLIENT_ID && (!NATIVE || nativeGoogle())) {
   document.querySelectorAll(".gsign").forEach(n => { n.hidden = false; });
   document.querySelectorAll("[data-google]").forEach(b => b.addEventListener("click", () => {
     b.disabled = true;
+    const hint = gateMode === "login" ? "liHint" : "pkHint";   /* said on the page the button was tapped on */
     if (NATIVE) {
-      say("liHint", "");
-      googleNative().catch(err => say("liHint", nativeGoogleError(err), true)).finally(() => { b.disabled = false; });
+      say(hint, "");
+      googleNative().catch(err => say(hint, nativeGoogleError(err), true)).finally(() => { b.disabled = false; });
     } else {
-      googleStart().catch(() => { b.disabled = false; say("liHint", "Couldn't start Google sign-in on this browser.", true); });
+      googleStart().catch(() => { b.disabled = false; say(hint, "Couldn't start Google sign-in on this browser.", true); });
     }
   }));
 }
 
-document.getElementById("liEmail").addEventListener("input", () => { say("liHint", ""); oneField(); });
-document.getElementById("liEmail").addEventListener("keydown", e => {
+["liEmail", "liPass"].forEach(id => document.getElementById(id).addEventListener("input", e => {
+  e.target.removeAttribute("aria-invalid");
+  if (id === "liEmail") say("liHint", "");
+  signInCard();
+}));
+function seePass(show) {
+  const see = document.getElementById("liSee");
+  document.getElementById("liPass").type = show ? "text" : "password";
+  see.textContent = show ? "Hide" : "Show";
+  see.setAttribute("aria-label", show ? "Hide password" : "Show password");
+}
+document.getElementById("liSee").addEventListener("click", () => seePass(document.getElementById("liPass").type === "password"));
+document.getElementById("pkName").addEventListener("input", () => { say("pkHint", ""); joinField(); });
+document.getElementById("pkName").addEventListener("keydown", e => {
   if (e.key !== "Enter") return;
   e.preventDefault();
-  const v = e.target.value.trim();
-  if (v.includes("@") && !signedPick()) return document.getElementById("liPass").focus();
+  if (e.target.value.includes("@") && !signedPick()) return gateShow("login");
   const first = document.querySelector("#pkList .pname:not(.taken)");
   if (first) first.click();
 });
@@ -10197,12 +9958,15 @@ function claimCheck() {
   say("clUserHint", !u ? "3–16 characters: lowercase letters, numbers, underscore."
       : okU ? "Looks good." : "3–16 characters: lowercase letters, numbers, underscore only.", !!u && !okU);
   say("clHint", clPass.value && !okP ? "At least " + MIN_PASS + " characters." : "", !!clPass.value && !okP);
-  clGo.disabled = !(okU && okE && okP && picked);
-  return { u, e: clEmail.value.trim(), p: clPass.value, ok: okU && okE && okP && !!picked };
+  return { u, e: clEmail.value.trim(), p: clPass.value, ok: okU && okE && okP && !!picked, okU, okE, okP };
 }
-[clUser, clEmail, clPass].forEach(i => i.addEventListener("input", claimCheck));
+[clUser, clEmail, clPass].forEach(i => i.addEventListener("input", () => { i.removeAttribute("aria-invalid"); claimCheck(); }));
+clEmail.addEventListener("input", () => say("clEmailHint", "Only used to sign in and reset your password. Never shown to your section."));
 clGo.addEventListener("click", async () => {
-  const { u, e, p, ok } = claimCheck();
+  const { u, e, p, ok, okU, okE, okP } = claimCheck();
+  if (!okU) return fieldBad(clUser, "clUserHint", "Pick a username first: 3–16 lowercase letters, numbers or underscore.");
+  if (!okE) return fieldBad(clEmail, "clEmailHint", e ? "That doesn't look like an email address." : "Enter your email.");
+  if (!okP) return fieldBad(clPass, "clHint", "Use at least " + MIN_PASS + " characters for the password.");
   if (!ok) return;
   busy(clGo, "Claiming…");
   try {
@@ -10228,7 +9992,7 @@ const fgGo = document.getElementById("fgGo");
 fgGo.addEventListener("click", async () => {
   const email = document.getElementById("fgEmail").value.trim();
   if (holdOff(fgGo, "mail")) return;
-  if (!email) return say("fgHint", "Enter the email you signed up with.", true);
+  if (!email) return fieldBad(document.getElementById("fgEmail"), "fgHint", "Enter the email you signed up with.");
   busy(fgGo, "Sending…");
   try {
     /* The link always lands on the live web app: the email is opened in a browser even
@@ -10243,14 +10007,14 @@ fgGo.addEventListener("click", async () => {
     say("fgHint", what + " — " + fix, true);
   } finally { idle(fgGo); holdOff(fgGo, "mail"); }
 });
-document.getElementById("fgEmail").addEventListener("keydown", e => { if (e.key === "Enter") fgGo.click(); });
+document.getElementById("fgEmail").addEventListener("input", e => e.target.removeAttribute("aria-invalid"));
 
 /* The recovery token is a real session, so once the password is changed there is no
    reason to ask for it again — save it and walk straight in. */
 const rsGo = document.getElementById("rsGo");
 rsGo.addEventListener("click", async () => {
   const pass = document.getElementById("rsPass").value;
-  if (pass.length < MIN_PASS) return say("rsHint", "At least " + MIN_PASS + " characters.", true);
+  if (pass.length < MIN_PASS) return fieldBad(document.getElementById("rsPass"), "rsHint", "At least " + MIN_PASS + " characters.");
   if (!recovery || !recovery.tok) return say("rsHint", "That link has expired. Ask for a new one.", true);
   say("rsHint", ""); busy(rsGo, "Saving…");
   try {
@@ -10270,7 +10034,7 @@ rsGo.addEventListener("click", async () => {
     say("rsHint", what + " — " + fix, true);
   } finally { idle(rsGo); }
 });
-document.getElementById("rsPass").addEventListener("keydown", e => { if (e.key === "Enter") rsGo.click(); });
+document.getElementById("rsPass").addEventListener("input", e => e.target.removeAttribute("aria-invalid"));
 
 /* Kick other device and claim this one */
 const cfKick = document.getElementById("cfKick");
@@ -10992,9 +10756,9 @@ try {
 /* ============================================================
    Bunkr Splash Animation Lifecycle & Web Interstitial
    - Splash animates on launch (pop emblem, expand wordmark)
-   - On web browsers: shows full-page native APK download front after splash
-   - On native app (Capacitor): completely suppressed and removed
-   - Continue on web button smoothly dismisses interstitial
+   - On an Android browser: the Android offer follows the splash, once
+   - In the native app and on every other browser: it is removed, never shown
+   - "Continue on the web" dismisses it for good (as does choosing the web on the landing page)
    ============================================================ */
 (function initBunkrSplashAndWebInterstitial() {
   const splash = document.getElementById("bunkr-splash");
@@ -11003,13 +10767,17 @@ try {
 
   const isNativeApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 
-  // If running inside native Android app: NEVER show the front prompt, remove immediately!
-  if (isNativeApp && apkFront) {
+  /* An APK is only any use to a phone that can install one. The native app has it
+     already, and a laptop or an iPhone cannot run it, so none of them is ever asked. */
+  const canInstall = !isNativeApp && /Android/i.test(navigator.userAgent);
+  if (!canInstall && apkFront) {
     try { apkFront.remove(); } catch (e) { apkFront.style.display = "none"; }
   }
+  const frontLogo = document.getElementById("apkFrontLogo"), gateMark = document.querySelector("#gate .gate-logo");
+  if (canInstall && frontLogo && gateMark) frontLogo.appendChild(gateMark.cloneNode(true));
 
   const showApkFront = () => {
-    if (isNativeApp || !apkFront) return;
+    if (!canInstall || !apkFront) return;
     try {
       if (localStorage.getItem("bunkr_dismiss_apk_prompt") === "1") {
         try { apkFront.remove(); } catch (e) { apkFront.style.display = "none"; }

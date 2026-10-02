@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#EEF1F7" media="(prefers-color-scheme: light)">
 <title>Bunkr · What's next, and can you skip it</title>
 <meta name="description" content="Bunkr shows the class you're in, what's next, and does the 75% attendance maths per subject, so you know exactly how many classes you can still miss. On the web and Android.">
 <meta property="og:type" content="website">
@@ -24,6 +25,8 @@
 <link rel="stylesheet" href="fonts/fonts.css">
 <link rel="stylesheet" href="landing-styles.css">
 <script>document.documentElement.classList.add("js")</script>
+<!-- the app's theme switch writes this key; reading it here keeps the site and the app on one theme -->
+<script>try { var t = localStorage.getItem("adgips-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
@@ -72,7 +75,7 @@
         <span class="ln"><span>What's next?</span></span>
         <span class="ln"><span>Can I skip&nbsp;it?</span></span>
       </h1>
-      <p class="lede">Bunkr turns your timetable into a live line and does the 75% attendance maths for every subject, so you always know the class you're in and how many you can still miss.</p>
+      <p class="lede">Your timetable as a live line, and the 75% attendance maths for every subject. Know how many you can miss.</p>
 
       <div class="doors">
         <a class="btn btn-ink" href="app.html">
@@ -81,7 +84,7 @@
         </a>
         <a class="btn btn-red" href="https://github.com/DkshByte/attendance-tracker/releases/latest/download/bunkr.apk">
           <span class="btn-main">Download for Android <svg aria-hidden="true"><use href="#i-down"/></svg></span>
-          <span class="btn-note">APK · 7.4 MB</span>
+          <span class="btn-note">APK · 7.3 MB</span>
         </a>
       </div>
     </div>
@@ -162,7 +165,7 @@
 
     <header class="scene-head">
       <h2 id="h-maths" class="headline">Then you sit down and decide.</h2>
-      <p class="lede">You need 75% in every subject, not 75% overall. A spare class in one subject can't cover a missed one in another. Bunkr counts each subject against every class left in the term, and tells you the consequence, not just the number.</p>
+      <p class="lede">You need 75% in every subject, not 75% overall. Bunkr counts each one against the classes left and tells you what a skip costs.</p>
     </header>
 
     <div class="calc-wrap">
@@ -246,7 +249,7 @@
         <p>Install once. It updates itself when a new version ships, keeps working with no signal, and reminds you to mark the day.</p>
         <a class="btn btn-red" href="https://github.com/DkshByte/attendance-tracker/releases/latest/download/bunkr.apk">
           <span class="btn-main">Download for Android <svg aria-hidden="true"><use href="#i-down"/></svg></span>
-          <span class="btn-note">APK · 7.4 MB</span>
+          <span class="btn-note">APK · 7.3 MB</span>
         </a>
         <p class="way-note">Coming to Google Play soon. Until then the APK is the same app, and the first time Android asks you to allow installs from your browser.</p>
       </div>
@@ -257,7 +260,7 @@
 <footer class="foot">
   <a class="foot-logo" href="landing.html" aria-label="Bunkr home"><svg><use href="#logo"/></svg></a>
   <nav class="foot-links" aria-label="Legal"><a href="privacy.html">Privacy</a><a href="privacy.html#cookies">Cookies</a><a href="terms.html">Terms</a><a href="privacy.html#delete">Delete account</a></nav>
-  <p>Made by <a href="https://github.com/DkshByte">Daksh Sharma</a> · <a href="https://github.com/DkshByte/attendance-tracker">Source on GitHub</a> · Demo data on this page</p>
+  <p>Made by <a href="https://github.com/DkshByte">Daksh Sharma</a>. <a href="https://github.com/DkshByte/attendance-tracker">Source on GitHub</a>. Demo data on this page.</p>
 </footer>
 
 <script src="landing-main.js"></script>

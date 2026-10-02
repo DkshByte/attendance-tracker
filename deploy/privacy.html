@@ -3,8 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#EEF1F7" media="(prefers-color-scheme: light)">
+<script>try { var t = localStorage.getItem("adgips-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <title>Privacy Policy · Bunkr</title>
 <meta name="description" content="What Bunkr collects, why, who can see it, how long it is kept, cookies and on-device storage, and how to delete your account.">
 <meta property="og:type" content="website">
