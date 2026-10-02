@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.4+59a00aa-->
+<!--secf-app--><!--build:1.1.4+b496383-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -1240,25 +1240,22 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
       --focus:#4E96FF;
       position:fixed; inset:0; z-index:5; display:flex; flex-direction:column; justify-content:flex-end;
       background-color:#000; color:var(--rw-ink); overflow:hidden; transition:background-color .45s var(--ease); }
-.rw-frame { position:absolute; inset:0; overflow:hidden; background:#000; transform-origin:50% 24%;
+/* the frame is painted in the reel's own ground, not pure black, so the band a tall
+   phone leaves above the reel has no seam against it */
+.rw-frame { position:absolute; inset:0; overflow:hidden; background:#090B09; transform-origin:50% 24%; container-type:size;
             transition:transform .6s var(--sp-card), opacity .42s var(--ease), border-radius .5s var(--ease); }
-/* the reel's box: it mounts into this, reads its size, and covers it */
-.rw-stage { position:absolute; inset:0; overflow:hidden; isolation:isolate; pointer-events:none; }
-/* the rendered reel, when the network can afford it. It lands exactly where the code reel
-   draws (width-fit, a third of the spare height above it), so the hand-over is invisible */
-/* blurred background fill: covers the full frame so no black bars on any aspect ratio */
-.rw-video-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 35%;
-               filter:blur(28px) brightness(.45) saturate(1.2); transform:scale(1.15);
-               opacity:0; transition:opacity .3s var(--ease); pointer-events:none; }
-.rw-frame.vid .rw-video-bg { opacity:1; }
-.rw-video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 35%;
-            opacity:0; transition:opacity .3s var(--ease); pointer-events:none;
-            -webkit-mask-image:linear-gradient(to bottom, transparent, black 15%, black 85%, transparent),
-                               linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-            -webkit-mask-composite:destination-in;
-            mask-image:linear-gradient(to bottom, transparent, black 15%, black 85%, transparent),
-                       linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-            mask-composite:intersect; }
+/* the reel's box: one 9:16 rectangle as wide as the frame. The code reel mounts into it
+   and the rendered video fills it, so the two cannot land in different places and the
+   hand-over is invisible on every screen. A phone taller than 9:16 gets it a third of
+   the spare height down, under the clock and clear of the sign-in panel. A shorter one
+   (an older phone, any phone with browser bars, a small tablet) pins it to the top and
+   lets the tapes run off the bottom, behind the panel, rather than shrinking the reel
+   between two bars. Without container units it falls back to the whole frame. */
+.rw-stage, .rw-video { position:absolute; left:0; top:0; top:max(0px, (100cqh - 100cqw * 16 / 9) * .35);
+                       width:100%; height:100%; height:calc(100cqw * 16 / 9); pointer-events:none; }
+.rw-stage { overflow:hidden; isolation:isolate; }
+/* the rendered reel, when the network can afford it */
+.rw-video { object-fit:contain; object-position:50% 35%; opacity:0; transition:opacity .3s var(--ease); }
 .rw-frame.vid .rw-video { opacity:1; }
 .rw-sound { position:absolute; z-index:2; top:calc(14px + max(env(safe-area-inset-top), var(--sa-top))); right:14px;
             display:inline-flex; align-items:center; gap:7px; min-height:44px; padding:0 14px 0 11px; border-radius:999px;
@@ -1291,6 +1288,22 @@ section { scroll-margin-top:calc(var(--top-h, 57px) + 14px); }
   .rw-have:hover { background:var(--rw-sec-hover); }
 }
 .rw-go:active, .rw-have:active { transform:scale(.97); }
+/* a frame too small for the pill's words keeps the icon; the button still names itself */
+@container (max-width:260px) {
+  .rw-sound { top:8px; right:8px; width:44px; padding:0; justify-content:center; }
+  .rw-sound span { display:none; }
+}
+/* a screen squatter than about 9:16.7 (an older phone, a phone with browser bars, a small
+   tablet) lands the panel on the reel's own words. There the scrim closes before the logo,
+   so the two never tangle, and the copy tightens so more of the reel stays above it. */
+@media (min-aspect-ratio:27/50) and (orientation:portrait) and (max-width:899.98px) {
+  .rw-panel { padding-top:80px;
+              background:linear-gradient(to top, rgba(0,0,0,.96) 0, rgba(0,0,0,.96) calc(100% - 80px), rgba(0,0,0,.88) calc(100% - 62px),
+                                         rgba(0,0,0,.66) calc(100% - 40px), rgba(0,0,0,.3) calc(100% - 18px), rgba(0,0,0,0) 100%); }
+  .rw-pitch { margin:10px 0 16px; font-size:17px; }
+  .rw-go, .rw-have { min-height:50px; }
+  .rw-acts { gap:8px; }
+}
 /* leaving: the reel folds up toward where the card lands, and only then fades, while
    the sign-in view rises in around it. Coming back runs the same curve in reverse,
    minus the wait. */
@@ -3091,7 +3104,7 @@ input[type="date"] { padding:12px 14px; }
        Shown when the gate opens on sign-in for someone signed out. The reel mounts
        into #reelStage; its code lives between the reel:start and reel:end markers. -->
   <div class="rw" id="reelWelcome" role="region" aria-labelledby="rwHead" hidden>
-    <div class="rw-frame"><div class="rw-stage" id="reelStage" aria-hidden="true"></div><video class="rw-video-bg" id="reelVideoBg" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><video class="rw-video" id="reelVideo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><button class="rw-sound" id="reelSound" type="button" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.2v13.6l-4.8-4.3H4z"/><path class="on" d="M15.6 8.6a4.6 4.6 0 0 1 0 6.8M18.2 6a8.3 8.3 0 0 1 0 12"/><path class="off" d="M16 9.4l5 5.2M21 9.4l-5 5.2"/></svg><span>Tap for sound</span></button></div>
+    <div class="rw-frame"><div class="rw-stage" id="reelStage" aria-hidden="true"></div><video class="rw-video" id="reelVideo" muted playsinline loop preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><button class="rw-sound" id="reelSound" type="button" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.2L12 5.2v13.6l-4.8-4.3H4z"/><path class="on" d="M15.6 8.6a4.6 4.6 0 0 1 0 6.8M18.2 6a8.3 8.3 0 0 1 0 12"/><path class="off" d="M16 9.4l5 5.2M21 9.4l-5 5.2"/></svg><span>Tap for sound</span></button></div>
     <p class="sr" id="reelDesc">Behind this screen a short muted animation loops: an attendance of 74.9%, then Bunkr shows the next class, how many classes you can still miss, the best day to bunk and the mid-sem countdown.</p>
     <div class="rw-panel">
       <div class="rw-copy">
@@ -7648,19 +7661,18 @@ const reelGate = (() => {
      it can play through, it takes over at the same moment of the loop. Data Saver, 2G,
      offline, a copy opened from disk and reduced motion never download it, and anything
      that goes wrong (too slow, autoplay refused, a 404) leaves the code reel playing. */
-  const video = document.getElementById("reelVideo"), videoBg = document.getElementById("reelVideoBg"), snd = document.getElementById("reelSound");
+  const video = document.getElementById("reelVideo"), snd = document.getElementById("reelSound");
   const frame = rw.querySelector(".rw-frame");
   const REEL_V = "v1";                           /* bump with new files: they are cached for a year */
   const reelSrc = q => (NATIVE ? "https://www.bunkr.website/" : "") + "reel/bunkr-reel-" + q + "-" + REEL_V + ".mp4";
   function reelQuality() {
     if (still() || navigator.onLine === false || location.protocol === "file:") return null;
     const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    if (!c) return "1080";
-    if (c.saveData) return null;
-    const et = String(c.effectiveType || "4g");
-    if (et === "slow-2g" || et === "2g") return null;
-    if (et === "3g" || (c.downlink && c.downlink < 3)) return "720";
-    return "1080";
+    const et = String((c && c.effectiveType) || "4g");
+    if (c && (c.saveData || et === "slow-2g" || et === "2g")) return null;
+    if (et === "3g" || (c && c.downlink && c.downlink < 3)) return "720";
+    /* 720p already outruns a frame under 800 device pixels wide: a 360px phone at 2x, the framed reel on a desk */
+    return frame.clientWidth * (window.devicePixelRatio || 1) < 800 ? "720" : "1080";
   }
   let vq, vready = false, vlive = false, vwait = 0;
   function vload() {
@@ -7670,10 +7682,6 @@ const reelGate = (() => {
     video.preload = "auto";
     video.src = reelSrc(vq);
     try { video.load(); } catch (e) {}
-    videoBg.preload = "auto";
-    videoBg.src = reelSrc(vq);
-    videoBg.defaultMuted = true; videoBg.muted = true;
-    try { videoBg.load(); } catch (e) {}
     vwait = setTimeout(vdrop, 12000);
   }
   function vdrop() {
@@ -7682,18 +7690,15 @@ const reelGate = (() => {
     frame.classList.remove("vid"); snd.hidden = true;
     video.pause(); video.removeAttribute("src");
     try { video.load(); } catch (e) {}
-    videoBg.pause(); videoBg.removeAttribute("src");
-    try { videoBg.load(); } catch (e) {}
     sync();
   }
   function vplay() {
     if (!video.paused) return;
-    if (!vlive) try { video.currentTime = (played + .06) % r.duration; videoBg.currentTime = video.currentTime; } catch (e) {}
+    if (!vlive) try { video.currentTime = (played + .06) % r.duration; } catch (e) {}
     const pr = video.play();
     if (pr && pr.catch) pr.catch(() => { if (vlive) played = video.currentTime; vdrop(); });
-    try { videoBg.play(); } catch (e) {}
   }
-  const vpause = () => { if (!video.paused) video.pause(); if (!videoBg.paused) videoBg.pause(); };
+  const vpause = () => { if (!video.paused) video.pause(); };
   video.addEventListener("canplaythrough", () => { clearTimeout(vwait); if (vq && !vready) { vready = true; sync(); } });
   video.addEventListener("playing", () => { vlive = true; frame.classList.add("vid"); snd.hidden = false; stop(); });
   video.addEventListener("pause", () => { if (vlive) played = video.currentTime; });
@@ -7750,7 +7755,7 @@ const reelGate = (() => {
     rw.hidden = false;                             /* before mounting: the reel reads the stage's size */
     if (!mount()) { rw.hidden = true; paintBack(); return false; }
     vload();
-    if (vlive) try { video.currentTime = 0; videoBg.currentTime = 0; } catch (e) {}
+    if (vlive) try { video.currentTime = 0; } catch (e) {}
     rw.classList.remove("out");
     form.inert = true;
     if (animate && !still()) {
