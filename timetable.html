@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.4+7e2999d-->
+<!--secf-app--><!--build:1.1.4+e7cee54-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -840,6 +840,13 @@ button.task-due-banner { width:100%; font:inherit; font-size:13px; font-weight:6
 .build-stamp { font-size:11px; color:var(--ink-3); opacity:.55; font-variant-numeric:tabular-nums; }
 .build-refresh { font-size:11px; color:var(--ink-3); opacity:.55; }
 .build-refresh:hover { opacity:1; color:var(--ink); }
+/* the maker's pill: his portfolio, one tap away, at the foot of every screen */
+.made-pill { display:inline-flex; border-radius:999px; text-decoration:none !important; transition:transform .18s var(--ease), filter .18s var(--ease); }
+.made-pill img { display:block; width:135px; height:auto; }
+.made-pill:hover { transform:translateY(-1px); filter:brightness(1.06); }
+.made-pill:active { transform:scale(.97); }
+.made-pill:focus-visible { outline:2px solid var(--ink-2); outline-offset:3px; }
+.app-footer { flex-wrap:wrap; gap:8px 12px; }
 .app-footer .heart, .gate-foot .heart {
   color: #ff3b30;
   display: inline-block;
@@ -2817,7 +2824,7 @@ input[type="date"] { padding:12px 14px; }
   </section>
 
   <footer class="app-footer">
-    <span>made with <svg class="heart" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M12 20.3 4.7 13.2a4.6 4.6 0 0 1 0-6.6 4.7 4.7 0 0 1 6.6 0l.7.7.7-.7a4.7 4.7 0 0 1 6.6 0 4.6 4.6 0 0 1 0 6.6z"/></svg> by <a href="https://github.com/DkshByte" target="_blank" rel="noopener noreferrer">daksh sharma</a></span>
+    <a class="made-pill" href="https://dkshbyte.com" target="_blank" rel="noopener noreferrer" title="dkshbyte.com"><img src="made-by-daksh-pill.svg" width="135" height="34" decoding="async" alt="Made by Daksh — dkshbyte.com"></a>
     <span class="build-stamp" id="buildStamp"></span>
     <button class="link build-refresh" id="buildRefresh" type="button" hidden>Check for update</button>
   </footer>
@@ -3006,7 +3013,7 @@ input[type="date"] { padding:12px 14px; }
 
     <div class="gate-foot">
       <button class="link rw-back" id="reelBack" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.9" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 5.3v5.4L10.9 8z" fill="currentColor"/></svg>watch the reel</button>
-      <span>made with <svg class="heart" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M12 20.3 4.7 13.2a4.6 4.6 0 0 1 0-6.6 4.7 4.7 0 0 1 6.6 0l.7.7.7-.7a4.7 4.7 0 0 1 6.6 0 4.6 4.6 0 0 1 0 6.6z"/></svg> by <a href="https://github.com/DkshByte" target="_blank" rel="noopener noreferrer">daksh sharma</a></span>
+      <a class="made-pill" href="https://dkshbyte.com" target="_blank" rel="noopener noreferrer" title="dkshbyte.com"><img src="made-by-daksh-pill.svg" width="135" height="34" decoding="async" alt="Made by Daksh — dkshbyte.com"></a>
     </div>
 
   </div>
@@ -4155,7 +4162,7 @@ function todayCard(s, key, iso, ii, dayIdx) {
   /* A class that has not started cannot have been attended, so it offers no marks.
      One that is over and still unmarked says so; one that is marked steps back. */
   const now = nowMin();
-  if (!tracked(key) || now < s.from || gazettedOn(iso) || isCancelled(iso, s.i)) return f;
+  if (!tracked(key) || now < s.from || closedOn(iso) || isCancelled(iso, s.i)) return f;
   if (now >= s.to) {
     if (att[iso + "|" + ii]) card.classList.add("done");
     else card.querySelector(".hd").appendChild(el("span", "badge due", "Not marked"));
@@ -4189,13 +4196,19 @@ function renderToday() {
 
   /* only the real today is markable — the Sunday view is next week's, not yet attended */
   const iso = isoOf(new Date());
-  const order = new Map();
-  DAYS[dayIdx].items.forEach((it, ii) => order.set(it.i, ii));
   const rail = document.getElementById("todayRail");
-  renderRail(rail, dayIdx, {
-    live, mark: live,
-    build: live ? (s, key) => todayCard(s, key, iso, order.get(s.i), dayIdx) : null,
-  });
+  if (examOn(iso)) {
+    document.getElementById("todayHead").textContent = "For the exam hall";
+    rail.textContent = ""; rail.style.paddingLeft = "0";
+    rail.appendChild(examDetails(iso));
+  } else {
+    const order = new Map();
+    DAYS[dayIdx].items.forEach((it, ii) => order.set(it.i, ii));
+    renderRail(rail, dayIdx, {
+      live, mark: live,
+      build: live ? (s, key) => todayCard(s, key, iso, order.get(s.i), dayIdx) : null,
+    });
+  }
 
   /* the line draws itself once, on the first paint of the session */
   if (!booted) {
@@ -4227,9 +4240,11 @@ function renderPlate() {
   const now = nowMin(), di = new Date().getDay() - 1, todayIso = isoOf(new Date());
   const day = di >= 0 && di < 6 ? DAYS[di] : null;
   const hol = gazettedOn(todayIso);
+  /* a mid-sem day: today's paper, or {} on the odd exam-week day without one */
+  const exam = examOn(todayIso) ? (MIDSEM.papers.find(p => p.iso === todayIso) || {}) : null;
 
   let current = null, next = null, nextDay = day;
-  if (day && !hol) {
+  if (day && !hol && !exam) {
     day.items.forEach(item => {
       const span = item.span || 1;
       if (now >= startMin(item.i) && now < endMin(item.i, span)) current = item;
@@ -4237,7 +4252,7 @@ function renderPlate() {
     });
   }
   let nextIso = todayIso;
-  if (!next) {                                     /* nothing left today: roll on to the next day that runs */
+  if (!next && !exam) {                            /* nothing left today: roll on to the next day that runs */
     const t = new Date(); t.setDate(t.getDate() + 1);
     const up = nextRunningDay(isoOf(t));
     if (up) { nextDay = DAYS[up.di]; nextIso = up.iso;
@@ -4250,7 +4265,22 @@ function renderPlate() {
   const shortDay = new Date().toLocaleDateString("en-IN", { weekday:"short", day:"numeric", month:"short" });
   plate.appendChild(row);
 
-  if (hol) {
+  if (exam) {
+    const k = exam.k, st = k ? paperState(exam, todayIso, now) : null;
+    plate.dataset.line = lineOf(k);
+    row.appendChild(el("span", "badge", !st ? "Mid-sems" : st.s === "now" ? "Paper on" : st.s === "done" ? "Paper done" : "Paper today"));
+    if (st && st.s === "now") { when.appendChild(el("b", null, String(st.left))); when.appendChild(document.createTextNode(" min left")); }
+    else when.textContent = st && st.s === "today" ? "in " + hm(st.left) : shortDay;
+    plate.appendChild(el("h1", null, k ? SUB[k].name : "Mid-sem week"));
+    plate.appendChild(el("div", "who", k ? SUB[k].code + " · " + MID_HOURS + " · Units I–II" : "No paper today, and no classes."));
+    if (st && st.s === "now") {
+      const g = el("div", "gauge"), track = el("div", "track"), fill = el("i");
+      fill.style.width = Math.round((now - MIDSEM.start) / (MIDSEM.end - MIDSEM.start) * 100) + "%";
+      track.appendChild(fill); g.appendChild(track);
+      g.appendChild(el("span", null, "till 11:30"));
+      plate.appendChild(g);
+    }
+  } else if (hol) {
     plate.dataset.line = "";
     row.appendChild(el("span", "badge", "Closed"));
     when.textContent = shortDay;
@@ -4740,6 +4770,9 @@ function buildHolidays() {
 }
 buildHolidays();
 const gazettedOn = iso => (HOLIDAYS[iso] || []).filter(h => h.gaz)[0];
+/* Mid-sem week sits papers, not classes: nothing to attend, mark, count or be reminded of */
+const examOn = iso => iso >= MIDSEM.from && iso <= MIDSEM.to;
+const closedOn = iso => gazettedOn(iso) || examOn(iso);
 
 /* Restricted on paper, shut in practice. The university order only fixes the gazetted
    closures; the institute decides the rest, and these are the ones it usually takes.
@@ -5187,7 +5220,7 @@ function classDays(fromIso, toIso) {
     const di = d.getDay() - 1;
     if (di < 0 || di > 5 || !DAYS[di].items.length) continue;
     const iso = isoOf(d);
-    if (gazettedOn(iso)) continue;
+    if (closedOn(iso)) continue;
     out.push({ iso, di });
   }
   return out;
@@ -5398,7 +5431,7 @@ function markDay(iso, di, mk) {
 let bulkUndo = null;                                /* { iso, ids } of the last fill */
 function fillable(iso) {
   const di = fromISO(iso).getDay() - 1;
-  if (iso > nowISO() || di < 0 || di > 5 || !DAYS[di] || !DAYS[di].items.length || gazettedOn(iso)) return [];
+  if (iso > nowISO() || di < 0 || di > 5 || !DAYS[di] || !DAYS[di].items.length || closedOn(iso)) return [];
   const today = iso === nowISO(), now = nowMin();
   return DAYS[di].items
     .map((it, ii) => ({ it, id: iso + "|" + ii, k: resolve(it) }))
@@ -5476,6 +5509,14 @@ function renderAttendance() {
     const e = el("div", "empty");
     e.appendChild(el("b", null, gaz.n));
     e.appendChild(document.createTextNode("Institute closed. Nothing to mark."));
+    rail.appendChild(e);
+  } else if (examOn(iso)) {
+    note.appendChild(el("b", null, " · mid-sems"));
+    rail.textContent = ""; rail.style.paddingLeft = "0";
+    const e = el("div", "empty");
+    const p = MIDSEM.papers.find(x => x.iso === iso);
+    e.appendChild(el("b", null, p ? SUB[p.k].short + " paper" : "Mid-sem week"));
+    e.appendChild(document.createTextNode("No classes during mid-sems. Nothing to mark."));
     rail.appendChild(e);
   } else if (!day || !day.items.length) {
     rail.textContent = ""; rail.style.paddingLeft = "0";
@@ -5805,7 +5846,7 @@ function daysOffLeft(room, from, skip) {
 }
 function freeDay(iso) {
   const d = fromISO(iso), di = d.getDay() - 1;
-  if (di < 0 || di > 5 || !DAYS[di].items.length || gazettedOn(iso)) return true;
+  if (di < 0 || di > 5 || !DAYS[di].items.length || closedOn(iso)) return true;
   return DAYS[di].items.every(it => isCancelled(iso, it.i));
 }
 function bestDays(fromIso, span) {
@@ -6328,7 +6369,7 @@ function renderEODNotice() {
   const iso = nowISO();
   const d = fromISO(iso);
   const di = d.getDay() - 1;
-  if (di < 0 || di > 5 || !DAYS[di] || !DAYS[di].items.length || gazettedOn(iso)) return;
+  if (di < 0 || di > 5 || !DAYS[di] || !DAYS[di].items.length || closedOn(iso)) return;
 
   // After 3:30 PM (930 minutes from midnight)
   if (nowMin() < 930) return;
@@ -9035,6 +9076,45 @@ function enrolRow() {
   return row;
 }
 
+/* Today, on a mid-sem day: no classes to mark, just what the hall asks of you —
+   your enrolment number for the answer sheet, who you are, the paper, the next one. */
+function examDetails(iso) {
+  const f = document.createDocumentFragment();
+  const me = enrolRow();
+  if (me) f.appendChild(me);
+  const rows = el("div", "d-rows");
+  const row = (a, b) => { const r = el("div", "d-row"); r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b)); rows.appendChild(r); };
+  if (profile) {
+    row("Name", profile.name);
+    row("Class no.", "#" + profile.sno + " · Batch " + profile.batch);
+  }
+  row("Course", "B.Tech IT · Semester 1");
+  const p = MIDSEM.papers.find(x => x.iso === iso);
+  if (p) {
+    row("Paper", SUB[p.k].short + " · " + SUB[p.k].code);
+    row("Time", MID_HOURS + " · be in by 9:45");
+    row("Covers", "Units I and II");
+  }
+  const nx = MIDSEM.papers.find(x => x.iso > iso);
+  row("Next paper", nx ? SUB[nx.k].short + " · " + paperDay(nx.iso) : "None, this is the last");
+  f.appendChild(rows);
+  const back = nextRunningDay(iso);
+  f.appendChild(el("div", "d-note", "No classes in mid-sem week, so there's no attendance to mark."
+    + (back ? " Classes pick up again on " + paperDay(back.iso) + "." : "")));
+  const act = el("div", "d-act");
+  const ds = el("button", "btn", "Date sheet");
+  ds.type = "button"; ds.addEventListener("click", openDatesheet);
+  act.appendChild(ds);
+  const study = p && paperState(p, iso, nowMin()).s !== "done" ? p : nx;
+  if (study) {
+    const ai = el("button", "btn pri", "Study " + SUB[study.k].short);
+    ai.type = "button"; ai.addEventListener("click", () => openAskAI(study.k));
+    act.appendChild(ai);
+  }
+  f.appendChild(act);
+  return f;
+}
+
 /* The date sheet as a sheet: open from Today's pill. Same for everyone; the one
    personal line is your own enrolment number, for the answer sheet. */
 function openDatesheet() {
@@ -9092,7 +9172,7 @@ function classFocus() {
   const d = new Date();
   for (let n = 0; n < 10; n++, d.setDate(d.getDate() + 1)) {
     const iso = isoOf(d), di = d.getDay() - 1;
-    if (di < 0 || di > 5 || gazettedOn(iso)) continue;
+    if (di < 0 || di > 5 || closedOn(iso)) continue;
     for (const it of DAYS[di].items) {
       const span = it.span || 1, from = startMin(it.i), to = endMin(it.i, span);
       if (iso === today && to <= now) continue;             /* already over */
