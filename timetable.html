@@ -1,5 +1,5 @@
 <!doctype html>
-<!--secf-app--><!--build:1.1.4+e7cee54-->
+<!--secf-app--><!--build:1.1.4+526d59d-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -334,6 +334,8 @@ input, textarea, .d-full, .d-row, p { -webkit-user-select:text; user-select:text
 
 /* ============ vertical rail (Today / mobile week) ============ */
 .railwrap { position:relative; margin-top:22px; padding-left:44px; }
+.railwrap.no-rail { padding-left:0 !important; }
+.railwrap.no-rail::before { display:none !important; }
 .railwrap::before {
   content:""; position:absolute; left:20px; top:8px; bottom:8px; width:2px;
   background:var(--rail); border-radius:1px;
@@ -1764,6 +1766,347 @@ dialog .btn { margin-top:8px; }
 .enrol b.none { font-size:16px; letter-spacing:0; color:var(--ink-2); }
 .enrol small { display:block; margin-top:2px; font-size:11.5px; color:var(--ink-3); }
 .enrol .link { flex:none; padding:12px 2px; }
+
+/* ============ Exam Hall Pass (Mid-Sem Days) ============ */
+.exam-hall {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.exam-pass-card {
+  position: relative;
+  background: var(--glass-plate);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: var(--lift), var(--glass-highlight);
+  overflow: hidden;
+}
+
+.exam-pass-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--l-phy) 0%, var(--l-smt) 50%, var(--warn) 100%);
+  opacity: 0.9;
+}
+
+.exam-pass-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.exam-pass-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.exam-pass-tag i {
+  display: inline-block;
+  width: 6.5px;
+  height: 6.5px;
+  border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 8px var(--ok);
+}
+
+.exam-pass-room {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.exam-pass-name {
+  font-family: 'Blinker', sans-serif;
+  font-size: 25px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -.01em;
+}
+
+.exam-pass-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.exam-pass-meta span:not(:last-child)::after {
+  content: "·";
+  margin-left: 8px;
+  color: var(--rule);
+}
+
+.exam-enrol-plate {
+  margin-top: 15px;
+  padding: 13px 16px;
+  background: rgba(0, 0, 0, 0.44);
+  border: 1px solid var(--rule-soft);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: border-color .18s var(--ease), background .18s var(--ease);
+}
+.exam-enrol-plate:hover {
+  border-color: var(--rule);
+  background: rgba(0, 0, 0, 0.56);
+}
+
+.exam-enrol-plate .enrol-details {
+  min-width: 0;
+  flex: 1;
+}
+
+.exam-enrol-plate .enrol-lbl {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 3px;
+}
+
+.exam-enrol-plate .enrol-num {
+  font-family: 'Blinker', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  line-height: 1.1;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.exam-enrol-plate .enrol-num.none {
+  font-size: 15px;
+  letter-spacing: 0;
+  color: var(--ink-2);
+}
+
+.exam-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px;
+  border-radius: 9px;
+  border: 1px solid var(--rule);
+  background: var(--plate-3);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .18s var(--ease);
+  white-space: nowrap;
+}
+.exam-copy-btn:hover {
+  background: var(--rule);
+  transform: translateY(-1px);
+}
+.exam-copy-btn:active {
+  transform: scale(.96);
+}
+.exam-copy-btn.copied {
+  background: color-mix(in srgb, var(--ok) 20%, var(--plate-3));
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.exam-enrol-caption {
+  margin-top: 7px;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.exam-paper-hero {
+  position: relative;
+  background: var(--glass-plate);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid color-mix(in srgb, var(--line, var(--glass-border)) 45%, var(--glass-border));
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: var(--lift), var(--glass-highlight);
+  overflow: hidden;
+}
+
+.exam-paper-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.exam-paper-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exam-paper-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--line, var(--ink));
+  color: var(--badge-ink, #000);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.exam-paper-code {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+  letter-spacing: .04em;
+}
+
+.exam-paper-when {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.exam-paper-name {
+  font-family: 'Blinker', sans-serif;
+  font-size: 23px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+.exam-paper-specs {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.exam-paper-specs b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.exam-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.exam-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+  background: var(--plate-2);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .18s var(--ease);
+  text-align: center;
+}
+.exam-btn:hover {
+  background: var(--plate-3);
+  border-color: var(--ink-3);
+}
+.exam-btn:active {
+  transform: scale(.98);
+}
+
+.exam-btn.pri {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+  font-weight: 700;
+}
+.exam-btn.pri:hover {
+  filter: brightness(.92);
+}
+
+.exam-next-bar {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.exam-next-bar .lbl {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.exam-next-bar .val {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.exam-quiet-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--plate) 75%, transparent);
+  border: 1px solid var(--rule-soft);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+.exam-quiet-note svg {
+  flex: none;
+  color: var(--ink-3);
+}
+
 #midBox { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
 #midBox:empty { display:none; }
 #midBox .mid-pill { margin-top:0; }
@@ -4198,10 +4541,13 @@ function renderToday() {
   const iso = isoOf(new Date());
   const rail = document.getElementById("todayRail");
   if (examOn(iso)) {
-    document.getElementById("todayHead").textContent = "For the exam hall";
-    rail.textContent = ""; rail.style.paddingLeft = "0";
+    document.getElementById("todayHead").textContent = "Exam Hall Pass";
+    rail.textContent = "";
+    rail.classList.add("no-rail");
     rail.appendChild(examDetails(iso));
   } else {
+    rail.classList.remove("no-rail");
+    rail.style.paddingLeft = "";
     const order = new Map();
     DAYS[dayIdx].items.forEach((it, ii) => order.set(it.i, ii));
     renderRail(rail, dayIdx, {
@@ -9076,42 +9422,137 @@ function enrolRow() {
   return row;
 }
 
-/* Today, on a mid-sem day: no classes to mark, just what the hall asks of you —
-   your enrolment number for the answer sheet, who you are, the paper, the next one. */
+/* Today, on a mid-sem day: crafted exam hall pass with student identity,
+   enrolment number for the answer sheet, paper status, and quick AI revision */
 function examDetails(iso) {
   const f = document.createDocumentFragment();
-  const me = enrolRow();
-  if (me) f.appendChild(me);
-  const rows = el("div", "d-rows");
-  const row = (a, b) => { const r = el("div", "d-row"); r.appendChild(el("span", null, a)); r.appendChild(el("span", null, b)); rows.appendChild(r); };
-  if (profile) {
-    row("Name", profile.name);
-    row("Class no.", "#" + profile.sno + " · Batch " + profile.batch);
+  const wrap = el("div", "exam-hall");
+
+  // --- 1. Student Admit Pass Card ---
+  const passCard = el("div", "exam-pass-card");
+
+  const pHead = el("div", "exam-pass-head");
+  const pTag = el("div", "exam-pass-tag");
+  pTag.appendChild(el("i"));
+  pTag.appendChild(document.createTextNode("Exam Hall Pass"));
+  pHead.appendChild(pTag);
+
+  const pRoom = el("div", "exam-pass-room", "Room 2311 · Sec F");
+  pHead.appendChild(pRoom);
+  passCard.appendChild(pHead);
+
+  const nm = (profile && profile.name) || "Student";
+  const sno = profile ? "#" + profile.sno : "Sec F";
+  const batch = profile ? "Batch " + profile.batch : "IT-1";
+
+  const who = el("div", "exam-pass-who");
+  who.appendChild(el("div", "exam-pass-name", nm));
+
+  const meta = el("div", "exam-pass-meta");
+  meta.appendChild(el("span", null, sno));
+  meta.appendChild(el("span", null, batch));
+  meta.appendChild(el("span", null, "B.Tech IT (Sem 1)"));
+  who.appendChild(meta);
+  passCard.appendChild(who);
+
+  // Dedicated Enrolment Plate
+  const enPlate = el("div", "exam-enrol-plate");
+  const dBox = el("div", "enrol-details");
+  dBox.appendChild(el("span", "enrol-lbl", "Enrolment No. (For Answer Sheet)"));
+
+  const enNum = (profile && profile.enrolment) || null;
+  const numEl = el("div", "enrol-num" + (enNum ? "" : " none"), enNum || (profile ? "Not on list yet" : "Sign in to view enrolment"));
+  dBox.appendChild(numEl);
+  enPlate.appendChild(dBox);
+
+  if (enNum) {
+    const copyBtn = el("button", "exam-copy-btn");
+    copyBtn.type = "button";
+    copyBtn.setAttribute("aria-label", "Copy your enrolment number");
+    copyBtn.innerHTML = `<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M3.5 10.5h-1a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v1"/></svg><span>Copy</span>`;
+    copyBtn.addEventListener("click", () => {
+      copyText(enNum).then(ok => {
+        if (typeof buzz === "function") buzz("tick");
+        copyBtn.classList.add("copied");
+        copyBtn.innerHTML = `<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg><span>Copied!</span>`;
+        setTimeout(() => {
+          copyBtn.classList.remove("copied");
+          copyBtn.innerHTML = `<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M3.5 10.5h-1a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v1"/></svg><span>Copy</span>`;
+        }, 2000);
+      });
+    });
+    enPlate.appendChild(copyBtn);
   }
-  row("Course", "B.Tech IT · Semester 1");
+  passCard.appendChild(enPlate);
+
+  const cap = el("div", "exam-enrol-caption", enNum ? "🔒 Visible only to you · Write carefully on your answer booklet" : "Tell your CR if your enrolment number is missing.");
+  passCard.appendChild(cap);
+  wrap.appendChild(passCard);
+
+  // --- 2. Today's Paper Hero Card ---
   const p = MIDSEM.papers.find(x => x.iso === iso);
   if (p) {
-    row("Paper", SUB[p.k].short + " · " + SUB[p.k].code);
-    row("Time", MID_HOURS + " · be in by 9:45");
-    row("Covers", "Units I and II");
+    const s = SUB[p.k];
+    const st = paperState(p, iso, nowMin());
+    const paperCard = el("div", "exam-paper-hero");
+    paperCard.dataset.line = s.line;
+
+    const top = el("div", "exam-paper-top");
+    const tags = el("div", "exam-paper-tags");
+    tags.appendChild(el("span", "exam-paper-badge", st.s === "now" ? "Paper in session" : st.s === "done" ? "Paper completed" : "Today's Paper"));
+    tags.appendChild(el("span", "exam-paper-code", s.code));
+    top.appendChild(tags);
+
+    const when = el("span", "exam-paper-when", MID_HOURS);
+    top.appendChild(when);
+    paperCard.appendChild(top);
+
+    const title = el("div", "exam-paper-name", s.name);
+    paperCard.appendChild(title);
+
+    const specs = el("div", "exam-paper-specs");
+    const cov = el("span", null, "Syllabus: "); cov.appendChild(el("b", null, "Units I & II"));
+    const timeReq = el("span", null, "Reporting: "); timeReq.appendChild(el("b", null, "Be seated by 9:45 AM"));
+    specs.appendChild(cov);
+    specs.appendChild(timeReq);
+    paperCard.appendChild(specs);
+
+    const acts = el("div", "exam-actions");
+
+    const aiBtn = el("button", "exam-btn pri");
+    aiBtn.type = "button";
+    aiBtn.innerHTML = `<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 0a8 8 0 0 1 .6 3.6A7.4 7.4 0 0 0 12.4 7.4 8 8 0 0 1 16 8a8 8 0 0 1-3.6.6 7.4 7.4 0 0 0-3.8 3.8A8 8 0 0 1 8 16a8 8 0 0 1-.6-3.6 7.4 7.4 0 0 0-3.8-3.8A8 8 0 0 1 0 8a8 8 0 0 1 3.6-.6 7.4 7.4 0 0 0 3.8-3.8A8 8 0 0 1 8 0z"/></svg><span>Study ${s.short} with AI</span>`;
+    aiBtn.addEventListener("click", () => openAskAI(p.k));
+    acts.appendChild(aiBtn);
+
+    const dsBtn = el("button", "exam-btn");
+    dsBtn.type = "button";
+    dsBtn.innerHTML = `<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 7h12M5 1.5v3M11 1.5v3"/></svg><span>Date Sheet</span>`;
+    dsBtn.addEventListener("click", openDatesheet);
+    acts.appendChild(dsBtn);
+
+    paperCard.appendChild(acts);
+
+    const nx = MIDSEM.papers.find(x => x.iso > iso);
+    if (nx) {
+      const nxBar = el("div", "exam-next-bar");
+      nxBar.appendChild(el("span", "lbl", "Next Paper"));
+      const nxVal = el("span", "val", SUB[nx.k].short + " · " + paperDay(nx.iso));
+      nxBar.appendChild(nxVal);
+      paperCard.appendChild(nxBar);
+    }
+
+    wrap.appendChild(paperCard);
   }
-  const nx = MIDSEM.papers.find(x => x.iso > iso);
-  row("Next paper", nx ? SUB[nx.k].short + " · " + paperDay(nx.iso) : "None, this is the last");
-  f.appendChild(rows);
+
+  // --- 3. Quiet attendance suspension note ---
+  const note = el("div", "exam-quiet-note");
   const back = nextRunningDay(iso);
-  f.appendChild(el("div", "d-note", "No classes in mid-sem week, so there's no attendance to mark."
-    + (back ? " Classes pick up again on " + paperDay(back.iso) + "." : "")));
-  const act = el("div", "d-act");
-  const ds = el("button", "btn", "Date sheet");
-  ds.type = "button"; ds.addEventListener("click", openDatesheet);
-  act.appendChild(ds);
-  const study = p && paperState(p, iso, nowMin()).s !== "done" ? p : nx;
-  if (study) {
-    const ai = el("button", "btn pri", "Study " + SUB[study.k].short);
-    ai.type = "button"; ai.addEventListener("click", () => openAskAI(study.k));
-    act.appendChild(ai);
-  }
-  f.appendChild(act);
+  const backMsg = back ? ` Regular classes & attendance resume <b>${paperDay(back.iso)}</b>.` : "";
+  note.innerHTML = `<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l5 2v4c0 3.5-2.5 6-5 7-2.5-1-5-3.5-5-7v-4l5-2z"/><path d="M6 7.5l1.5 1.5 3-3"/></svg><span>No regular classes during mid-sems (5–10 Oct). Attendance is paused.${backMsg}</span>`;
+  wrap.appendChild(note);
+
+  f.appendChild(wrap);
   return f;
 }
 
